@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('team_name', 50);
             $table->string('team_city', 50);
-            $table->timestamps();
+            // $table->timestamps();
         });
     }
 

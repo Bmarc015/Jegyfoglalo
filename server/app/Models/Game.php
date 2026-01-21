@@ -9,4 +9,5 @@ class Game extends Model
 {
     /** @use HasFactory<\Database\Factories\GameFactory> */
     use HasFactory;
+    public $timestamps = false;
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('sector_number');
             $table->decimal('sector_price', 10,2)->nullable();
 
-            $table->timestamps();
+            // $table->timestamps();
         });
     }
 

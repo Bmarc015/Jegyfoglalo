@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GameController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 //endpoint
-Route::get('/x', function(){
+Route::get('/x', function () {
     return 'API';
 });
 
@@ -21,6 +22,7 @@ Route::get('/x', function(){
 Route::post('users/login', [UserController::class, 'login']);
 Route::post('users/logout', [UserController::class, 'logout']);
 Route::post('users', [UserController::class, 'store']);
+Route::get('students', [GameController::class, 'index']);
 
 //Admin: 
 //minden user lekérdezése
@@ -31,22 +33,25 @@ Route::get('users/{id}', [UserController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');
 //User adatok módosítása      
 Route::patch('users/{id}', [UserController::class, 'update'])
-->middleware('auth:sanctum', 'ability:admin');
+    ->middleware('auth:sanctum', 'ability:admin');
 //User törlés
 Route::delete('users/{id}', [UserController::class, 'destroy'])
-->middleware('auth:sanctum', 'ability:admin');  
+    ->middleware('auth:sanctum', 'ability:admin');
 
 //User self (Amit a user önmagával csinálhat) parancsok
 Route::delete('usersme', [UserController::class, 'destroySelf'])
-->middleware('auth:sanctum', 'ability:usersme:delete');
+    ->middleware('auth:sanctum', 'ability:usersme:delete');
 
 Route::patch('usersme', [UserController::class, 'updateSelf'])
-->middleware('auth:sanctum', 'ability:usersme:patch');
+    ->middleware('auth:sanctum', 'ability:usersme:patch');
 
 Route::patch('usersmeupdatepassword', [UserController::class, 'updatePassword'])
-->middleware('auth:sanctum', 'ability:usersme:updatePassword');
+    ->middleware('auth:sanctum', 'ability:usersme:updatePassword');
 
 Route::get('usersme', [UserController::class, 'indexSelf'])
-    ->middleware('auth:sanctum', 'ability:usersme:get'); 
-//endregion
+    ->middleware('auth:sanctum', 'ability:usersme:get');
 
+
+//Games lekerdezese
+Route::get('games', [GameController::class, 'index']);
+//endregion

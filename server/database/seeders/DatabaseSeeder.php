@@ -16,8 +16,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         //Mielőtt seedelünk, minden táblát töröljünk le.
         DB::statement('DELETE FROM users');
 
@@ -25,7 +23,12 @@ class DatabaseSeeder extends Seeder
 
         //Ami Seeder osztály itt fel van sorolva, annak lefut a run() metódusa
         $this->call([
+            TeamSeeder::class,
+            SectorSeeder::class,
+            SeatSeeder::class,
+            GameSeeder::class,
             UserSeeder::class,
+            TicketSeeder::class,
         ]);
     }
 }

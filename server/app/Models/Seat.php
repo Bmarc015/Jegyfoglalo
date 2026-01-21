@@ -9,4 +9,6 @@ class Seat extends Model
 {
     /** @use HasFactory<\Database\Factories\SeatFactory> */
     use HasFactory;
+
+    public $timestamps = false;
 }

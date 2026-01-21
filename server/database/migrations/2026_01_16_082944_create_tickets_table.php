@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('seat_id')->constrained(table: 'seats')->onDelete('restrict')->nullable();
             $table->string('status');
             $table->unique(['user_id', 'game_id', 'seat_id']);
-            $table->timestamps();
+            // $table->timestamps();
         });
     }
 

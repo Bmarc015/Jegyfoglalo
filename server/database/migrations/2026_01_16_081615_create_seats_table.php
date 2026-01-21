@@ -17,8 +17,8 @@ return new class extends Migration
             $table->integer('seat_number');
             $table->integer('row');
             $table->integer('col');
-            $table->unique(['row', 'col']);
-            $table->timestamps();
+            $table->unique(columns: ['row', 'col']);
+            // $table->timestamps();
         });
     }
 

@@ -1,0 +1,31 @@
+### változók
+@protocol = http://
+@hostname = localhost
+@port = 8000
+@host = {{protocol}}{{hostname}}:{{port}}
+### @token = 12|ibiwTdr77o8ppToh1tBxIkckBNb8ECjIjLgaweTaa757cdef
+
+
+### login
+# @name login
+POST {{host}}/api/users/login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "lakatosronaldo@example.com",
+    "password": "1234"
+}
+
+###
+@token = {{login.response.body.data.token}}
+
+POST  {{host}}/api/users/logout
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### get users
+GET  {{host}}/api/games
+Accept: application/json
+Authorization: Bearer {{token}}

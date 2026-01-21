@@ -13,8 +13,8 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "vasarlo1@example.com",
-    "password": "ronaldo"
+    "email": "lakatosronaldo@example.com",
+    "password": "1234"
 }
 
 ###
@@ -43,9 +43,10 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name":  "Vásárló2",
-    "email": "vasarlo2@example.com",
-    "password": "123"
+    "name":  "Lakatos Ronaldo",
+    "email": "lakatosronaldo@example.com",
+    "password": "1234",
+    "role": "1"
 }
 
 ### patch user

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('team_away_id')->constrained('teams')->onDelete('restrict')->nullable(); 
             $table->dateTime('game_date')->nullable();
             $table->unique(['team_home_id', 'team_away_id', 'game_date']);
-            $table->timestamps();
+            // $table->timestamps();
         });
     }
 
