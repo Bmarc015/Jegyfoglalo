@@ -65,6 +65,9 @@ Route::get('games/{id}', [GameController::class, 'show'])
 
 Route::post('games', [GameController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
+
+Route::delete('games/{id}', [GameController::class, 'destroy'])
+    ->middleware('auth:sanctum', 'ability:admin');
 //Seats 
 Route::get('seats', [SeatController::class, 'index']);
 
@@ -73,6 +76,9 @@ Route::get('seats/{id}', action: [SeatController::class, 'show'])
 
 Route::post('seats', [SeatController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
+
+Route::delete('seats/{id}', [SeatController::class, 'destroy'])
+    ->middleware('auth:sanctum', 'ability:admin');
 //Sectors 
 Route::get('sectors', [SectorController::class, 'index']);
 
@@ -81,6 +87,9 @@ Route::get('sectors/{id}', [SectorController::class, 'show'])
 
 Route::post('sectors', [SectorController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
+
+Route::delete('sectors/{id}', [SectorController::class, 'destroy'])
+    ->middleware('auth:sanctum', 'ability:admin');
 //Teams 
 Route::get('teams', [TeamController::class, 'index']);
 
@@ -91,6 +100,8 @@ Route::get('teams/{id}', [TeamController::class, 'show'])
 Route::post('teams', [TeamController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
 
+Route::delete('teams/{id}', [TeamController::class, 'destroy'])
+    ->middleware('auth:sanctum', 'ability:admin');
 //Tickets 
 Route::get('tickets', [TicketController::class, 'index']);
 
@@ -99,6 +110,9 @@ Route::get('tickets/{id}', [TicketController::class, 'show'])
 
 Route::post('tickets', [TicketController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
+
+Route::delete('tickets/{id}', [TicketController::class, 'destroy'])
+    ->middleware('auth:sanctum', 'ability:admin');
 
 
 //endregion

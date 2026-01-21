@@ -95,4 +95,8 @@ Authorization: Bearer {{token}}
     "status": "paid"
 }
 
-
+### delete game
+DELETE {{host}}/api/sectors/4
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}

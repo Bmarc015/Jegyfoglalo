@@ -105,8 +105,32 @@ class TicketController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Ticket $ticket)
+      public function destroy(int $id)
     {
         //
+            $row = Ticket::find($id);
+        if (!$row) {
+            return response()->json([
+                'message' => "Not_Found id: $id",
+                'data' => null
+            ], 404, options: JSON_UNESCAPED_UNICODE);
+        }
+        try {
+            $row->delete();
+            return response()->json([
+                'message' => 'OK',
+                'data' => ['id' => $id]
+            ], 200, options: JSON_UNESCAPED_UNICODE);
+        } catch (QueryException $e) {
+            // VALÓDI MySQL hibakód
+            $mysqlError = $e->errorInfo[1];
+            if ($mysqlError == 1451) {
+                return response()->json([
+                    'message' => "Delete failed (FK constraint). Id: $id",
+                    'data' => null
+                ], 409, options: JSON_UNESCAPED_UNICODE);
+            }
+            throw $e; // egyéb hibák
+        }
     }
 }
