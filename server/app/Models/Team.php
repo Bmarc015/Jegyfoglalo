@@ -11,4 +11,9 @@ class Team extends Model
     use HasFactory;
         public $timestamps = false;
 
+        protected $fillable = [
+            'team_name',
+            'team_city'
+        ];
+
 }

@@ -56,18 +56,27 @@ Route::get('usersme', [UserController::class, 'indexSelf'])
     ->middleware('auth:sanctum', 'ability:usersme:get');
 
 
-//Games lekerdezese
+//Games 
 Route::get('games', [GameController::class, 'index']);
-//Seats lekerdezese
-Route::get('seats', [SeatController::class, 'index']);
-//Sectors lekerdezese
-Route::get('sectors', [SectorController::class, 'index']);
-//Teams lekerdezese
-Route::get('teams', [TeamController::class, 'index']);
-//Tickets lekerdezese
-Route::get('tickets', [TicketController::class, 'index']);
 
-//Games post
 Route::post('games', [GameController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
+//Seats 
+Route::get('seats', [SeatController::class, 'index']);
+
+Route::post('seats', [SeatController::class, 'store'])
+->middleware('auth:sanctum', 'ability:admin');
+//Sectors 
+Route::get('sectors', [SectorController::class, 'index']);
+//Teams 
+Route::get('teams', [TeamController::class, 'index']);
+
+Route::post('teams', [TeamController::class, 'store'])
+->middleware('auth:sanctum', 'ability:admin');
+
+//Tickets 
+Route::get('tickets', [TicketController::class, 'index']);
+
+
+
 //endregion

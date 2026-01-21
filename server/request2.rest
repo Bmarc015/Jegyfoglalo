@@ -30,14 +30,38 @@ GET  {{host}}/api/tickets
 Accept: application/json
 Authorization: Bearer {{token}}
 
-# ### post games
-# POST {{host}}/api/games 
-# Content-Type: application/json
-# Accept: application/json
-# Authorization: Bearer {{token}}
+### post teams
+POST {{host}}/api/teams 
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
 
-# {
-#     "team_home_id":  "234",
-#     "team_away_id": "6643",
-#     "game_date": "2026. 03. 01. 05:00:00",
-# }
+{
+    "team_name":  "Ujszasz VVSE",
+    "team_city": "Ujszasz"
+}
+
+### post games
+POST {{host}}/api/games 
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "team_home_id":  "4",
+    "team_away_id": "1",
+    "game_date": "2026.03.01. 22:00:00"
+}
+
+### post seats
+POST {{host}}/api/seats 
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "sector_id":  "1",
+    "seat_number": "234",
+    "row": "13",
+    "col": "4"
+}
