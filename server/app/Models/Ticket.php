@@ -11,4 +11,11 @@ class Ticket extends Model
     use HasFactory;
         public $timestamps = false;
 
+        protected $fillable = [
+            'user_id',
+            'game_id',
+            'seat_id',
+            'status'
+        ];
+
 }

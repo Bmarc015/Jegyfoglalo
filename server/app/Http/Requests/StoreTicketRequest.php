@@ -11,7 +11,7 @@ class StoreTicketRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,6 +23,19 @@ class StoreTicketRequest extends FormRequest
     {
         return [
             //
+            'user_id'  => 'required|exists:users,id',
+            'game_id'  => 'required|exists:games,id',
+            'seat_id'  => 'required|exists:seats,id',
+            'status'   => 'required|string|in:paid,cancelled,reserved',
+
         ];
     }
+    public function messages(): array
+{
+    return [
+        'status.in' => 'Invalid ticket status. Allowed values: paid, cancelled, reserved.',
+        'status.required' => 'The ticket status is required.',
+    ];
+}
+
 }

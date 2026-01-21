@@ -30,17 +30,6 @@ GET  {{host}}/api/tickets
 Accept: application/json
 Authorization: Bearer {{token}}
 
-### post teams
-POST {{host}}/api/teams 
-Content-Type: application/json
-Accept: application/json
-Authorization: Bearer {{token}}
-
-{
-    "team_name":  "Ujszasz VVSE",
-    "team_city": "Ujszasz"
-}
-
 ### post games
 POST {{host}}/api/games 
 Content-Type: application/json
@@ -65,3 +54,40 @@ Authorization: Bearer {{token}}
     "row": "13",
     "col": "4"
 }
+
+### post sectors
+POST {{host}}/api/sectors 
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "sector_number":  "302",
+    "sector_price": "12000"
+}
+
+### post teams
+POST {{host}}/api/teams 
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "team_name":  "Ujszasz VVSE",
+    "team_city": "Ujszasz"
+}
+
+### post tickets
+POST {{host}}/api/tickets 
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "user_id":  "3",
+    "game_id": "3",
+    "seat_id": "3",
+    "status": "paid"
+}
+
+

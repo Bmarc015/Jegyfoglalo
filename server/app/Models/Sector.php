@@ -11,4 +11,9 @@ class Sector extends Model
     use HasFactory;
         public $timestamps = false;
 
+        protected $fillable = [
+            'sector_number',
+            'sector_price'
+        ];
+
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\SectorController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
+use App\Models\Sector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -68,6 +69,9 @@ Route::post('seats', [SeatController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
 //Sectors 
 Route::get('sectors', [SectorController::class, 'index']);
+
+Route::post('sectors', [SectorController::class, 'store'])
+->middleware('auth:sanctum', 'ability:admin');
 //Teams 
 Route::get('teams', [TeamController::class, 'index']);
 
@@ -77,6 +81,8 @@ Route::post('teams', [TeamController::class, 'store'])
 //Tickets 
 Route::get('tickets', [TicketController::class, 'index']);
 
+Route::post('tickets', [TicketController::class, 'store'])
+->middleware('auth:sanctum', 'ability:admin');
 
 
 //endregion
