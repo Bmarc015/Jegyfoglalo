@@ -30,6 +30,11 @@ GET  {{host}}/api/tickets
 Accept: application/json
 Authorization: Bearer {{token}}
 
+### get minden by id
+GET  {{host}}/api/teams/2
+Accept: application/json
+Authorization: Bearer {{token}}
+
 ### post games
 POST {{host}}/api/games 
 Content-Type: application/json

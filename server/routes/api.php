@@ -60,26 +60,42 @@ Route::get('usersme', [UserController::class, 'indexSelf'])
 //Games 
 Route::get('games', [GameController::class, 'index']);
 
+Route::get('games/{id}', [GameController::class, 'show'])
+    ->middleware('auth:sanctum', 'ability:admin');
+
 Route::post('games', [GameController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
 //Seats 
 Route::get('seats', [SeatController::class, 'index']);
+
+Route::get('seats/{id}', action: [SeatController::class, 'show'])
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::post('seats', [SeatController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
 //Sectors 
 Route::get('sectors', [SectorController::class, 'index']);
 
+Route::get('sectors/{id}', [SectorController::class, 'show'])
+    ->middleware('auth:sanctum', 'ability:admin');
+
 Route::post('sectors', [SectorController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
 //Teams 
 Route::get('teams', [TeamController::class, 'index']);
+
+
+Route::get('teams/{id}', [TeamController::class, 'show'])
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::post('teams', [TeamController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
 
 //Tickets 
 Route::get('tickets', [TicketController::class, 'index']);
+
+Route::get('tickets/{id}', [TicketController::class, 'show'])
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::post('tickets', [TicketController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');

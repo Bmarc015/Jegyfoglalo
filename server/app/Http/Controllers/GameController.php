@@ -66,10 +66,26 @@ class GameController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Game $game)
+    public function show(int $id)
     {
         //
+         $row = Game::find($id);
+        if ($row) {
+            # code...
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $row
+            ];
+        } else {
+            $status = 404;
+            $data = [
+                'message' => "Not_Found id: $id ",
+                'data' => null
+            ]; 
     }
+    return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+}
 
     /**
      * Update the specified resource in storage.

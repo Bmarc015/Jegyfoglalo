@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Seat;
 use App\Http\Requests\StoreSeatRequest;
 use App\Http\Requests\UpdateSeatRequest;
+use App\Models\Game;
 use Illuminate\Database\QueryException;
 
 class SeatController extends Controller
@@ -69,10 +70,26 @@ class SeatController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Seat $seat)
+      public function show(int $id)
     {
         //
+         $row = Seat::find($id);
+        if ($row) {
+            # code...
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $row
+            ];
+        } else {
+            $status = 404;
+            $data = [
+                'message' => "Not_Found id: $id ",
+                'data' => null
+            ]; 
     }
+    return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+}
 
     /**
      * Update the specified resource in storage.

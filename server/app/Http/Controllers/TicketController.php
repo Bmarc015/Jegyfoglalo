@@ -66,16 +66,33 @@ class TicketController extends Controller
 
             throw $e; // ha más hiba, feldobjuk
         }
+        
     }
 
 
     /**
      * Display the specified resource.
      */
-    public function show(Ticket $ticket)
+    public function show(int $id)
     {
         //
+         $row = Ticket::find($id);
+        if ($row) {
+            # code...
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $row
+            ];
+        } else {
+            $status = 404;
+            $data = [
+                'message' => "Not_Found id: $id ",
+                'data' => null
+            ]; 
     }
+    return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+}
 
     /**
      * Update the specified resource in storage.
