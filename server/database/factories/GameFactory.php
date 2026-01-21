@@ -10,15 +10,20 @@ class GameFactory extends Factory
     public function definition(): array
     {
         $teams = Team::pluck('id')->toArray();
-        $home  = $this->faker->randomElement($teams);
+        $home = $this->faker->randomElement($teams);
         do {
             $away = $this->faker->randomElement($teams);
         } while ($away === $home);
+        $date = $this->faker->dateTimeBetween('+1 week', '+3 months');   
+        $hour = $this->faker->numberBetween(14, 21); 
+        $minuteOptions = [0, 30, 45];
+        $minute = $this->faker->randomElement($minuteOptions);
+        $date->setTime($hour, $minute, 0);
 
         return [
             'team_home_id' => $home,
             'team_away_id' => $away,
-            'game_date' => $this->faker->dateTimeBetween('+1 week', '+3 months'),
+            'game_date'    => $date,
         ];
     }
 }

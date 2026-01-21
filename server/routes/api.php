@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SeatController;
+use App\Http\Controllers\SectorController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -54,4 +58,16 @@ Route::get('usersme', [UserController::class, 'indexSelf'])
 
 //Games lekerdezese
 Route::get('games', [GameController::class, 'index']);
+//Seats lekerdezese
+Route::get('seats', [SeatController::class, 'index']);
+//Sectors lekerdezese
+Route::get('sectors', [SectorController::class, 'index']);
+//Teams lekerdezese
+Route::get('teams', [TeamController::class, 'index']);
+//Tickets lekerdezese
+Route::get('tickets', [TicketController::class, 'index']);
+
+//Games post
+Route::post('games', [GameController::class, 'store'])
+->middleware('auth:sanctum', 'ability:admin');
 //endregion
