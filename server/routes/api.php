@@ -8,6 +8,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 use App\Models\Sector;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +67,9 @@ Route::get('games/{id}', [GameController::class, 'show'])
 Route::post('games', [GameController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
 
+Route::patch('games/{id}', [GameController::class, 'update'])
+    ->middleware('auth:sanctum', 'ability:admin');
+
 Route::delete('games/{id}', [GameController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
 //Seats 
@@ -76,6 +80,9 @@ Route::get('seats/{id}', action: [SeatController::class, 'show'])
 
 Route::post('seats', [SeatController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
+
+Route::patch('seats/{id}', [SeatController::class, 'update'])
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::delete('seats/{id}', [SeatController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
@@ -88,17 +95,22 @@ Route::get('sectors/{id}', [SectorController::class, 'show'])
 Route::post('sectors', [SectorController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
 
+Route::patch('sectors/{id}', [SectorController::class, 'update'])
+    ->middleware('auth:sanctum', 'ability:admin');
+
 Route::delete('sectors/{id}', [SectorController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
 //Teams 
 Route::get('teams', [TeamController::class, 'index']);
-
 
 Route::get('teams/{id}', [TeamController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::post('teams', [TeamController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
+
+Route::patch('teams/{id}', [TeamController::class, 'update'])
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::delete('teams/{id}', [TeamController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
@@ -110,6 +122,9 @@ Route::get('tickets/{id}', [TicketController::class, 'show'])
 
 Route::post('tickets', [TicketController::class, 'store'])
 ->middleware('auth:sanctum', 'ability:admin');
+
+Route::patch('tickets/{id}', [TicketController::class, 'update'])
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::delete('tickets/{id}', [TicketController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');

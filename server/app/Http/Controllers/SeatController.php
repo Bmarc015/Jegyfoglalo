@@ -39,6 +39,7 @@ class SeatController extends Controller
     public function store(StoreSeatRequest $request)
     {
         //
+       
          try {
             $row = Seat::create($request->all());
 
@@ -52,7 +53,7 @@ class SeatController extends Controller
             // Ellenőrizzük, hogy ez egy "Duplicate entry for key" hiba-e (MySQL hibakód: 23000 vagy 1062)
             if ($e->getCode() == 23000 || str_contains($e->getMessage(), 'Duplicate entry')) {
                 $data = [
-                    'message' => 'Insert error: The given name already exists, please choose another one',
+                    'message' => 'Insert error: The given combination already exists, please choose another one',
                     'data' => [
                         'row' => $request->input('row'), // Visszaküldhetjük, mi volt a hibás
                         'col' => $request->input('col') // Visszaküldhetjük, mi volt a hibás
@@ -94,9 +95,47 @@ class SeatController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSeatRequest $request, Seat $seat)
+    public function update(UpdateSeatRequest $request, int $id)
     {
         //
+         
+           try {
+            $row = Seat::find($id);
+            if ($row) {
+                $status = 200;
+                $row->update($request->all());
+                $data = [
+                    'message' => 'OK',
+                    'data' => [$row],
+
+                ];
+            } else {
+
+                $status = 404;
+                $data = [
+                    'message' => "Patch error. Not found id: $id",
+                    'data' => null
+                ];
+
+            }
+            return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+        } catch (QueryException $e) {
+            // Ellenőrizzük, hogy ez egy "Duplicate entry for key" hiba-e (MySQL hibakód: 23000 vagy 1062)
+            if ($e->getCode() == 23000 || str_contains($e->getMessage(), 'Duplicate entry')) {
+                $data = [
+                     'message' => 'Insert error: The given combination already exists, please choose another one',
+                    'data' => [
+                        'row' => $request->input('row'), // Visszaküldhetjük, mi volt a hibás
+                        'col' => $request->input('col') // Visszaküldhetjük, mi volt a hibás
+                ]
+            ];
+                // Kliens hiba, ami jelzi a kérés érvénytelenségét
+                return response()->json($data, 409, options: JSON_UNESCAPED_UNICODE); // 409 Conflict ajánlott
+            }
+
+            // Ha nem ez a hiba volt, dobjuk tovább az eredeti kivételt, vagy kezeljük másképp
+            throw $e;
+        }
     }
 
     /**

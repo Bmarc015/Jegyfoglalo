@@ -20,6 +20,7 @@ Content-Type: application/json
 ###
 @token = {{login.response.body.data.token}}
 
+
 POST  {{host}}/api/users/logout
 Accept: application/json
 Authorization: Bearer {{token}}
@@ -31,7 +32,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### get minden by id
-GET  {{host}}/api/teams/2
+GET  {{host}}/api/tickets/2
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -95,8 +96,19 @@ Authorization: Bearer {{token}}
     "status": "paid"
 }
 
-### delete game
+### delete 
 DELETE {{host}}/api/sectors/4
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
+
+### patch
+PATCH {{host}}/api/sectors/3
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "sector_number":  "301",
+    "sector_price": "150000"
+}

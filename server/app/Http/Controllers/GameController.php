@@ -49,9 +49,11 @@ class GameController extends Controller
             // Ellenőrizzük, hogy ez egy "Duplicate entry for key" hiba-e (MySQL hibakód: 23000 vagy 1062)
             if ($e->getCode() == 23000 || str_contains($e->getMessage(), 'Duplicate entry')) {
                 $data = [
-                    'message' => 'Insert error: The given name already exists, please choose another one',
+                    'message' => 'Insert error: The given match already exists, please make another one',
                     'data' => [
-                        'sportNev' => $request->input('sportNev') // Visszaküldhetjük, mi volt a hibás
+                        'team_home_id' => $request->input('team_home_id'), // Visszaküldhetjük, mi volt a hibás
+                        'team_away_id' => $request->input('team_away_id'), // Visszaküldhetjük, mi volt a hibás
+                        'game_date' => $request->input('game_date') // Visszaküldhetjük, mi volt a hibás
                     ]
                 ];
                 // Kliens hiba, ami jelzi a kérés érvénytelenségét
@@ -90,9 +92,49 @@ class GameController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateGameRequest $request, Game $game)
+    public function update(UpdateGameRequest $request, int $id)
     {
+        
+
         //
+        try {
+            $row = Game::find($id);
+            if ($row) {
+                $status = 200;
+                $row->update($request->all());
+                $data = [
+                    'message' => 'OK',
+                    'data' => [$row],
+
+                ];
+            } else {
+
+                $status = 404;
+                $data = [
+                    'message' => "Patch error. Not found id: $id",
+                    'data' => null
+                ];
+
+            }
+            return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+        } catch (QueryException $e) {
+            // Ellenőrizzük, hogy ez egy "Duplicate entry for key" hiba-e (MySQL hibakód: 23000 vagy 1062)
+            if ($e->getCode() == 23000 || str_contains($e->getMessage(), 'Duplicate entry')) {
+                $data = [
+                   'message' => 'Insert error: The given match already exists, please make another one',
+                    'data' => [
+                        'team_home_id' => $request->input('team_home_id'), // Visszaküldhetjük, mi volt a hibás
+                        'team_away_id' => $request->input('team_away_id'), // Visszaküldhetjük, mi volt a hibás
+                        'game_date' => $request->input('game_date') // Visszaküldhetjük, mi volt a hibás
+                    ]
+                ];
+                // Kliens hiba, ami jelzi a kérés érvénytelenségét
+                return response()->json($data, 409, options: JSON_UNESCAPED_UNICODE); // 409 Conflict ajánlott
+            }
+
+            // Ha nem ez a hiba volt, dobjuk tovább az eredeti kivételt, vagy kezeljük másképp
+            throw $e;
+        }
     }
 
     /**

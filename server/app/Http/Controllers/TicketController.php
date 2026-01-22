@@ -97,9 +97,50 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTicketRequest $request, Ticket $ticket)
+        public function update(UpdateTicketRequest $request, int $id)
     {
         //
+        var_dump($request->all());
+        die;
+           try {
+            $row = Ticket::find($id);
+            if ($row) {
+                $status = 200;
+                $row->update($request->all());
+                $data = [
+                    'message' => 'OK',
+                    'data' => [$row],
+
+                ];
+            } else {
+
+                $status = 404;
+                $data = [
+                    'message' => "Patch error. Not found id: $id",
+                    'data' => null
+                ];
+
+            }
+            return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+        } catch (QueryException $e) {
+            // Ellenőrizzük, hogy ez egy "Duplicate entry for key" hiba-e (MySQL hibakód: 23000 vagy 1062)
+            if ($e->getCode() == 23000 || str_contains($e->getMessage(), 'Duplicate entry')) {
+                $data = [
+                     'message' => 'Insert error: The given ticket is already reserved, please choose another one',
+                    'data' => [
+                        'user_id' => $request->input('user_id'),
+                        'game_id' => $request->input('game_id'),
+                        'seat_id' => $request->input('seat_id'),
+                        'status'  => $request->input('status'),
+                    ]
+                ];
+                // Kliens hiba, ami jelzi a kérés érvénytelenségét
+                return response()->json($data, 409, options: JSON_UNESCAPED_UNICODE); // 409 Conflict ajánlott
+            }
+
+            // Ha nem ez a hiba volt, dobjuk tovább az eredeti kivételt, vagy kezeljük másképp
+            throw $e;
+        }
     }
 
     /**
