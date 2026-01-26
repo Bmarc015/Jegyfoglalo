@@ -66,9 +66,9 @@ Authorization: Bearer {{token}}
 
 {
     "sector_id":  "1",
-    "seat_number": "234",
-    "row": "13",
-    "col": "4"
+    "seat_number": "1",
+    "row": "1",
+    "col": "1"
 }
 
 ### post sectors
