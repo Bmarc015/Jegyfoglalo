@@ -115,7 +115,8 @@ Route::patch('teams/{id}', [TeamController::class, 'update'])
 Route::delete('teams/{id}', [TeamController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
 //Tickets 
-Route::get('tickets', [TicketController::class, 'index']);
+Route::get('tickets', [TicketController::class, 'index'])
+    ->middleware(['auth:sanctum']);
 
 Route::get('tickets/{id}', [TicketController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');

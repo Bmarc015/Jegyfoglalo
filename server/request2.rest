@@ -16,6 +16,16 @@ Content-Type: application/json
     "email": "lakatosronaldo@example.com",
     "password": "1234"
 }
+### login
+# @name login
+POST {{host}}/api/users/login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "email": "lakatosmessi@example.com",
+    "password": "1234"
+}
 
 ###
 @token = {{login.response.body.data.token}}
@@ -111,4 +121,17 @@ Authorization: Bearer {{token}}
 {
     "sector_number":  "301",
     "sector_price": "150000"
+}
+
+### jegy post
+POST {{host}}/api/tickets 
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "user_id":  "21",
+    "game_id": "4",
+    "seat_id": "450",
+    "status": "paid"
 }

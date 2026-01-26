@@ -55,6 +55,11 @@ class User extends Authenticatable
     {
         // Feltételezve, hogy a 'role' mező tárolja a szerepkört,
         // és '1' az adminisztrátori szerep száma.
-        return $this->role === 1; 
+        return $this->role === 1;
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
     }
 }

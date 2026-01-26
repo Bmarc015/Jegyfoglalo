@@ -6,32 +6,62 @@ use App\Models\Ticket;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
-        try {
-            $rows = Ticket::all();
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $rows
-            ];
-        } catch (\Exception $e) {
-            $status = 500;
-            $data = [
-                'message' => "Server error {$e->getCode()}",
-                'data' => []
-            ];
-        }
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+
+public function getMyTickets(Request $request)
+{
+    if (!$request->user()->tokenCan('usersme:get')) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+    // A bejelentkezett user lekérése
+    $user = $request->user();
+
+    // Jegyek lekérése a kapcsolaton keresztül + eager loading a meccsnek és széknek
+    $tickets = $user->tickets()->with(['game', 'seat.sector'])->get();
+
+    // Ha nincs jegye
+    if ($tickets->isEmpty()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Ennek a felhasználónak nincsenek jegyei.',
+            'data' => []
+        ], 200);
     }
 
+    // Ha vannak jegyek
+    return response()->json([
+        'success' => true,
+        'data' => $tickets
+    ], 200);
+}
+   public function index(Request $request)
+{
+    $user = $request->user();
+
+    // 1. Ha ADMIN (role: 1 vagy '*' képesség)
+    if ($user->tokenCan('*')) {
+        // Az összes jegyet látja, minden userrel, meccsel, székkel együtt
+        $tickets = \App\Models\Ticket::with(['user', 'game', 'seat.sector'])->get();
+    } 
+    // 2. Ha VÁSÁRLÓ vagy bárki más
+    else {
+        // Csak a saját jegyeit látja
+        $tickets = $user->tickets()->with(['game', 'seat.sector'])->get();
+    }
+
+    // Válasz kezelése
+    if ($tickets->isEmpty()) {
+        return response()->json(['message' => 'Nincs megjeleníthető jegy.'], 200);
+    }
+
+    return response()->json($tickets);
+}
     /**
      * Store a newly created resource in storage.
      */
@@ -174,4 +204,5 @@ class TicketController extends Controller
             throw $e; // egyéb hibák
         }
     }
+
 }
