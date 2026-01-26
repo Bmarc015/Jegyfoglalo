@@ -43,10 +43,10 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name":  "Lakatos Ronaldo",
-    "email": "lakatosronaldo@example.com",
+    "name":  "Lakatos Messi",
+    "email": "lakatosmessi@example.com",
     "password": "1234",
-    "role": "1"
+    "role": "0"
 }
 
 ### patch user

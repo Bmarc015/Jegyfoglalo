@@ -37,7 +37,7 @@ Authorization: Bearer {{token}}
 
 
 ### get minden
-GET  {{host}}/api/tickets
+GET  {{host}}/api/seats
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -124,14 +124,13 @@ Authorization: Bearer {{token}}
 }
 
 ### jegy post
-POST {{host}}/api/tickets 
+POST {{host}}/api/games 
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id":  "21",
-    "game_id": "4",
-    "seat_id": "450",
-    "status": "paid"
+    "team_home_id":  "5",
+    "team_away_id": "6",
+    "game_date": "2072.12.12 12:12:00"
 }
