@@ -67,18 +67,10 @@ class UserController extends Controller
                     'usersme:patch',
                     'usersme:updatePassword',
                     'usersme:get',
-                    'products:create',
-                    'products:delete',
-                    'products:update',
-                ];
-                break;
-            default:
-                //Vásárló
-                $abilities = [
-                    'usersme:delete',
-                    'usersme:patch',
-                    'usersme:updatePassword',
-                    'usersme:get',
+                    'tickets:get',
+                    'tickets:post',
+                    'tickets:delete',
+                    'tickets:update',
                 ];
                 break;
         }

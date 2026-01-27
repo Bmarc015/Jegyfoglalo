@@ -5,7 +5,7 @@
 @host = {{protocol}}{{hostname}}:{{port}}
 ### @token = 12|ibiwTdr77o8ppToh1tBxIkckBNb8ECjIjLgaweTaa757cdef
 
-
+### --- users
 ### login
 # @name login
 POST {{host}}/api/users/login
@@ -42,10 +42,11 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### get minden by id
-GET  {{host}}/api/tickets/2
+GET  {{host}}/api/tickets/3
 Accept: application/json
 Authorization: Bearer {{token}}
 
+### --- games
 ### post games
 POST {{host}}/api/games 
 Content-Type: application/json
@@ -124,13 +125,14 @@ Authorization: Bearer {{token}}
 }
 
 ### jegy post
-POST {{host}}/api/games 
+POST {{host}}/api/tickets 
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "team_home_id":  "5",
-    "team_away_id": "6",
-    "game_date": "2072.12.12 12:12:00"
+    "user_id":  "21",
+    "game_id": "32",
+    "seat_id": "31456",
+    "status": "cancelled"
 }

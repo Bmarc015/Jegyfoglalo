@@ -17,6 +17,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         //Mielőtt seedelünk, minden táblát töröljünk le.
+        DB::statement('DELETE FROM tickets');
+        DB::statement('DELETE FROM games');
+        DB::statement('DELETE FROM teams');
+        DB::statement('DELETE FROM seats');
+        DB::statement('DELETE FROM sectors');
         DB::statement('DELETE FROM users');
 
 

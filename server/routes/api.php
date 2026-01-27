@@ -58,77 +58,93 @@ Route::get('usersme', [UserController::class, 'indexSelf'])
     ->middleware('auth:sanctum', 'ability:usersme:get');
 
 
-//Games 
+////////////////////////////////Games/////////////////////////////////////////////// 
 Route::get('games', [GameController::class, 'index']);
 
 Route::get('games/{id}', [GameController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::post('games', [GameController::class, 'store'])
-->middleware('auth:sanctum', 'ability:admin');
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::patch('games/{id}', [GameController::class, 'update'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::delete('games/{id}', [GameController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
-//Seats 
+    
+////////////////////////////////Seats/////////////////////////////////////////////// 
 Route::get('seats', [SeatController::class, 'index']);
 
 Route::get('seats/{id}', action: [SeatController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::post('seats', [SeatController::class, 'store'])
-->middleware('auth:sanctum', 'ability:admin');
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::patch('seats/{id}', [SeatController::class, 'update'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::delete('seats/{id}', [SeatController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
-//Sectors 
+
+////////////////////////////////Sectors/////////////////////////////////////////////// 
 Route::get('sectors', [SectorController::class, 'index']);
 
 Route::get('sectors/{id}', [SectorController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::post('sectors', [SectorController::class, 'store'])
-->middleware('auth:sanctum', 'ability:admin');
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::patch('sectors/{id}', [SectorController::class, 'update'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::delete('sectors/{id}', [SectorController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
-//Teams 
+
+////////////////////////////////Teams/////////////////////////////////////////////// 
 Route::get('teams', [TeamController::class, 'index']);
 
 Route::get('teams/{id}', [TeamController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::post('teams', [TeamController::class, 'store'])
-->middleware('auth:sanctum', 'ability:admin');
+    ->middleware('auth:sanctum', 'ability:admin');
 
 Route::patch('teams/{id}', [TeamController::class, 'update'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::delete('teams/{id}', [TeamController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
-//Tickets 
+
+////////////////////////////////Tickets/////////////////////////////////////////////// 
 Route::get('tickets', [TicketController::class, 'index'])
     ->middleware(['auth:sanctum']);
+    
+    Route::get('tickets', [TicketController::class, 'show'])
+        ->middleware('auth:sanctum', 'ability:tickets:get');
 
 Route::get('tickets/{id}', [TicketController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');
 
 Route::post('tickets', [TicketController::class, 'store'])
-->middleware('auth:sanctum', 'ability:admin');
+    ->middleware('auth:sanctum', 'ability:admin');
+
+Route::post('tickets', [TicketController::class, 'store'])
+    ->middleware('auth:sanctum', 'ability:tickets:post');
 
 Route::patch('tickets/{id}', [TicketController::class, 'update'])
     ->middleware('auth:sanctum', 'ability:admin');
 
+Route::patch('tickets/{id}', [TicketController::class, 'update'])
+    ->middleware('auth:sanctum', 'ability:tickets:update');
+
 Route::delete('tickets/{id}', [TicketController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
+
+Route::delete('tickets/{id}', [TicketController::class, 'destroy'])
+    ->middleware('auth:sanctum', 'ability:tickets:delete');
 
 
 //endregion

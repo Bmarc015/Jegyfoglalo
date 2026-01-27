@@ -9,13 +9,16 @@ class UserFactory extends Factory
 {
     public function definition(): array
     {
+        static $number = 0;
+        $current = $number;   // eltesszük az aktuális értéket
+        $number++;
+
         return [
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'role' => $this->faker->numberBetween(0, 1),
+            'name' => 'Vásárló' . $current,
+            'email' => 'vasarlo' . $current . "@minta.hu",
+            'role' => 2,
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
-            'remember_token' => null,
         ];
     }
 }
