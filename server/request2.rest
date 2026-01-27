@@ -13,8 +13,8 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "lakatosronaldo@example.com",
-    "password": "1234"
+    "email": "admin@example.com",
+    "password": "123"
 }
 ### login
 # @name login
@@ -23,8 +23,8 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "lakatosmessi@example.com",
-    "password": "1234"
+    "email": "vasarlo1@minta.hu",
+    "password": "123"
 }
 
 ###
@@ -131,8 +131,8 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id":  "21",
-    "game_id": "32",
-    "seat_id": "31456",
+    "user_id":  "69",
+    "game_id": "411",
+    "seat_id": "300001",
     "status": "cancelled"
 }

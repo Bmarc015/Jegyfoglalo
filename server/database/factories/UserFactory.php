@@ -18,7 +18,7 @@ class UserFactory extends Factory
             'email' => 'vasarlo' . $current . "@minta.hu",
             'role' => 2,
             'email_verified_at' => now(),
-            'password' => Hash::make('password'),
+            'password' => Hash::make('123'),
         ];
     }
 }
