@@ -72,7 +72,7 @@ Route::patch('games/{id}', [GameController::class, 'update'])
 
 Route::delete('games/{id}', [GameController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
-    
+
 ////////////////////////////////Seats/////////////////////////////////////////////// 
 Route::get('seats', [SeatController::class, 'index']);
 
@@ -120,10 +120,7 @@ Route::delete('teams/{id}', [TeamController::class, 'destroy'])
 
 ////////////////////////////////Tickets/////////////////////////////////////////////// 
 Route::get('tickets', [TicketController::class, 'index'])
-    ->middleware(['auth:sanctum']);
-    
-    Route::get('tickets', [TicketController::class, 'show'])
-        ->middleware('auth:sanctum', 'ability:tickets:get');
+    ->middleware('auth:sanctum', 'ability:tickets:get');
 
 Route::get('tickets/{id}', [TicketController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');
