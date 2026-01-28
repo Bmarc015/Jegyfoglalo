@@ -37,13 +37,13 @@ Authorization: Bearer {{token}}
 
 
 ### get minden
-GET  {{host}}/api/tickets
+GET  {{host}}/api/games
 Accept: application/json
 Authorization: Bearer {{token}}
 
 
 ### get minden by id
-GET  {{host}}/api/tickets/3
+GET  {{host}}/api/tickets
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -109,21 +109,22 @@ Authorization: Bearer {{token}}
 }
 
 ### delete 
-DELETE {{host}}/api/teams/101
+DELETE {{host}}/api/tickets/501
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### patch
-PATCH {{host}}/api/teams/102
+PATCH {{host}}/api/tickets/502
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "team_name": "Ujszasz",
-      "team_city": "München"
-
+    "user_id": "1",
+    "game_id": "25",
+    "seat_id": "3",
+    "status": "paid"
 }
 
 ### jegy post
