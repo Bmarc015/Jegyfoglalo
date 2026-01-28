@@ -37,7 +37,7 @@ Authorization: Bearer {{token}}
 
 
 ### get minden
-GET  {{host}}/api/games/1
+GET  {{host}}/api/seats/1
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -48,15 +48,16 @@ Authorization: Bearer {{token}}
 
 ### --- games
 ### post games
-POST {{host}}/api/games 
+POST {{host}}/api/seats
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "team_home_id":  "4",
-    "team_away_id": "1",
-    "game_date": "2026-03-01. 22:00:00"
+    "sector_id":  "1",
+    "seat_number": "151",
+    "row": "10",
+    "col": "16"
 }
 
 ### post seats
@@ -114,15 +115,16 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### patch
-PATCH {{host}}/api/games/1
+PATCH {{host}}/api/seats/37502
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "team_home_id":  "1",
-    "team_away_id": "2",
-    "game_date": "2026-03-26 15:00"
+     "sector_id":  "2",
+    "seat_number": "152",
+    "row": "11",
+    "col": "17"
 }
 
 ### jegy post
