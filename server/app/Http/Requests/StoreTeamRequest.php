@@ -22,7 +22,19 @@ class StoreTeamRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'team_name' => [
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+                'unique:teams,team_name', // Ne lehessen két azonos nevű csapat
+            ],
+            'team_city' => [
+                'required',
+                'string',
+                'min:2',
+                'max:100',
+            ],
         ];
     }
 }

@@ -37,7 +37,7 @@ Authorization: Bearer {{token}}
 
 
 ### get minden
-GET  {{host}}/api/sectors
+GET  {{host}}/api/teams
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -48,16 +48,15 @@ Authorization: Bearer {{token}}
 
 ### --- games
 ### post games
-POST {{host}}/api/sectors
+POST {{host}}/api/teams
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "sector_id":  "1",
-    "seat_number": "151",
-    "row": "10",
-    "col": "16"
+    "team_name": "Ujszasz",
+    "team_city": "München"
+
 }
 
 ### post seats
@@ -109,20 +108,21 @@ Authorization: Bearer {{token}}
 }
 
 ### delete 
-DELETE {{host}}/api/sectors/251
+DELETE {{host}}/api/teams/101
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### patch
-PATCH {{host}}/api/sectors/252
+PATCH {{host}}/api/teams/102
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "sector_number": "1300",
-    "sector_price": "12000"
+    "team_name": "Ujszasz",
+      "team_city": "München"
+
 }
 
 ### jegy post

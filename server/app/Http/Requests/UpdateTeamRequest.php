@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTeamRequest extends FormRequest
 {
@@ -21,8 +22,25 @@ class UpdateTeamRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Megszerezzük a csapat ID-ját a route-ból
+        $teamId = $this->route('team');
+
         return [
-            //
+            'team_name' => [
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+                // Egyediség ellenőrzése, kivéve a jelenlegi csapatot
+                Rule::unique('teams', 'team_name')->ignore($teamId),
+            ],
+            'team_city' => [
+                'required',
+                'string',
+                'min:2',
+                'max:100',
+            ],
         ];
     }
+ 
 }
