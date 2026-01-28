@@ -37,9 +37,10 @@ Authorization: Bearer {{token}}
 
 
 ### get minden
-GET  {{host}}/api/teams
+GET  {{host}}/api/tickets
 Accept: application/json
 Authorization: Bearer {{token}}
+
 
 ### get minden by id
 GET  {{host}}/api/tickets/3

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests;
+use Illuminate\Validation\Rule;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,14 +23,21 @@ class StoreTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
-            'user_id'  => 'required|exists:users,id',
-            'game_id'  => 'required|exists:games,id',
-            'seat_id'  => 'required|exists:seats,id',
-            'status'   => 'required|string|in:paid,cancelled,reserved',
-
+            'user_id' => 'required|exists:users,id',
+            'game_id' => 'required|exists:games,id',
+            'seat_id' => [
+                'required',
+                'exists:seats,id',
+                // Összetett egyediség: Erre a meccsre ezt a széket ne lehessen újra lefoglalni
+                Rule::unique('tickets')->where(function ($query) {
+                    return $query->where('game_id', $this->game_id)
+                                 ->where('seat_id', $this->seat_id);
+                }),
+            ],
+            'status' => ['required', Rule::in(['reserved', 'paid', 'cancelled'])],
         ];
     }
+ 
     public function messages(): array
 {
     return [
