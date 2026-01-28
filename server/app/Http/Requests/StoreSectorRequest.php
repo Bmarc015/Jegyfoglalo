@@ -22,7 +22,18 @@ class StoreSectorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'sector_number' => [
+                'required',
+                'string',
+                'max:10',
+                'unique:sectors,sector_number', // Ne lehessen két "302"-es szektor
+            ],
+            'sector_price' => [
+                'required',
+                'numeric',
+                'min:0', // Ingyenes szektor elvileg lehet, de negatív nem
+            ],
         ];
     }
+ 
 }

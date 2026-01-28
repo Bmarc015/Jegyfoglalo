@@ -37,7 +37,7 @@ Authorization: Bearer {{token}}
 
 
 ### get minden
-GET  {{host}}/api/seats/1
+GET  {{host}}/api/sectors
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -48,7 +48,7 @@ Authorization: Bearer {{token}}
 
 ### --- games
 ### post games
-POST {{host}}/api/seats
+POST {{host}}/api/sectors
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
@@ -80,7 +80,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "sector_number":  "302",
+    "sector_number":  "1200",
     "sector_price": "12000"
 }
 
@@ -109,22 +109,20 @@ Authorization: Bearer {{token}}
 }
 
 ### delete 
-DELETE {{host}}/api/games/1
+DELETE {{host}}/api/sectors/251
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### patch
-PATCH {{host}}/api/seats/37502
+PATCH {{host}}/api/sectors/252
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-     "sector_id":  "2",
-    "seat_number": "152",
-    "row": "11",
-    "col": "17"
+    "sector_number": "1300",
+    "sector_price": "12000"
 }
 
 ### jegy post

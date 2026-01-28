@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateSectorRequest extends FormRequest
 {
@@ -21,8 +22,22 @@ class UpdateSectorRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Megszerezzük a szektor ID-ját a route-ból
+        $sectorId = $this->route('sector');
+
         return [
-            //
+            'sector_number' => [
+                'required',
+                'string',
+                'max:10',
+                // Ellenőrzi az egyediséget, de figyelmen kívül hagyja a jelenlegi szektort
+                Rule::unique('sectors', 'sector_number')->ignore($sectorId),
+            ],
+            'sector_price' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
         ];
     }
 }
