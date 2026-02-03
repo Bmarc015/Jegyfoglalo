@@ -1,12 +1,10 @@
 ### változók
-@protocol = http://
+@protocol = http
 @hostname = localhost
 @port = 8000
-@host = {{protocol}}{{hostname}}:{{port}}
-### @token = 12|ibiwTdr77o8ppToh1tBxIkckBNb8ECjIjLgaweTaa757cdef
+@host = {{protocol}}://{{hostname}}:{{port}}
 
-### --- users
-### login
+### --- USERS (Auth)
 # @name login
 POST {{host}}/api/users/login
 Accept: application/json
@@ -16,126 +14,223 @@ Content-Type: application/json
     "email": "admin@minta.hu",
     "password": "123"
 }
-### login
+
+
 # @name login
 POST {{host}}/api/users/login
 Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "vasarlo1@minta.hu",
+    "email": "vasarlo@minta.hu",
     "password": "123"
 }
 
-###
+### Token kinyerése a login válaszból
 @token = {{login.response.body.data.token}}
 
-
-POST  {{host}}/api/users/logout
+### Logout
+POST {{host}}/api/users/logout
 Accept: application/json
 Authorization: Bearer {{token}}
 
+---
 
-### get minden
-GET  {{host}}/api/games
+### --- TEAMS
+### get all teams
+GET {{host}}/api/teams
 Accept: application/json
 Authorization: Bearer {{token}}
 
-
-### get minden by id
-GET  {{host}}/api/tickets
+### get team by id
+GET {{host}}/api/teams/1
 Accept: application/json
 Authorization: Bearer {{token}}
 
-### --- games
-### post games
+### post team
 POST {{host}}/api/teams
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "team_name": "Ujszasz",
-    "team_city": "München"
-
+    "team_name": "Újszász VVSE",
+    "team_city": "Újszász"
 }
 
-### post seats
-POST {{host}}/api/seats 
+### patch team
+PATCH {{host}}/api/teams/1
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "sector_id":  "1",
-    "seat_number": "1",
-    "row": "1",
-    "col": "1"
+    "team_name": "Újszász",
+    "team_city": "Zagyvarékas"
 }
 
-### post sectors
-POST {{host}}/api/sectors 
+### delete team
+DELETE {{host}}/api/teams/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+---
+
+### --- GAMES
+### get all games
+GET {{host}}/api/games
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### get game by id
+GET {{host}}/api/games/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### post game
+POST {{host}}/api/games
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "sector_number":  "1200",
-    "sector_price": "12000"
+    "team_home_id": 1,
+    "team_away_id": 2,
+    "game_date": "2026-03-15 18:00:00"
 }
 
-### post teams
-POST {{host}}/api/teams 
+### patch game
+PATCH {{host}}/api/games/1
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "team_name":  "Ujszasz VVSE",
-    "team_city": "Ujszasz"
+    "game_date": "2026-03-15 20:00:00"
 }
 
-### post tickets
-POST {{host}}/api/tickets 
+### delete game
+DELETE {{host}}/api/games/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+---
+
+### --- SECTORS
+### get all sectors
+GET {{host}}/api/sectors
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### get sector by id
+GET {{host}}/api/sectors/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### post sector
+POST {{host}}/api/sectors
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id":  "3",
-    "game_id": "3",
-    "seat_id": "3",
+    "sector_number": 1200,
+    "sector_price": 12000
+}
+
+### patch sector
+PATCH {{host}}/api/sectors/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "sector_price": 13500
+}
+
+### delete sector
+DELETE {{host}}/api/sectors/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+---
+
+### --- SEATS
+### get all seats
+GET {{host}}/api/seats
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### get seat by id
+GET {{host}}/api/seats/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### post seat
+POST {{host}}/api/seats
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "sector_id": 1,
+    "seat_number": 10,
+    "row": 5,
+    "col": 2
+}
+
+### patch seat
+PATCH {{host}}/api/seats/1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "seat_number": 11
+}
+
+### delete seat
+DELETE {{host}}/api/seats/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+---
+
+### --- TICKETS
+### get all tickets
+GET {{host}}/api/tickets
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### get ticket by id
+GET {{host}}/api/tickets/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### post ticket
+POST {{host}}/api/tickets
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "user_id": 1,
+    "game_id": 1,
+    "seat_id": 1,
     "status": "paid"
 }
 
-### delete 
-DELETE {{host}}/api/tickets/501
-Content-Type: application/json
-Accept: application/json
-Authorization: Bearer {{token}}
-
-### patch
-PATCH {{host}}/api/tickets/502
+### patch ticket
+PATCH {{host}}/api/tickets/1
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id": "1",
-    "game_id": "25",
-    "seat_id": "3",
-    "status": "paid"
-}
-
-### jegy post
-POST {{host}}/api/tickets 
-Content-Type: application/json
-Accept: application/json
-Authorization: Bearer {{token}}
-
-{
-    "user_id":  "69",
-    "game_id": "411",
-    "seat_id": "300001",
     "status": "cancelled"
 }
+
+### delete ticket
+DELETE {{host}}/api/tickets/1
+Accept: application/json
+Authorization: Bearer {{token}}
