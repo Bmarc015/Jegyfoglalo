@@ -15,7 +15,7 @@ Content-Type: application/json
     "password": "123"
 }
 
-
+###
 # @name login
 POST {{host}}/api/users/login
 Accept: application/json
@@ -214,9 +214,9 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id": 1,
-    "game_id": 1,
-    "seat_id": 1,
+    "user_id": 9,
+    "game_id": 32,
+    "seat_id": 16000,
     "status": "paid"
 }
 

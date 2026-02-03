@@ -2,72 +2,88 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ticket as CurrentModel;
-use App\Http\Requests\StoreTicketRequest as StoreCurrentModelRequest;
-use App\Http\Requests\UpdateTicketRequest as UpdateCurrentModelRequest;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\Ticket;
+
+use App\Http\Requests\StoreTicketRequest;
+use App\Mail\TicketMail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 class TicketController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Új jegy vásárlása, PDF generálása és küldése e-mailben.
      */
-
-
-   public function index()
-{
-    return $this->apiResponse(
-            function () {
-                return CurrentModel::all();
-            }
-        );
-}
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreCurrentModelRequest $request)
+    public function store(StoreTicketRequest $request)
     {
-        return $this->apiResponse(
-            function () use ($request) {
-                return CurrentModel::create($request->validated());
-            }
-        );
-        
+        // Adatok mentése tranzakcióban
+        $ticket = DB::transaction(function () use ($request) {
+            $ticket = Ticket::create($request->validated());
+
+            $ticket->load([
+                'game.team_home',
+                'game.team_away',
+                'seat.sector',
+                'user'
+            ]);
+
+            $pdf = Pdf::loadView('ticket', compact('ticket'));
+
+            Mail::to('jegyfoglaloteszt@gmail.com')->send(new TicketMail($ticket, $pdf->output()));
+
+            return $ticket;
+        });
+
+        // Sima JSON válasz a Laravel beépített függvényével
+        return response()->json([
+            'message' => 'Sikeres vásárlás!',
+            'data' => $ticket
+        ], 201);
     }
 
+    /**
+     * Összes jegy listázása.
+     */
+    public function index()
+    {
+        return $this->apiResponse(function () {
+            return Ticket::with(['game', 'user', 'seat'])->get();
+        });
+    }
 
     /**
-     * Display the specified resource.
+     * Egy konkrét jegy lekérése ID alapján.
      */
-    public function show(int $id)
+    public function show($id)
     {
         return $this->apiResponse(function () use ($id) {
-            return CurrentModel::findOrFail($id);
+            return Ticket::with(['game', 'user', 'seat.sector'])->findOrFail($id);
         });
-}
+    }
 
     /**
-     * Update the specified resource in storage.
+     * Jegy adatainak módosítása (pl. státusz állítása).
      */
-        public function update(UpdateCurrentModelRequest $request, int $id)
+    public function update(StoreTicketRequest $request, $id)
     {
         return $this->apiResponse(function () use ($request, $id) {
-            $row = CurrentModel::findOrFail($id);
-            $row->update($request->validated());
-            return $row;
+            $ticket = Ticket::findOrFail($id);
+            $ticket->update($request->validated());
+            return $ticket;
         });
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Jegy törlése.
      */
-      public function destroy(int $id)
+    public function destroy($id)
     {
         return $this->apiResponse(function () use ($id) {
-            CurrentModel::findOrFail($id)->delete();
-            return ['id' => $id];
+            $ticket = Ticket::findOrFail($id);
+            $ticket->delete();
+            return ['message' => 'Jegy sikeresen törölve'];
         });
     }
-
 }
