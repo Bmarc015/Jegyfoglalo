@@ -216,7 +216,7 @@ Authorization: Bearer {{token}}
 {
     "user_id": 9,
     "game_id": 32,
-    "seat_id": 16000,
+    "seat_id": 67,
     "status": "paid"
 }
 
