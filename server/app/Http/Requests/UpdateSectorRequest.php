@@ -40,4 +40,17 @@ class UpdateSectorRequest extends FormRequest
             ],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'sector_number.required' => 'The sector number is required.',
+            'sector_number.string'   => 'The sector number must be a string.',
+            'sector_number.max'      => 'The sector number may not be longer than 10 characters.',
+            'sector_number.unique'   => 'This sector number is already assigned to another sector.',
+
+            'sector_price.required'  => 'The sector price is required.',
+            'sector_price.numeric'   => 'The price must be a numeric value.',
+            'sector_price.min'       => 'The price cannot be a negative number.',
+        ];
+    }
 }

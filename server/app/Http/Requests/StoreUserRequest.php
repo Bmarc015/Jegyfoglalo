@@ -28,4 +28,16 @@ class StoreUserRequest extends FormRequest
             
         ];
     }
+    public function messages(): array
+{
+    return [
+        'name.required'     => 'The name field is required.',
+        'name.string'       => 'The name must be a valid text.',
+        
+        'email.required'    => 'An email address is required.',
+        'email.email'       => 'Please provide a valid email address.',
+        
+        'password.required' => 'A password is required.',
+    ];
+}
 }
