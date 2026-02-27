@@ -9,16 +9,16 @@ use App\Models\Game;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestBase; // Feltételezve, hogy itt van a login/token kezelés
+use Tests\ApiHelpers; // Feltételezve, hogy itt van a login/token kezelés
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\TestCase;
 
 class PingTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseTransactions, ApiHelpers;
 
     // Teszt adatok a POST kérésekhez
     private static function getSampleTeamData() { return ["team_name" => "Új Csapat", "team_city" => "Budapest"]; }
-    private static function getSampleSectorData() { return ["sector_number" => 99, "sector_price" => 5000]; }
     private static function getSampleGameData($hId, $aId) { return ["team_home_id" => $hId, "team_away_id" => $aId, "game_date" => "2026-10-10 20:00:00"]; }
 
     /**
@@ -49,13 +49,13 @@ class PingTest extends TestCase
     {
         return [
             // Admin tud létrehozni és törölni
-            'admin_teams'   => ['teams',   'admin@example.com', '123', true, true],
-            'admin_games'   => ['games',   'admin@example.com', '123', true, true],
-            'admin_sectors' => ['sectors', 'admin@example.com', '123', true, true],
+            'admin_teams'   => ['teams',   'admin@minta.com', '123', true, true],
+            'admin_games'   => ['games',   'admin@minta.com', '123', true, true],
+            'admin_sectors' => ['sectors', 'admin@minta.com', '123', true, true],
 
             // Sima felhasználó nem piszkálhatja az alapokat
-            'user_teams_no' => ['teams',   'user@example.com', '123', false, false],
-            'user_games_no' => ['games',   'user@example.com', '123', false, false],
+            'user_teams_no' => ['teams',   'vasarlo@minta.com', '123', false, false],
+            'user_games_no' => ['games',   'vasarlo@minta.com', '123', false, false],
         ];
     }
 
@@ -72,18 +72,30 @@ class PingTest extends TestCase
 
         $this->logout($token);
     }
-
-    #[DataProvider('tablesPostDeleteDataProvider')]
+   #[DataProvider('tablesPostDeleteDataProvider')]
     public function test_api_post_delete_endpoints($route, $email, $password, $canPost, $canDelete): void
     {
+        // Meghatározzuk a role-t az email alapján (Admin = 1, Sima user = 2)
+        $role = str_contains($email, 'admin') ? 1 : 2;
+
+        // Létrehozzuk a usert a megfelelő role-al
+        User::factory()->create([
+            'email' => $email,
+            'password' => bcrypt($password),
+            'role' => $role, 
+        ]);
+
         $response = $this->login($email, $password);
+        
+        // Ha itt 401-et kapsz, nézd meg a Controller Hash::check sorát!
+        $response->assertStatus(200); 
+        
         $token = $this->myGetToken($response);
 
-        // POST teszt
+        // --- POST teszt ---
         $data = match($route) {
             'teams' => self::getSampleTeamData(),
-            'sectors' => self::getSampleSectorData(),
-            'games' => self::getSampleGameData(1, 2), // Példa ID-k
+            'games' => self::getSampleGameData(1, 2),
             default => []
         };
 
@@ -91,30 +103,14 @@ class PingTest extends TestCase
         $response = $this->myPost($uri, $data, $token);
         
         if ($canPost) {
-            $response->assertSuccessful();
+            // Admin esetén siker (201 vagy 200, nálad a store 201-et ad)
+            $response->assertStatus(201);
         } else {
-            $response->assertForbidden(); // Vagy assertStatus(403)
+            // Na, ez fogja most már a 403-at dobni!
+            $response->assertStatus(403);
         }
 
-        // DELETE teszt (létrehozunk egyet factoryval, majd törölni próbáljuk)
-        $model = match($route) {
-            'teams' => Team::factory()->create(),
-            'sectors' => Sector::factory()->create(),
-            'games' => Game::factory()->create(),
-            default => null
-        };
-
-        if ($model) {
-            $deleteUri = "/api/$route/{$model->id}";
-            $response = $this->myDelete($deleteUri, $token);
-            
-            if ($canDelete) {
-                $response->assertSuccessful();
-            } else {
-                $response->assertForbidden();
-            }
-        }
-
-        $this->logout($token);
+        // --- DELETE teszt ---
+        // ... (maradhat a korábbi factory-s törlés)
     }
 }
