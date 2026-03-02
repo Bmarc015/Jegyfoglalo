@@ -1,20 +1,16 @@
 <template>
-  <div class="container-fluid my-container my-border mt-2">
+  <div class=" my-container  ">
     <!-- Head -->
-    <Header/>
 
     <!-- Menü -->
-    <Menu class="my-border"/>
-    <Breadcrumb class="my-border"/>
+    <Menu/>
+    <!-- <Breadcrumb class="my-border"/> -->
 
     <!-- Ide töltődnek be az oldalak -->
     <RouterView class="my-border my-content-height"/>
 
-
-    <Footer  class="my-border"
-      :content="footerContent"
-    />
     <ToastContanier/>
+    <Footer class="my-border"/>
   </div>
 </template>
 
@@ -34,7 +30,6 @@ export default {
   },
   data() {
     return {
-      footerContent: "Ez egy másik lábléc szöveg",
     }
   }
 };

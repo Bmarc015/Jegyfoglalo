@@ -1,103 +1,60 @@
 <template>
   <div>
-    <nav class="navbar navbar-expand-md bg-primary" data-bs-theme="dark">
-      <div class="container-fluid">
+    <nav class="navbar navbar-expand-md bg-white border-bottom border-dark-subtle shadow-sm " data-bs-theme="light">
+      <div class="container-fluid text-center">
+        <Header id="home-link" />
         <!-- <a class="navbar-brand" href="#">Navbar</a> -->
         <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
         >
-          <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <RouterLink class="nav-link" to="/">Főoldal</RouterLink>
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-2">
+            
+            <li class="nav-item" v-if="hasMenuAccess('/adatok/matches')">
+              <RouterLink class="nav-link" to="/adatok/matches">Matches</RouterLink>
+            </li>
+            <li class="nav-item" v-if="hasMenuAccess('/adatok/leagues')">
+              <RouterLink class="nav-link" to="/adatok/leagues">Leagues</RouterLink>
+            </li>
+            <li class="nav-item" v-if="hasMenuAccess('/adatok/teams')">
+              <RouterLink class="nav-link" to="/adatok/teams">Teams</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">Rólunk</RouterLink>
+              <RouterLink class="nav-link" to="/about">About</RouterLink>
             </li>
-            <li class="nav-item dropdown" v-if="hasMenuAccess('/adatok')">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Adatok
-              </a>
-              <ul class="dropdown-menu">
-                <li v-if="hasMenuAccess('/adatok/sport')">
-                  <RouterLink class="dropdown-item" to="/adatok/sport"
-                    >Sportok</RouterLink
-                  >
-                </li>
-                <li v-if="hasMenuAccess('/adatok/schoolclass')">
-                  <RouterLink class="dropdown-item" to="/adatok/schoolclass"
-                    >Osztályok</RouterLink
-                  >
-                </li>
-                <li v-if="hasMenuAccess('/adatok/student')">
-                  <RouterLink class="dropdown-item" to="/adatok/student"
-                    >Tanulók</RouterLink
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li v-if="hasMenuAccess('/adatok/plaingsport')">
-                  <RouterLink class="dropdown-item" to="/adatok/plaingsport"
-                    >Sportolás</RouterLink
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li v-if="hasMenuAccess('/adatok/users')">
-                  <RouterLink class="dropdown-item" to="/adatok/users"
-                    >Userek</RouterLink
-                  >
-                </li>
-              </ul>
+            <li class="nav-item" v-if="hasMenuAccess('/adatok/users')">
+              <RouterLink class="nav-link" to="/adatok/users">Users</RouterLink>
             </li>
-            <li class="nav-item">
-              <RouterLink class="nav-link" to="/login" v-if="!isLoggedIn">
-                Login
+          </ul>
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item" v-if="!isLoggedIn">
+              <RouterLink class="nav-link" to="/login">
+                <i class="bi bi-person"></i> Sign In
               </RouterLink>
-              <div v-if="isLoggedIn" class="d-flex align-items-center">
+            </li>
+            <li class="nav-item" v-if="isLoggedIn">
+              <div class="d-flex align-items-center">
                 <RouterLink class="nav-link" to="/userprofil">
                   <i class="bi bi-person"></i>
                   {{ userNameWithRole }}
                 </RouterLink>
-
-                <!-- logout -->
                 <i
                   class="bi bi-box-arrow-right ms-2 my-pointer tight-icon"
-                  style="font-size: 2rem"
+                  style="font-size: 1.5rem"
                   @click="onClickLogut()"
+                  title="Kijelentkezés"
                 ></i>
               </div>
             </li>
           </ul>
-          <form class="d-flex" role="search">
-            <input
-              id="search"
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-              v-model="searchWordInput"
-            />
-
-            <label for="search" class="form-label m-0">
-              <i
-                @click="onClickSearchButton"
-                class="bi bi-search fs-4 my-pointer"
-              ></i>
-            </label>
-          </form>
         </div>
       </div>
     </nav>
@@ -109,30 +66,19 @@ import { mapActions, mapState } from "pinia";
 import { useSearchStore } from "@/stores/searchStore";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import userLoginLogoutService from "@/api/userLoginLogoutService";
+import Header from "./Header.vue";
 export default {
+  components: {
+    Header,
+  },
   data() {
     return {
       searchWordInput: "",
       timeout: null,
+
     };
   },
   watch: {
-    //Keresőszó késleltetés
-    // searchWordInput(value) {
-    //   //töröljük az éppen futó setTimeout-ot
-    //   //hogy újraindíthassuk
-    //   clearTimeout(this.timeout);
-    //   //x-re kattintva kiürül az kereső input
-    //   if (value === "") {
-    //     this.setSearchWord("");
-    //     return;
-    //   }
-    //   //500ms késleltetés után tárolja
-    //   this.timeout = setTimeout(() => {
-    //     this.setSearchWord(value);
-    //   }, 1000);
-    // },
-
     searchWordInput(value) {
       if (!value) {
         this.resetSearchWord();
@@ -185,17 +131,18 @@ export default {
 /* 1. A sima .active ÉS a router által adott osztály is legyen sárga */
 .nav-link.active,
 .nav-link.router-link-exact-active {
-  color: #ffff00 !important;
+  color: #0800ff !important;
   font-weight: bold;
-  border-bottom: 2px solid yellow;
+  border-bottom: 2px solid rgb(0, 17, 255);
 }
+
 
 /* 2. Az "Adatok" gomb sárgítása, ha az alatta lévő listában van aktív elem */
 /* Azt mondjuk: "Színezd a .nav-item-et, ha van benne aktív router-link" */
 .nav-item:has(.dropdown-item.router-link-active) .nav-link.dropdown-toggle {
-  color: #ffff00 !important;
+  color: #0800ff !important;
   font-weight: bold;
-  border-bottom: 2px solid yellow;
+  border-bottom: 2px solid rgb(0, 21, 255);
 }
 
 /* 3. A lenyíló menüben a konkrét aktív elem (pl. Sportok) kijelölése */
@@ -203,7 +150,7 @@ export default {
   /* background-color: #ffff00 !important; */
   /* color: #000 !important; */
   background-color: transparent !important; /* Levesszük a teli hátteret */
-  color: #ffff00 !important; /* Csak a szöveg lesz sárga */
+  color: #0800ff !important; /* Csak a szöveg lesz sárga */
   font-weight: bold;
 }
 
@@ -220,5 +167,9 @@ export default {
 
 .dropdown-menu {
   z-index: 1060 !important;
+}
+
+.home-link {
+  color: black !important;
 }
 </style>
