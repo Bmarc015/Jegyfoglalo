@@ -14,8 +14,8 @@ class UserFactory extends Factory
         $number++;
 
         return [
-            'name' => 'Vásárló' . $current,
-            'email' => 'vasarlo' . $current . "@minta.hu",
+            'name' => 'Customer' . $current,
+            'email' => 'customer' . $current . "@example.com",
             'role' => 2,
             'email_verified_at' => now(),
             'password' => Hash::make('123'),
