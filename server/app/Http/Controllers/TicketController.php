@@ -31,7 +31,11 @@ class TicketController extends Controller
 
             $pdf = Pdf::loadView('ticket', compact('ticket'));
 
+<<<<<<< HEAD
             Mail::to('bartamarcell0@gmail.com')->send(new TicketMail($ticket, $pdf->output()));
+=======
+            Mail::to('laszloseres38@gmail.com')->send(new TicketMail($ticket, $pdf->output()));
+>>>>>>> 46ecc9af5f56c60337cca99e63d669035a6add9c
 
             return $ticket;
         });

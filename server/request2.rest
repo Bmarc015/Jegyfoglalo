@@ -214,9 +214,15 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
+<<<<<<< HEAD
     "user_id": 2,
     "game_id": 25,
     "seat_id": 70,
+=======
+    "user_id": 9,
+    "game_id": 33,
+    "seat_id": 67,
+>>>>>>> 46ecc9af5f56c60337cca99e63d669035a6add9c
     "status": "paid"
 }
 
