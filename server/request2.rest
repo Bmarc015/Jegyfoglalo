@@ -22,7 +22,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "vasarlo@minta.hu",
+    "email": "vasarlo1@minta.hu",
     "password": "123"
 }
 
@@ -214,9 +214,9 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id": 9,
-    "game_id": 32,
-    "seat_id": 16000,
+    "user_id": 2,
+    "game_id": 25,
+    "seat_id": 70,
     "status": "paid"
 }
 
