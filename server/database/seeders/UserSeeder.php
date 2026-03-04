@@ -13,6 +13,9 @@ class UserSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@example.com',
             'role' => 1,
+            'billing_city' => 'Budapest',
+            'billing_zip' => '1111',
+            'billing_address' => 'Fő utca 1.',
             'password' => '123',
         ]);
 
