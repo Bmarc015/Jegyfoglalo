@@ -26,7 +26,9 @@ class UpdateUserRequest extends FormRequest
             'email' => 'nullable|email',
             'password' => 'nullable',
             'role' => 'nullable',
-            
+            'billing_city' => 'nullable|string|max:100',
+            'billing_zip' => ['nullable', 'regex:/^[0-9]+$/', 'max:20'],
+            'billing_address' => 'nullable|string|max:255',
         ];
     }
 }

@@ -14,4 +14,10 @@ export default {
   getMeRefresh() {
     return apiClient.get(`/usersme`);
   },
+  getMe() {
+    return apiClient.get(`/usersme`);
+  },
+  updateMe(data) {
+    return apiClient.patch(`/usersme`, data);
+  },
 };

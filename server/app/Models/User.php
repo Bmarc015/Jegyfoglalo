@@ -23,6 +23,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'billing_city',
+        'billing_zip',
+        'billing_address',
     ];
 
     /**

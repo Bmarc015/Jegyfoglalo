@@ -41,7 +41,25 @@
     
     <!-- Match Calendar -->
     <div class="match-calendar container mt-auto pt-5 mb-4">
-      <h5 class="text-center mb-3">Select a Day</h5>
+      <div class="calendar-toolbar mb-3">
+        <div class="calendar-title-wrap">
+          <h5 class="m-0">Select a Week</h5>
+          <span class="selected-month">{{ selectedMonthLabel }}</span>
+        </div>
+        <div class="calendar-picker-wrap">
+          <button class="calendar-pick-btn" type="button" @click="openCalendarPicker">
+            <i class="bi bi-calendar2-week me-2"></i>
+            Choose Week
+          </button>
+          <input
+            ref="weekPicker"
+            type="week"
+            class="day-picker-input"
+            :value="selectedWeek"
+            @change="onWeekChange"
+          />
+        </div>
+      </div>
       <div class="d-flex justify-content-center flex-wrap gap-2">
         <div 
           v-for="(day, index) in weekDays" 
@@ -94,22 +112,36 @@ export default {
   data() {
     return {
       selectedDay: 0,
+      selectedWeek: "",
       weekDays: [],
       matches: []
     };
   },
+  computed: {
+    selectedMonthLabel() {
+      if (!this.weekDays.length) return "";
+      const baseDate = new Date(`${this.weekDays[0].fullDate}T00:00:00`);
+      return baseDate.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+    },
+  },
   mounted() {
-    this.generateWeekDays();
+    const today = new Date();
+    this.selectedWeek = this.getISOWeekValue(today);
+    this.generateWeekDays(this.getISOWeekStartDate(today));
     this.loadMatches();
   },
   methods: {
-    generateWeekDays() {
+    generateWeekDays(startDate = new Date()) {
       const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const today = new Date();
+      this.weekDays = [];
+      const anchorDate = new Date(startDate);
       
       for (let i = 0; i < 7; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
+        const date = new Date(anchorDate);
+        date.setDate(anchorDate.getDate() + i);
         
         this.weekDays.push({
           name: days[date.getDay()],
@@ -121,6 +153,55 @@ export default {
     selectDay(index) {
       this.selectedDay = index;
       this.loadMatches();
+    },
+    openCalendarPicker() {
+      const picker = this.$refs.weekPicker;
+      if (!picker) return;
+      if (typeof picker.showPicker === 'function') {
+        picker.showPicker();
+      } else {
+        picker.click();
+      }
+    },
+    onWeekChange(event) {
+      const selected = event?.target?.value;
+      if (!selected) return;
+      const startOfWeek = this.getDateFromISOWeekValue(selected);
+      this.selectedWeek = selected;
+      this.generateWeekDays(startOfWeek);
+      this.selectedDay = 0;
+      this.loadMatches();
+    },
+    getISOWeekStartDate(date) {
+      const d = new Date(date);
+      const day = (d.getDay() + 6) % 7; // Monday=0 ... Sunday=6
+      d.setDate(d.getDate() - day);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    },
+    getISOWeekValue(date) {
+      const tmp = new Date(date);
+      tmp.setHours(0, 0, 0, 0);
+      tmp.setDate(tmp.getDate() + 3 - ((tmp.getDay() + 6) % 7));
+      const week1 = new Date(tmp.getFullYear(), 0, 4);
+      const weekNo =
+        1 +
+        Math.round(
+          ((tmp - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7,
+        );
+      return `${tmp.getFullYear()}-W${String(weekNo).padStart(2, "0")}`;
+    },
+    getDateFromISOWeekValue(isoWeek) {
+      const [yearText, weekText] = isoWeek.split("-W");
+      const year = Number(yearText);
+      const week = Number(weekText);
+      const jan4 = new Date(year, 0, 4);
+      const jan4WeekDay = (jan4.getDay() + 6) % 7; // Monday=0
+      const mondayWeek1 = new Date(year, 0, 4 - jan4WeekDay);
+      const weekStart = new Date(mondayWeek1);
+      weekStart.setDate(mondayWeek1.getDate() + (week - 1) * 7);
+      weekStart.setHours(0, 0, 0, 0);
+      return weekStart;
     },
     loadMatches() {
       // Sample matches data - in real app, this would fetch from API based on selected date
@@ -171,6 +252,51 @@ export default {
 .content-overlay p {
   font-size: 1.5rem;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.calendar-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.calendar-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.selected-month {
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  color: #40638f;
+  font-weight: 600;
+}
+
+.calendar-pick-btn {
+  border: 1px solid #c9d6ea;
+  background: linear-gradient(135deg, #f8fbff 0%, #eaf2ff 100%);
+  color: #163a6b;
+  border-radius: 10px;
+  padding: 0.45rem 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(22, 58, 107, 0.12);
+  transition: all 0.2s ease;
+}
+
+.calendar-pick-btn:hover {
+  background: linear-gradient(135deg, #eaf2ff 0%, #dce9ff 100%);
+  transform: translateY(-1px);
+}
+
+.day-picker-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 .calendar-day {

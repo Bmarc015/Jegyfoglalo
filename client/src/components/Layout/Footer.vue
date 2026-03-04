@@ -7,7 +7,7 @@
           <h5>TicketMaster</h5>
           <p class="small text-light mb-0">
             Your one-stop destination for football tickets. 
-            Experience the thrill of live matches!
+            Experience the thrill of live matches in Estadio Santiago Bernabéu!
           </p>
         </div>
         

@@ -45,19 +45,32 @@
                 <i class="bi bi-person"></i> Sign In
               </RouterLink>
             </li>
-            <li class="nav-item" v-if="isLoggedIn">
-              <div class="d-flex align-items-center">
-                <RouterLink class="nav-link" to="/userprofil">
-                  <i class="bi bi-person"></i>
-                  {{ userNameWithRole }}
-                </RouterLink>
-                <i
-                  class="bi bi-box-arrow-right ms-2 my-pointer tight-icon"
-                  style="font-size: 1.5rem"
-                  title="Kijelentkezes"
-                  @click="onClickLogut()"
-                ></i>
-              </div>
+            <li class="nav-item dropdown" v-if="isLoggedIn">
+              <a
+                class="nav-link dropdown-toggle d-flex align-items-center"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="bi bi-person me-1"></i>
+                {{ userNameWithRole }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                  <RouterLink class="dropdown-item" to="/profile">
+                    <i class="bi bi-person-badge me-2"></i>
+                    Profil
+                  </RouterLink>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <button class="dropdown-item text-danger" type="button" @click="onClickLogut()">
+                    <i class="bi bi-box-arrow-right me-2"></i>
+                    Kijelentkezes
+                  </button>
+                </li>
+              </ul>
             </li>
           </ul>
         </div>
@@ -157,12 +170,6 @@ export default {
   background-color: transparent !important;
   color: #0800ff !important;
   font-weight: bold;
-}
-
-.tight-icon {
-  line-height: 1 !important;
-  display: inline-flex;
-  vertical-align: middle;
 }
 
 .navbar {

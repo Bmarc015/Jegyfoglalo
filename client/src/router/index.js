@@ -59,9 +59,9 @@ const router = createRouter({
           component: () => import("@/views/GamesView.vue"),
           beforeEnter: [checkIfNotLogged],
           meta: {
-            title: (route) => "Osztály",
-            breadcrumb: "Osztály",
-            roles: [1],
+            title: (route) => "Games",
+            breadcrumb: "Games",
+            roles: [1,2],
           },
         },
         {
@@ -117,7 +117,17 @@ const router = createRouter({
         breadcrumb: "Regisztráció",
       },
     },
-
+    {
+      path: "/profile",
+      name: "profile",
+      component: () => import("@/views/ProfileView.vue"),
+      beforeEnter: [checkIfNotLogged],
+      meta: {
+        title: (route) => "Profil",
+        breadcrumb: "Profil",
+        roles: [1, 2],
+      },
+    },
     {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
@@ -163,3 +173,4 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router;
+

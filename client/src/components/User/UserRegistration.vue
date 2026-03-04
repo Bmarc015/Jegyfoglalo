@@ -45,6 +45,51 @@
               {{ serverErrors.email[0] }}
             </div>
           </div>
+          <!-- Billing Address Fields -->
+          <div class="mb-3">
+            <label for="billingCity" class="form-label">Település:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="billingCity"
+              v-model="billingCity"
+              @input="clearError('billing_city')"
+            />
+            <div v-if="serverErrors.billing_city" class="invalid-feedback d-block">
+              {{ serverErrors.billing_city[0] }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="billingZip" class="form-label">Irányítószám:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="billingZip"
+              v-model="billingZip"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              @input="clearError('billing_zip')"
+            />
+            <div v-if="serverErrors.billing_zip" class="invalid-feedback d-block">
+              {{ serverErrors.billing_zip[0] }}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="billingAddress" class="form-label">Cím:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="billingAddress"
+              v-model="billingAddress"
+              @input="clearError('billing_address')"
+            />
+            <div v-if="serverErrors.billing_address" class="invalid-feedback d-block">
+              {{ serverErrors.billing_address[0] }}
+            </div>
+          </div>
+
           <!-- Password1 -->
           <PasswordField
             class="mb-3"
@@ -95,6 +140,9 @@ export default {
     return {
       userName: "",
       email: "",
+      billingCity: "",
+      billingZip: "",
+      billingAddress: "",
       password: "",
       confirmPassword: "",
       validated: false,
@@ -133,6 +181,9 @@ export default {
         const data = {
           name: this.userName,
           email: this.email,
+          billing_city: this.billingCity,
+          billing_zip: this.billingZip,
+          billing_address: this.billingAddress,
           password: this.password,
         };
         this.$emit("createUser", 

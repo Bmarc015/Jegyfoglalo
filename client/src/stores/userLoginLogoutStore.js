@@ -9,7 +9,7 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
     item: JSON.parse(localStorage.getItem("user_data")) || null,
     loading: false,
     error: null,
-    rolNames: ["Admin", "Tanár", "Diák"],
+    rolNames: ["Admin", "Customer", "Guest"],
   }),
   //valamilyen formában visszaadja
   getters: {
@@ -33,10 +33,13 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
     },
     userNameWithRole() {
       if (!this.item) {
-        return null;
+        return "";
       }
-      const userInfo = `${this.item.name}: ${this.rolNames[this.item.role - 1]}`;
-      return userInfo;
+      const name = this.item.name || "";
+      if (this.item.role === 1) {
+        return `${name}: ${this.rolNames[this.item.role - 1]}`;
+      }
+      return name;
     },
     isLoggedIn() {
       return this.item != null ? true : false;
@@ -96,13 +99,52 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
         this.error = null;
         this.loading = true;
         const response = await service.getMeRefresh();
-        this.item.name = response.data.name;
-        this.item.email = response.data.email;
+        const me = response?.data?.data || {};
+        if (!this.item) {
+          this.item = {};
+        }
+        this.item = {
+          ...this.item,
+          name: me.name ?? this.item.name,
+          email: me.email ?? this.item.email,
+          billing_city: me.billing_city ?? this.item.billing_city,
+          billing_zip: me.billing_zip ?? this.item.billing_zip,
+          billing_address: me.billing_address ?? this.item.billing_address,
+          role: me.role ?? this.item.role,
+        };
+        localStorage.setItem("user_data", JSON.stringify(this.item));
         return true;
       } catch (err) {
         this.error = err;
         throw err;
         return false;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async updateMe(data) {
+      try {
+        this.error = null;
+        this.loading = true;
+        const response = await service.updateMe(data);
+        const updated = response?.data?.data || {};
+
+        if (this.item) {
+          this.item = {
+            ...this.item,
+            name: updated.name ?? this.item.name,
+            email: updated.email ?? this.item.email,
+            billing_city: updated.billing_city ?? this.item.billing_city,
+            billing_zip: updated.billing_zip ?? this.item.billing_zip,
+            billing_address:
+              updated.billing_address ?? this.item.billing_address,
+          };
+          localStorage.setItem("user_data", JSON.stringify(this.item));
+        }
+        return true;
+      } catch (err) {
+        this.error = err;
+        throw err;
       } finally {
         this.loading = false;
       }
