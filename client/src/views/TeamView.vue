@@ -1,10 +1,16 @@
 <template>
   <div>
     <!-- oldal fejléc -->
-    <!-- oldal címe -->
-    <div class="d-flex align-items-center m-0 mb-2">
-      <h1>{{ pageTitle }}</h1>
-      <div class="d-flex align-items-center m-0 ms-2">
+    <div class="team-header mb-3">
+      <div class="team-header-left">
+        <h1 class="m-0">{{ pageTitle }}</h1>
+      </div>
+
+      <div class="team-header-center">
+        <Pagination :useCollectionStore="useCollectionStore" />
+      </div>
+
+      <div class="team-header-right d-flex align-items-center">
         <!-- homokóra -->
         <i
           v-if="loading"
@@ -12,30 +18,27 @@
         ></i>
         <!-- új rekord ikon -->
         <ButtonsCrudCreate v-if="!loading" @create="createHandler" />
-        <p class="m-0 ms-2">({{ getItemsLength }})</p>
+        <p class="m-0 ms-2 records-pill">{{ getItemsLength }} rekord</p>
 
         <!-- sor/oldal -->
         <SetSelectedPerPage
          :useCollectionStore="useCollectionStore" 
         />
-        <!-- Paginátor -->
-         <Pagination
-          :useCollectionStore="useCollectionStore"
-         />
       </div>
     </div>
 
     <!-- táblázat -->
-    <GenericTable
-      :items="items"
-      :columns="tableColumns"
-      :useCollectionStore="useCollectionStore"
-      @delete="deleteHandler"
-      @update="updateHandler"
-      @create="createHandler"
-      @sort="sortHandler"
-      v-if="items.length > 0"
-    />
+    <div class="table-full-bleed" v-if="items.length > 0">
+      <GenericTable
+        :items="items"
+        :columns="tableColumns"
+        :useCollectionStore="useCollectionStore"
+        @delete="deleteHandler"
+        @update="updateHandler"
+        @create="createHandler"
+        @sort="sortHandler"
+      />
+    </div>
     <div v-else style="width: 100px" class="m-auto">Nincs találat</div>
 
     <!-- Form -->
@@ -58,7 +61,7 @@
 <script>
 import { mapActions, mapState } from "pinia";
 //módosít
-import { useSportStore } from "@/stores/sporsStore";
+import { useTeamStore } from "@/stores/teamStore";
 import { useSearchStore } from "@/stores/searchStore";
 import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
@@ -85,14 +88,16 @@ export default {
   data() {
     return {
       //módosít
-      pageTitle: "Sportok",
+      pageTitle: "Teams",
       //módosít
       tableColumns: [
-        { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
-        { key: "sportNev", label: "Sportnév", debug: 2 },
+        // { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
+        { key: "id", label: "ID", debug: 2 },
+        { key: "team_name", label: "Team_Name", debug: 2 },
+        { key: "team_city", label: "Team_City", debug: 2 },
       ],
       //módosít
-      useCollectionStore: useSportStore,
+      useCollectionStore: useTeamStore,
       isOpenConfirmModal: false,
       toDeleteId: null,
       state: "r", //crud
@@ -101,7 +106,7 @@ export default {
   },
   computed: {
     //módosít
-    ...mapState(useSportStore, [
+    ...mapState(useTeamStore, [
       "item",
       "items",
       "loading",
@@ -113,7 +118,7 @@ export default {
   },
   methods: {
     //módosít
-    ...mapActions(useSportStore, [
+    ...mapActions(useTeamStore, [
       "getAll",
       "getAllSortSearch",
       "getPaging",
@@ -195,4 +200,100 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.team-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #d8dee7;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f3f6fb 100%);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.team-header-left {
+  flex: 0 0 auto;
+}
+
+.team-header-left h1 {
+  font-size: 2.1rem;
+  letter-spacing: 0.01em;
+}
+
+.team-header-center {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.team-header-center :deep(nav) {
+  margin-left: 0 !important;
+}
+
+.team-header-center :deep(.pagination) {
+  background: #eef3fb;
+  border: 1px solid #d8e2f0;
+  border-radius: 10px;
+  padding: 0.2rem;
+}
+
+.team-header-center :deep(.page-link) {
+  border: 0;
+  margin: 0 1px;
+  border-radius: 8px;
+  color: #1f3a67;
+  font-weight: 600;
+  background: transparent;
+}
+
+.team-header-center :deep(.page-item.active .page-link) {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b57d0 100%);
+  color: #fff;
+}
+
+.team-header-center :deep(.page-link:hover) {
+  background: #dbe8ff;
+}
+
+.team-header-right {
+  flex: 0 0 auto;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #e0e7f1;
+  border-radius: 10px;
+  padding: 0.35rem 0.45rem;
+}
+
+.records-pill {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #e8f0ff;
+  color: #0b57d0;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 992px) {
+  .team-header {
+    flex-wrap: wrap;
+    padding: 0.6rem;
+  }
+
+  .team-header-center {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.table-full-bleed {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+  overflow-x: auto;
+}
+</style>

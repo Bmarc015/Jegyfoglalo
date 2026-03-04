@@ -1,5 +1,5 @@
 <template>
-  <nav v-if="pagination.last_page > 1" class="ms-2">
+  <nav v-if="pagination && pagination.last_page > 1" class="ms-2">
     <ul class="pagination m-0">
       <!-- firs -->
       <li
@@ -94,7 +94,7 @@ export default {
   },
   computed: {
     pagination() {
-      return this.store ? this.store.pagination : {};
+      return this.store ? this.store.pagination : { current_page: 1, last_page: 1, total: 0 };
     },
   },
   methods: {

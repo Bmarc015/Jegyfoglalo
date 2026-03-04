@@ -118,6 +118,8 @@ Route::patch('teams/{id}', [TeamController::class, 'update'])
 Route::delete('teams/{id}', [TeamController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
 
+Route::get('teamspaging/{page}/{per_page}/{column}/{direction}/{search?}', [TeamController::class, 'indexPaging']);
+
 ////////////////////////////////Tickets/////////////////////////////////////////////// 
 Route::get('tickets', [TicketController::class, 'index'])
     ->middleware('auth:sanctum', 'ability:tickets:get');

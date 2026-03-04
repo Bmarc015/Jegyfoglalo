@@ -1,15 +1,16 @@
 import { defineStore } from "pinia";
 // import { useToastStore } from "@/stores/toastStore";
 import { useSearchStore } from "./searchStore";
-import service from "@/api/sportService";
+import service from "@/api/teamService";
 
 // const toast = useToastStore();
 
 //változtatás
 class Item {
-  constructor(id = 0, sportNev = "") {
+  constructor(id = 0, team_name = "", team_city = "") {
     this.id = id;
-    this.sportNev = sportNev;
+    this.team_name = team_name;
+    this.team_city = team_city;
   }
 }
 
@@ -21,13 +22,13 @@ class Pagination {
   }
 }
 
-export const useSportStore = defineStore("sports", {
+export const useTeamStore = defineStore("teams", {
   state: () => ({
     item: new Item(),
     items: [new Item()],
     pagination: new Pagination(),
     selectedPerPage: 10,
-    selectedPerPageList: [10, 30, 50, 100],
+    selectedPerPageList: [10, 30, 50],
     loading: false,
     error: null,
     sortColumn: "id",
@@ -47,13 +48,14 @@ export const useSportStore = defineStore("sports", {
       this.loading = false;
     },
     setColumn(column) {
-      this.sortColumn = column;
-      const direction =
-        this.sortColumn === column && this.sortDirection === "asc"
-          ? "desc"
-          : "asc";
-      this.sortDirection = direction;
-      this.getPaging();
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = "asc";
+      }
+
+      this.getPaging(this.pagination?.current_page || 1);
     },
 
     clearItem() {
@@ -77,30 +79,11 @@ export const useSportStore = defineStore("sports", {
     //Ha a direction meg van aadva, akkor ez lesz a sorrend
     //Ha nincs megadva, akkor ellentettjére vált
     async getAllSortSearch(column = "id", direction = null) {
-      //   const toast = useToastStore();
-      this.loading = true;
-      this.error = null;
       this.sortColumn = column;
-      if (!direction) {
-        direction =
-          this.sortColumn === column && this.sortDirection === "asc"
-            ? "desc"
-            : "asc";
+      if (direction) {
+        this.sortDirection = direction;
       }
-      this.sortDirection = direction;
-      try {
-        const response = await service.getAllSortSearch(
-          this.sortColumn,
-          this.sortDirection,
-          this.searchStore.searchWord,
-        );
-        this.items = response.data;
-      } catch (err) {
-        this.error = err;
-        throw err;
-      } finally {
-        this.loading = false;
-      }
+      return await this.getPaging(1);
     },
     async getAll() {
       //   const toast = useToastStore();
@@ -118,29 +101,50 @@ export const useSportStore = defineStore("sports", {
       }
     },
 
+    // teamStore.js
+
     async getPaging(page = null) {
       this.loading = true;
       this.error = null;
-      //Ha nincs megadva oldal, menj az aktuálisra
-      if (!page) {
-        page = this.pagination.current_page;
+
+      // UI oldalszám (amit a felhasználó lát és kattint)
+      const logicalPage = page || this.pagination?.current_page || 1;
+      let apiPage = logicalPage;
+      const lastPage = this.pagination?.last_page || 1;
+
+      // Speciális szabály: ID DESC esetén az oldalszám maradjon "logikai",
+      // de a háttérben tükrözött oldalt kérünk le, így pl. az 1. oldal 10..1 lesz.
+      if (this.sortColumn === "id" && this.sortDirection === "desc") {
+        apiPage = Math.max(1, lastPage - logicalPage + 1);
       }
+
       try {
         const response = await service.getPaging(
-          page,
+          apiPage,
           this.selectedPerPage,
           this.sortColumn,
           this.sortDirection,
-          this.searchStore.searchWord,
+          this.searchStore.searchWord || "",
         );
-        this.items = response.data;
-        this.pagination = response.meta;
+
+        // Az axios interceptor miatt itt már a szerver JSON-ja van:
+        // { message: 'OK', data: { data: [...], meta: {...} } }
+        const payload = response?.data ?? {};
+        this.items = Array.isArray(payload.data) ? payload.data : [];
+        this.pagination = payload.meta || this.pagination;
+
+        // A lapozóban a logikai oldalszám maradjon meg.
+        if (this.sortColumn === "id" && this.sortDirection === "desc") {
+          this.pagination = {
+            ...this.pagination,
+            current_page: logicalPage,
+          };
+        }
+
         return true;
       } catch (err) {
         this.error = err;
-        // toast.messages.push(`Az adatok nem töltődtek be`);
-        // toast.show("Error");
-        throw err;
+        console.error("Hiba a getPaging-ben:", err);
         return false;
       } finally {
         this.loading = false;
@@ -168,13 +172,8 @@ export const useSportStore = defineStore("sports", {
       this.loading = true;
       this.error = null;
       try {
-        const newItem = await service.create(data);
-        const response = await service.getAllSortSearch(
-          this.sortColumn,
-          this.sortDirection,
-          this.searchStore.searchWord,
-        );
-        this.items = response.data;
+        await service.create(data);
+        await this.getPaging(this.pagination?.current_page || 1);
         // toast.messages.push("Sikeresen létrehozva!");
         // toast.show("Success");
         return true;
@@ -192,14 +191,8 @@ export const useSportStore = defineStore("sports", {
       this.loading = true;
       this.error = null;
       try {
-        const updatedItem = await service.update(id, updateData);
-        // const response = await service.getAll();
-        const response = await service.getAllSortSearch(
-          this.sortColumn,
-          this.sortDirection,
-          this.searchStore.searchWord,
-        );
-        this.items = response.data;
+        await service.update(id, updateData);
+        await this.getPaging(this.pagination?.current_page || 1);
         // toast.messages.push(`Sikeresen módosítva`);
         // toast.show("Success");
         return true;
@@ -218,13 +211,7 @@ export const useSportStore = defineStore("sports", {
       this.error = null;
       try {
         await service.delete(id);
-        // const response = await service.getAll();
-        const response = await service.getAllSortSearch(
-          this.sortColumn,
-          this.sortDirection,
-          this.searchStore.searchWord,
-        );
-        this.items = response.data;
+        await this.getPaging(this.pagination?.current_page || 1);
         // toast.messages.push(`Sikeresen törölve`);
         // toast.show("Success");
         return true;

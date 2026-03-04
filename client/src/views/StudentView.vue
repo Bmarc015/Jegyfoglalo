@@ -63,7 +63,7 @@
 <script>
 import { mapActions, mapState } from "pinia";
 //módosít
-import { useSchoolclassStore } from "@/stores/schoolclassStore";
+import { useSchoolclassStore } from "@/stores/gamesStore";
 import { useStudentStore } from "@/stores/studentStore";
 import { useSearchStore } from "@/stores/searchStore";
 import GenericTable from "@/components/Table/GenericTable.vue";

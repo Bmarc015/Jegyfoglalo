@@ -43,20 +43,20 @@ const router = createRouter({
       },
       children: [
         {
-          path: "sport",
-          name: "sport",
-          component: () => import("@/views/SportView.vue"),
+          path: "teams",
+          name: "teams",
+          component: () => import("@/views/TeamView.vue"),
           beforeEnter: [checkIfNotLogged],
           meta: {
-            title: (route) => "Sport",
-            breadcrumb: "Sport",
+            title: (route) => "Teams",
+            breadcrumb: "Teams",
             roles: [1],
           },
         },
         {
-          path: "schoolclass",
-          name: "schoolclass",
-          component: () => import("@/views/SchoolClasssView.vue"),
+          path: "games",
+          name: "games",
+          component: () => import("@/views/GamesView.vue"),
           beforeEnter: [checkIfNotLogged],
           meta: {
             title: (route) => "Osztály",

@@ -49,7 +49,7 @@
 <script>
 import { mapActions, mapState } from "pinia";
 //módosít
-import { useSchoolclassStore } from "@/stores/schoolclassStore";
+import { useGamesStore } from "@/stores/gamesStore";
 import { useSearchStore } from "@/stores/searchStore";
 import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
@@ -57,7 +57,7 @@ import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
 import FormSchoolClass from "@/components/Forms/FormSchoolClass.vue";
 export default {
   //módosít
-  name: "SchooClassView",
+  name: "GamesView",
   components: {
     GenericTable,
     ConfirmModal,
@@ -72,14 +72,16 @@ export default {
   data() {
     return {
       //módosít
-      pageTitle: "Osztályok",
+      pageTitle: "Games",
       //módosít
       tableColumns: [
         { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
-        { key: "osztalyNev", label: "Osztálynév", debug: 2 },
+        { key: "team_home_id", label: "Team_Home_Id", debug: 2 },
+        { key: "team_away_id", label: "Team_Away_Id", debug: 2 },
+        { key: "game_date", label: "Game_Date", debug: 2 },
       ],
       //módosít
-      useCollectionStore: useSchoolclassStore,
+      useCollectionStore: useGamesStore,
       isOpenConfirmModal: false,
       toDeleteId: null,
       state: "r", //crud
@@ -88,7 +90,7 @@ export default {
   },
   computed: {
     //módosít
-    ...mapState(useSchoolclassStore, [
+    ...mapState(useGamesStore, [
       "item",
       "items",
       "loading",
@@ -100,7 +102,7 @@ export default {
   },
   methods: {
     //módosít
-    ...mapActions(useSchoolclassStore, [
+    ...mapActions(useGamesStore, [
       "getAll",
       "getAllSortSearch",
       "getById",

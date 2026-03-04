@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 // import { useToastStore } from "@/stores/toastStore";
 import { useSearchStore } from "./searchStore";
-import service from "@/api/schoolclassService";
+import service from "@/api/gameService";
 
 // const toast = useToastStore();
 
@@ -13,7 +13,7 @@ class Item {
   }
 }
 
-export const useSchoolclassStore = defineStore("schoolclass", {
+export const useGamesStore = defineStore("games", {
   state: () => ({
     item: new Item(),
     items: [new Item()],

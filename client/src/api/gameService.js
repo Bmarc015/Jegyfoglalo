@@ -1,39 +1,25 @@
-import apiClient from "./axiosClient";
-const route = "/sports";
+import apiClient from './axiosClient'; 
+const route = '/games';
 
 export default {
   // async getAllAbc() {
-  //   const route = `/schoolclassesabc`
+  //   const route = `/gamesabc`
   //   return await apiClient.get(route);
   // },
 
-  async getAllSortSearch(column = "id", direction = "asc", search = "") {
-    const route = `/sportssortsearch/${column}/${direction}/${search}`;
-    return await apiClient.get(route);
-  },
+  //  async getAllSortSearch(column='id', direction='asc', search='') {
+  //   const route = `/schoolclassessortsearch/${column}/${direction}/${search}`
+  //   return await apiClient.get(route);
+  // },
 
   // GET: Összes rekord lekérése
   async getAll() {
     return await apiClient.get(`${route}`);
   },
 
-  async getPaging(
-    page,
-    per_page = 10,
-    column = "id",
-    direction = "asc",
-    search = "",
-  ) {
-    let route = `/sportspaging/${page}/${per_page}/${column}/${direction}`;
-    if (search) {
-      route = `/sportspaging/${page}/${per_page}/${column}/${direction}/${search}`;
-    }
-    return await apiClient.get(`${route}`);
-  },
-
   // GET: Egy rekord (ID alapján)
   async getById(id) {
-    const url = `${route}/${id}`;
+    const url = `${route}/${id}`
     return await apiClient.get(url);
   },
 
@@ -52,5 +38,5 @@ export default {
   // DELETE: Törlés
   async delete(id) {
     return await apiClient.delete(`${route}/${id}`);
-  },
+  }
 };

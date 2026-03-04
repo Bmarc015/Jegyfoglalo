@@ -323,7 +323,7 @@
 <script>
 import { mapActions, mapState } from "pinia";
 import Modal from "@/components/Modal/Modal.vue";
-import { useSchoolclassStore } from "@/stores/schoolclassStore";
+import { useSchoolclassStore } from "@/stores/gamesStore";
 
 // import Modal from "../Modal/Modal.vue";
 export default {

@@ -1,68 +1,65 @@
 <template>
-  <div
-    class="table-responsive my-table-container"
-    style="max-height: calc(100vh - 360px); overflow-y: auto"
-  >
-    <table class="table table-hover w-auto mx-auto">
-      <thead class="table-dark sticky-top" style="z-index: 10; top: 0">
-        <tr class="align-middle text-center">
-          <th>Műveletek</th>
-          <template v-for="col in columns">
-            <th
-              class="my-pointer"
-              v-if="col.debug >= 1"
-              :key="col.key"
-              @click="$emit('sort', col.key)"
-              :class="{ 'my-debug': col.debug == 1 }"
-            >
-              <div
-                class="d-flex align-items-center justify-content-center text-nowrap"
+  <div class="table-shell">
+    <div class="table-responsive my-table-container">
+      <table class="table table-hover my-table">
+        <thead class="sticky-top my-table-head">
+          <tr class="align-middle text-center">
+            <th>Tools</th>
+            <template v-for="col in columns">
+              <th
+                v-if="col.debug >= 1"
+                :key="col.key"
+                class="my-pointer"
+                :class="{ 'my-debug': col.debug == 1 }"
+                @click="$emit('sort', col.key)"
               >
-                <span>{{ col.label }}</span>
-                <span
-                  :class="{ invisible: sortColumn !== col.key }"
-                  class="ms-1"
+                <div
+                  class="d-flex align-items-center justify-content-center text-nowrap"
                 >
-                  {{ sortDirection === "asc" ? "▲" : "▼" }}
-                </span>
-              </div>
-            </th>
-          </template>
-        </tr>
-      </thead>
-      <tbody class="table-group-divider">
-        <tr
-          v-for="item in items"
-          :key="item.id"
-          @click="onClickRow(item.id)"
-          :class="{ 'table-primary': selectedId === item.id }"
-        >
-          <td>
-            <ButtonsCrud
-              :id="item.id"
-              @delete="$emit('delete', $event)"
-              @update="$emit('update', $event)"
-              @create="$emit('create', $event)"
-              @passwordChange="$emit('passwordChange', $event)"
-              :cButtonVisible="cButtonVisible"
-              :uButtonVisible="uButtonVisible"
-              :dButtonVisible="dButtonVisible"
-              :pButtonVisible="pButtonVisible"
-            />
-            
-          </td>
-          <template v-for="col in columns">
-            <td
-              v-if="col.debug >= 1"
-              :key="col.key"
-              :class="{ 'my-debug': col.debug == 1 }"
-            >
-              {{ item[col.key] }}
+                  <span>{{ col.label }}</span>
+                  <span :class="{ invisible: sortColumn !== col.key }" class="ms-1">
+                    {{ sortDirection === "asc" ? "↑" : "↓" }}
+                  </span>
+                </div>
+              </th>
+            </template>
+          </tr>
+        </thead>
+
+        <tbody class="table-group-divider">
+          <tr
+            v-for="item in items"
+            :key="item.id"
+            :class="{ 'table-primary': selectedId === item.id }"
+            @click="onClickRow(item.id)"
+          >
+            <td>
+              <ButtonsCrud
+                :id="item.id"
+                :cButtonVisible="cButtonVisible"
+                :uButtonVisible="uButtonVisible"
+                :dButtonVisible="dButtonVisible"
+                :pButtonVisible="pButtonVisible"
+                @delete="$emit('delete', $event)"
+                @update="$emit('update', $event)"
+                @create="$emit('create', $event)"
+                @passwordChange="$emit('passwordChange', $event)"
+              />
             </td>
-          </template>
-        </tr>
-      </tbody>
-    </table>
+
+            <template v-for="col in columns">
+              <td
+                v-if="col.debug >= 1"
+                :key="col.key"
+                :class="{ 'my-debug': col.debug == 1 }"
+              >
+                {{ item[col.key] }}
+              </td>
+            </template>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -71,23 +68,22 @@ import ButtonsCrud from "./ButtonsCrud.vue";
 
 export default {
   name: "GenericTable",
+  components: {
+    ButtonsCrud,
+  },
   props: {
     items: { type: Array, required: true },
-    columns: { type: Array, required: true }, // Pl: [{key: 'name', label: 'Név', debug: false}]
+    columns: { type: Array, required: true },
     useCollectionStore: { type: Function, required: true },
     cButtonVisible: { type: Boolean, default: true },
     uButtonVisible: { type: Boolean, default: true },
     dButtonVisible: { type: Boolean, default: true },
     pButtonVisible: { type: Boolean, default: false },
-
-  },
-  components: {
-    ButtonsCrud,
   },
   data() {
     return {
       selectedId: null,
-      store: null, // Itt tároljuk a példányosított store-t
+      store: null,
     };
   },
   created() {
@@ -96,7 +92,6 @@ export default {
     }
   },
   computed: {
-    // Ezeket a store-ból húzzuk be reaktívan
     sortColumn() {
       return this.store ? this.store.sortColumn : "";
     },
@@ -113,22 +108,78 @@ export default {
 </script>
 
 <style scoped>
-/* Ez a titkos szósz a sticky fejléc stabilizálásához */
-.my-table-container {
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
+.table-shell {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
 }
 
-/* Megakadályozza, hogy görgetéskor "átlátszanak" a betűk a fekete fejléc alatt */
-/* .sticky-top th {
-  background-color: #212529 !important;
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.15);
-} */
+.my-table-container {
+  width: 100%;
+  max-width: 100%;
+  max-height: none;
+  overflow-y: visible;
+  border: 1px solid #d6dbe3;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
+  padding: 6px;
+}
 
-/* Ha a táblázat keskenyebb mint a képernyő, de középre akarod tenni */
-.table {
-  margin-left: auto;
-  margin-right: auto;
-  width: auto !important; /* Csak akkor, ha nem akarod, hogy kifeszüljön */
+.my-table {
+  width: 100%;
+  min-width: 100%;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  table-layout: fixed;
+}
+
+.my-table-head th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #f8fafc;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.8rem 0.6rem;
+}
+
+.my-table tbody td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.75rem 0.6rem;
+}
+
+.my-table tbody tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+.my-table tbody tr:hover td {
+  background-color: #eaf2ff;
+  transition: background-color 120ms ease-in-out;
+}
+
+.my-pointer {
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .my-table-container {
+    max-height: none;
+    border-radius: 10px;
+  }
+
+  .my-table-head th,
+  .my-table tbody td {
+    padding: 0.62rem 0.45rem;
+    font-size: 0.92rem;
+  }
 }
 </style>

@@ -60,8 +60,8 @@ export default {
 <style scoped>
 .footer {
   position: relative;
-  bottom: 0;
   width: 100%;
+  border-top: 1px solid #2b3a47;
 }
 
 .footer a:hover {
