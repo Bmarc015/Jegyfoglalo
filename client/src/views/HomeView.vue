@@ -33,7 +33,7 @@
         Don't miss out on the action!
       </p>
       <div class="d-flex justify-content-center mt-4">
-        <RouterLink to="/matches" class="btn btn-primary btn-lg">
+        <RouterLink to="/tickets" class="btn btn-primary btn-lg">
           Featured Matches
         </RouterLink>
       </div>

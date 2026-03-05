@@ -83,8 +83,7 @@
             v-model="formItem.role"
           >
             <option value="1">Admin</option>
-            <option value="2">Tanár</option>
-            <option value="3">Diák</option>
+            <option value="2">Customer</option>
           </select>
           <div
             v-if="!serverErrors.role"

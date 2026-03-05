@@ -25,9 +25,6 @@
             <li class="nav-item" v-if="hasMenuAccess('/adatok/games')">
               <RouterLink class="nav-link" to="/adatok/games">Games</RouterLink>
             </li>
-            <li class="nav-item" v-if="hasMenuAccess('/adatok/leagues')">
-              <RouterLink class="nav-link" to="/adatok/leagues">Leagues</RouterLink>
-            </li>
             <li class="nav-item" v-if="hasMenuAccess('/adatok/teams')">
               <RouterLink class="nav-link" to="/adatok/teams">Teams</RouterLink>
             </li>
@@ -36,6 +33,9 @@
             </li>
             <li class="nav-item" v-if="hasMenuAccess('/adatok/users')">
               <RouterLink class="nav-link" to="/adatok/users">Users</RouterLink>
+            </li>
+            <li class="nav-item" v-if="hasMenuAccess('/adatok/users')">
+              <RouterLink class="btn btn-outline-primary ms-2" to="/adatok/buytickets">Buy Tickets</RouterLink>
             </li>
           </ul>
 

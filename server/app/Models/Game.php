@@ -16,4 +16,14 @@ class Game extends Model
         'team_away_id',
         'game_date'
     ];
+    
+    public function homeTeam()
+    {
+        return $this->belongsTo(Team::class, 'team_home_id');
+    }
+
+    public function awayTeam()
+    {
+        return $this->belongsTo(Team::class, 'team_away_id');
+    }
 }

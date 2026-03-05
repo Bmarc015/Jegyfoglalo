@@ -16,6 +16,7 @@
       </div>
     </div>
 
+
     <!-- táblázat -->
     <GenericTable
       :items="items"
@@ -76,8 +77,8 @@ export default {
       //módosít
       tableColumns: [
         { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
-        { key: "team_home_id", label: "Team_Home_Id", debug: 2 },
-        { key: "team_away_id", label: "Team_Away_Id", debug: 2 },
+        { key: "team_home_name", label: "Home Team", debug: 2 },
+        { key: "team_away_name", label: "Away Team", debug: 2 },
         { key: "game_date", label: "Game_Date", debug: 2 },
       ],
       //módosít

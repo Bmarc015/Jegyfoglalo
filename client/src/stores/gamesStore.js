@@ -23,10 +23,10 @@ export const useGamesStore = defineStore("games", {
     sortDirection: "asc",
     searchStore: useSearchStore(),
   }),
-   getters:{
-    getItemsLength(){
+  getters: {
+    getItemsLength() {
       return this.items.length;
-    }
+    },
   },
   actions: {
     clearItem() {
@@ -76,16 +76,19 @@ export const useGamesStore = defineStore("games", {
       }
     },
     async getAll() {
-      //   const toast = useToastStore();
       this.loading = true;
-      this.error = null;
       try {
         const response = await service.getAll();
-        // this.searchStore.reset();
-        this.items = response.data;
+
+        // Átalakítjuk az adatokat, hogy a táblázat könnyen kiolvashassa
+        this.items = response.data.map((game) => ({
+          ...game,
+          // Létrehozunk két új kulcsot, amik pontosan egyeznek a View-ban lévő kulcsokkal
+          team_home_name: game.home_team ? game.home_team.team_name : "N/A",
+          team_away_name: game.away_team ? game.away_team.team_name : "N/A",
+        }));
       } catch (err) {
         this.error = err;
-        throw err;
       } finally {
         this.loading = false;
       }

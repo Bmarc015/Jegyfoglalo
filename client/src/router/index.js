@@ -54,6 +54,17 @@ const router = createRouter({
           },
         },
         {
+          path: "buytickets",
+          name: "buytickets",
+          component: () => import("@/views/BuyTicketsView.vue"),
+          beforeEnter: [checkIfNotLogged],
+          meta: {
+            title: (route) => "Buy Tickets",
+            breadcrumb: "Buy Tickets",
+            roles: [1,2],
+          },
+        },
+        {
           path: "games",
           name: "games",
           component: () => import("@/views/GamesView.vue"),
