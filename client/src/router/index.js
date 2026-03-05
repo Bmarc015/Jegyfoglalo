@@ -4,10 +4,10 @@ import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import { useToastStore } from "@/stores/toastStore";
 
 //Azt nézi meg, hogy be van-e valaki jelentkezve
-function checkIfNotLogged() {
+function checkIfNotLogged(to) {
   const storeAuth = useUserLoginLogoutStore();
   if (!storeAuth.isLoggedIn) {
-    return "/login";
+    return { path: "/login", query: { redirect: to.fullPath } };
   }
 }
 
@@ -19,8 +19,7 @@ const router = createRouter({
       name: "home",
       component: HomeView,
       meta: {
-        title: (route) => "Főoldal",
-        breadcrumb: "Főoldal",
+        title: (route) => "Home Page",
       },
     },
     {
@@ -28,8 +27,7 @@ const router = createRouter({
       name: "about",
       component: () => import("@/views/AboutView.vue"),
       meta: {
-        title: (route) => "Rólunk",
-        breadcrumb: "Rólunk",
+        title: (route) => "About Us",
       },
     },
     {
@@ -37,7 +35,6 @@ const router = createRouter({
       name: "adatok",
       component: () => import("@/views/EmptyWrapperView.vue"),
       meta: {
-        breadcrumb: "Adatok",
         disabled: true,
         roles: [1, 2],
       },
@@ -49,8 +46,7 @@ const router = createRouter({
           beforeEnter: [checkIfNotLogged],
           meta: {
             title: (route) => "Teams",
-            breadcrumb: "Teams",
-            roles: [1],
+            roles: [1,2],
           },
         },
         {
@@ -60,7 +56,6 @@ const router = createRouter({
           beforeEnter: [checkIfNotLogged],
           meta: {
             title: (route) => "Buy Tickets",
-            breadcrumb: "Buy Tickets",
             roles: [1,2],
           },
         },
@@ -71,7 +66,6 @@ const router = createRouter({
           beforeEnter: [checkIfNotLogged],
           meta: {
             title: (route) => "Games",
-            breadcrumb: "Games",
             roles: [1,2],
           },
         },
@@ -82,7 +76,6 @@ const router = createRouter({
           beforeEnter: [checkIfNotLogged],
           meta: {
             title: (route) => "Tanuló",
-            breadcrumb: "Tanuló",
             roles: [1, 2],
           },
         },
@@ -93,7 +86,6 @@ const router = createRouter({
           beforeEnter: [checkIfNotLogged],
           meta: {
             title: (route) => "Sportolás",
-            breadcrumb: "Sportolás",
             roles: [1, 2],
           },
         },
@@ -104,7 +96,6 @@ const router = createRouter({
           beforeEnter: [checkIfNotLogged],
           meta: {
             title: (route) => "Users",
-            breadcrumb: "Users",
             roles: [1],
           },
         },
@@ -116,7 +107,6 @@ const router = createRouter({
       component: () => import("@/views/LoginView.vue"),
       meta: {
         title: (route) => "Login",
-        breadcrumb: "Login",
       },
     },
     {
@@ -125,7 +115,6 @@ const router = createRouter({
       component: () => import("@/views/RegistrationView.vue"),
       meta: {
         title: (route) => "Regisztráció",
-        breadcrumb: "Regisztráció",
       },
     },
     {
@@ -135,7 +124,6 @@ const router = createRouter({
       beforeEnter: [checkIfNotLogged],
       meta: {
         title: (route) => "Profil",
-        breadcrumb: "Profil",
         roles: [1, 2],
       },
     },
@@ -145,7 +133,6 @@ const router = createRouter({
       component: () => import("@/views/404.vue"),
       meta: {
         title: (route) => "404",
-        breadcrumb: "",
       },
     },
   ],
@@ -169,7 +156,7 @@ router.beforeEach((to, from, next) => {
     // 2. eset: Nincs joga
     if (!userStore.isLoggedIn) {
       // Ha nincs belépve, küldjük a loginra
-      next({ path: "/login" });
+      next({ path: "/login", query: { redirect: to.fullPath } });
     } else {
       // Ha be van lépve, de ehhez nincs joga (pl. diák admin oldalra téved)
       // Küldjük a főoldalra vagy egy "Nincs jogosultság" oldalra

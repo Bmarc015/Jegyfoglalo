@@ -1,220 +1,85 @@
 <template>
   <div class="home-view">
-    <!-- Carousel Background -->
-    <div id="homeCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000">
-      <!-- Carousel Indicators -->
+    <!-- Carousel -->
+    <div
+      id="homeCarousel"
+      class="carousel slide carousel-fade"
+      data-bs-ride="carousel"
+      data-bs-interval="3000"
+    >
       <div class="carousel-indicators">
-        <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-        <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        <button
+          type="button"
+          data-bs-target="#homeCarousel"
+          data-bs-slide-to="0"
+          class="active"
+          aria-current="true"
+          aria-label="Slide 1"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#homeCarousel"
+          data-bs-slide-to="1"
+          aria-label="Slide 2"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#homeCarousel"
+          data-bs-slide-to="2"
+          aria-label="Slide 3"
+        ></button>
       </div>
-      
-      <!-- Carousel Slides -->
+      <!-- Carousel Pics -->
       <div class="carousel-inner">
         <div class="carousel-item active">
-          <img src="/carousel_santiago.jpg" class="d-block w-100 carousel-img" alt="Football 1">
+          <img
+            src="/carousel_santiago.jpg"
+            class="d-block w-100 carousel-img"
+            alt="Football 1"
+          />
         </div>
         <div class="carousel-item">
-          <img src="/carousel2_santiago.jpg" class="d-block w-100 carousel-img" alt="Football 2">
+          <img
+            src="/carousel2_santiago.jpg"
+            class="d-block w-100 carousel-img"
+            alt="Football 2"
+          />
         </div>
         <div class="carousel-item">
-          <img src="/carousel3_santiago.jpg" class="d-block w-100 carousel-img" alt="Football 3">
+          <img
+            src="/carousel3_santiago.jpg"
+            class="d-block w-100 carousel-img"
+            alt="Football 3"
+          />
         </div>
       </div>
     </div>
-    
-    <!-- Content Overlay -->
+    <!-- Carousel Text -->
     <div class="content-overlay flex-grow-0">
       <h1 class="text-center mt-5">Welcome to TicketMaster!</h1>
       <p class="text-center mt-3">
-        Discover the best football events and get your tickets now. 
+        Discover the best football events and get your tickets now.
       </p>
-      <p>
-        Don't miss out on the action!
-      </p>
+      <p>Don't miss out on the action!</p>
       <div class="d-flex justify-content-center mt-4">
         <RouterLink to="/tickets" class="btn btn-primary btn-lg">
           Featured Matches
         </RouterLink>
       </div>
     </div>
-    
-    <!-- Match Calendar -->
-    <div class="match-calendar container mt-auto pt-5 mb-4">
-      <div class="calendar-toolbar mb-3">
-        <div class="calendar-title-wrap">
-          <h5 class="m-0">Select a Week</h5>
-          <span class="selected-month">{{ selectedMonthLabel }}</span>
-        </div>
-        <div class="calendar-picker-wrap">
-          <button class="calendar-pick-btn" type="button" @click="openCalendarPicker">
-            <i class="bi bi-calendar2-week me-2"></i>
-            Choose Week
-          </button>
-          <input
-            ref="weekPicker"
-            type="week"
-            class="day-picker-input"
-            :value="selectedWeek"
-            @change="onWeekChange"
-          />
-        </div>
-      </div>
-      <div class="d-flex justify-content-center flex-wrap gap-2">
-        <div 
-          v-for="(day, index) in weekDays" 
-          :key="index"
-        >
-          <div 
-            class="calendar-day text-center" 
-            :class="{ 'active': selectedDay === index }"
-            @click="selectDay(index)"
-          >
-            <div class="day-name">{{ day.name }}</div>
-            <div class="day-date">{{ day.date }}</div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Matches for Selected Day -->
-      <div class="matches-section mt-4">
-        <h5 class="mb-3">Matches on {{ weekDays[selectedDay]?.name }} {{ weekDays[selectedDay]?.date }}</h5>
-        <div class="row justify-content-center">
-          <div 
-            v-for="match in matches" 
-            :key="match.id"
-            class="col-12 col-md-6 col-lg-4 mb-3"
-          >
-            <div class="card match-card h-100">
-              <div class="card-body text-center">
-                <div class="match-time">{{ match.time }}</div>
-                <div class="match-teams">
-                  <span class="team-name">{{ match.homeTeam }}</span>
-                  <span class="vs">vs</span>
-                  <span class="team-name">{{ match.awayTeam }}</span>
-                </div>
-                <div class="match-venue">{{ match.venue }}</div>
-                <button class="btn btn-sm btn-outline-primary mt-2">Buy Tickets</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-if="matches.length === 0" class="text-center text-muted">
-          <p>No matches scheduled for this day.</p>
-        </div>
-      </div>
-    </div>
+    <!-- Calendar -->
+    <HomeMatchCalendar />
   </div>
 </template>
 
 <script>
+import HomeMatchCalendar from "@/components/Home/HomeMatchCalendar.vue";
+
 export default {
-  data() {
-    return {
-      selectedDay: 0,
-      selectedWeek: "",
-      weekDays: [],
-      matches: []
-    };
+  name: "HomeView",
+  components: {
+    HomeMatchCalendar,
   },
-  computed: {
-    selectedMonthLabel() {
-      if (!this.weekDays.length) return "";
-      const baseDate = new Date(`${this.weekDays[0].fullDate}T00:00:00`);
-      return baseDate.toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-      });
-    },
-  },
-  mounted() {
-    const today = new Date();
-    this.selectedWeek = this.getISOWeekValue(today);
-    this.generateWeekDays(this.getISOWeekStartDate(today));
-    this.loadMatches();
-  },
-  methods: {
-    generateWeekDays(startDate = new Date()) {
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      this.weekDays = [];
-      const anchorDate = new Date(startDate);
-      
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(anchorDate);
-        date.setDate(anchorDate.getDate() + i);
-        
-        this.weekDays.push({
-          name: days[date.getDay()],
-          date: date.getDate(),
-          fullDate: date.toISOString().split('T')[0]
-        });
-      }
-    },
-    selectDay(index) {
-      this.selectedDay = index;
-      this.loadMatches();
-    },
-    openCalendarPicker() {
-      const picker = this.$refs.weekPicker;
-      if (!picker) return;
-      if (typeof picker.showPicker === 'function') {
-        picker.showPicker();
-      } else {
-        picker.click();
-      }
-    },
-    onWeekChange(event) {
-      const selected = event?.target?.value;
-      if (!selected) return;
-      const startOfWeek = this.getDateFromISOWeekValue(selected);
-      this.selectedWeek = selected;
-      this.generateWeekDays(startOfWeek);
-      this.selectedDay = 0;
-      this.loadMatches();
-    },
-    getISOWeekStartDate(date) {
-      const d = new Date(date);
-      const day = (d.getDay() + 6) % 7; // Monday=0 ... Sunday=6
-      d.setDate(d.getDate() - day);
-      d.setHours(0, 0, 0, 0);
-      return d;
-    },
-    getISOWeekValue(date) {
-      const tmp = new Date(date);
-      tmp.setHours(0, 0, 0, 0);
-      tmp.setDate(tmp.getDate() + 3 - ((tmp.getDay() + 6) % 7));
-      const week1 = new Date(tmp.getFullYear(), 0, 4);
-      const weekNo =
-        1 +
-        Math.round(
-          ((tmp - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7,
-        );
-      return `${tmp.getFullYear()}-W${String(weekNo).padStart(2, "0")}`;
-    },
-    getDateFromISOWeekValue(isoWeek) {
-      const [yearText, weekText] = isoWeek.split("-W");
-      const year = Number(yearText);
-      const week = Number(weekText);
-      const jan4 = new Date(year, 0, 4);
-      const jan4WeekDay = (jan4.getDay() + 6) % 7; // Monday=0
-      const mondayWeek1 = new Date(year, 0, 4 - jan4WeekDay);
-      const weekStart = new Date(mondayWeek1);
-      weekStart.setDate(mondayWeek1.getDate() + (week - 1) * 7);
-      weekStart.setHours(0, 0, 0, 0);
-      return weekStart;
-    },
-    loadMatches() {
-      // Sample matches data - in real app, this would fetch from API based on selected date
-      const sampleMatches = [
-        { id: 1, time: '15:00', homeTeam: 'Real Madrid', awayTeam: 'Barcelona', venue: 'Santiago Bernabéu' },
-        { id: 2, time: '18:00', homeTeam: 'Manchester United', awayTeam: 'Liverpool', venue: 'Old Trafford' },
-        { id: 3, time: '20:00', homeTeam: 'Bayern Munich', awayTeam: 'Dortmund', venue: 'Allianz Arena' }
-      ];
-      
-      // For demo, show same matches for all days
-      this.matches = sampleMatches;
-    }
-  }
 };
 </script>
 
@@ -252,124 +117,5 @@ export default {
 .content-overlay p {
   font-size: 1.5rem;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-}
-
-.calendar-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-}
-
-.calendar-title-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.2;
-}
-
-.selected-month {
-  margin-top: 0.15rem;
-  font-size: 0.85rem;
-  color: #40638f;
-  font-weight: 600;
-}
-
-.calendar-pick-btn {
-  border: 1px solid #c9d6ea;
-  background: linear-gradient(135deg, #f8fbff 0%, #eaf2ff 100%);
-  color: #163a6b;
-  border-radius: 10px;
-  padding: 0.45rem 0.9rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(22, 58, 107, 0.12);
-  transition: all 0.2s ease;
-}
-
-.calendar-pick-btn:hover {
-  background: linear-gradient(135deg, #eaf2ff 0%, #dce9ff 100%);
-  transform: translateY(-1px);
-}
-
-.day-picker-input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-
-.calendar-day {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid #dee2e6;
-  background-color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  min-width: 70px;
-}
-
-.calendar-day:hover {
-  border-color: #0d6efd;
-  background-color: #f8f9fa;
-}
-
-.calendar-day.active {
-  background-color: #0d6efd;
-  color: white;
-  border-color: #0d6efd;
-}
-
-.day-name {
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.day-date {
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.match-card {
-  border: 1px solid #dee2e6;
-  border-radius: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.match-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.match-time {
-  font-size: 0.9rem;
-  color: #6c757d;
-  font-weight: bold;
-}
-
-.match-teams {
-  font-size: 1rem;
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-.team-name {
-  color: #212529;
-}
-
-.vs {
-  color: #6c757d;
-  margin: 0 8px;
-  font-size: 0.85rem;
-}
-
-.match-venue {
-  font-size: 0.85rem;
-  color: #6c757d;
-}
-
-.gap-2 {
-  gap: 0.5rem;
 }
 </style>

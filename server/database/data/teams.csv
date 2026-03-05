@@ -3,7 +3,7 @@ FC Barcelona,Barcelona
 Manchester City,Manchester
 Liverpool FC,Liverpool
 Bayern München,München
-Paris Saint-Germain,Paris
+PSG,Paris
 Arsenal FC,London
 Inter Milan,Milano
 AC Milan,Milano
@@ -24,7 +24,7 @@ Sporting CP,Lisboa
 Ajax,Amsterdam
 PSV Eindhoven,Eindhoven
 Feyenoord,Rotterdam
-Olympique Marseille,Marseille
+Marseille,Marseille
 AS Monaco,Monaco
 Lille OSC,Lille
 Lazio,Roma
@@ -34,10 +34,10 @@ Real Sociedad,San Sebastian
 Villarreal CF,Villarreal
 Real Betis,Sevilla
 Athletic Bilbao,Bilbao
-Newcastle United,Newcastle
-West Ham United,London
-Brighton & Hove Albion,Brighton
-Eintracht Frankfurt,Frankfurt
+Newcastle,Newcastle
+West Ham,London
+Brighton,Brighton
+Frankfurt,Frankfurt
 VfB Stuttgart,Stuttgart
 Fenerbahçe,Istanbul
 Galatasaray,Istanbul
@@ -49,17 +49,17 @@ Celtic FC,Glasgow
 Rangers FC,Glasgow
 Club Brugge,Brugge
 Anderlecht,Brussels
-Red Bull Salzburg,Salzburg
+Salzburg,Salzburg
 Sturm Graz,Graz
 Dinamo Zagreb,Zagreb
 Hajduk Split,Split
 Slavia Praha,Praha
 Sparta Praha,Praha
 Ferencváros,Budapest
-MOL Fehérvár,Székesfehérvár
+Fehérvár,Székesfehérvár
 Debreceni VSC,Debrecen
 Puskás Akadémia,Felcsút
-MTK Budapest,Budapest
+MTK,Budapest
 Újpest FC,Budapest
 Boca Juniors,Buenos Aires
 River Plate,Buenos Aires
@@ -78,7 +78,7 @@ Shakhtar Donetsk,Donetsk
 Dynamo Kyiv,Kyiv
 FC Basel,Basel
 Young Boys,Bern
-Sheriff Tiraspol,Tiraspol
+Sheriff,Tiraspol
 Ludogorets,Razgrad
 Crvena Zvezda,Beograd
 Partizan,Beograd
@@ -93,7 +93,7 @@ Girona FC,Girona
 Atalanta,Bergamo
 OGC Nice,Nice
 RC Lens,Lens
-Stade Rennais,Rennes
+Rennes,Rennes
 VfL Wolfsburg,Wolfsburg
 SC Freiburg,Freiburg
 TSG Hoffenheim,Sinsheim

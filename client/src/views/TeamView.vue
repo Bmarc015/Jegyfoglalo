@@ -31,7 +31,7 @@
     <div class="table-full-bleed" v-if="items.length > 0">
       <GenericTable
         :items="items"
-        :columns="tableColumns"
+        :columns="visibleTableColumns"
         :useCollectionStore="useCollectionStore"
         @delete="deleteHandler"
         @update="updateHandler"
@@ -63,6 +63,7 @@ import { mapActions, mapState } from "pinia";
 //módosít
 import { useTeamStore } from "@/stores/teamStore";
 import { useSearchStore } from "@/stores/searchStore";
+import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
 import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
@@ -115,6 +116,11 @@ export default {
       "getItemsLength",
     ]),
     ...mapState(useSearchStore, ["searchWord"]),
+    ...mapState(useUserLoginLogoutStore, ["role"]),
+    visibleTableColumns() {
+      if (this.role === 1) return this.tableColumns;
+      return this.tableColumns.filter((column) => column.key !== "id");
+    },
   },
   methods: {
     //módosít

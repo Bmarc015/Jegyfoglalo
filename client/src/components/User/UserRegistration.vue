@@ -1,58 +1,57 @@
 <template>
-  <div class="d-flex justify-content-center my-4">
-    <div class="card" style="width: 26rem">
-      <div class="card-header text-bg-primary">Regisztráció</div>
-      <div class="card-body">
-        <form
-          @submit.prevent="handleSubmit"
-          :class="{ 'was-validated': validated }"
-          novalidate
-        >
-          <!-- User név -->
-          <div class="mb-3">
-            <label for="userName" class="form-label">User neved:</label>
+  <section class="auth-shell">
+    <div class="auth-card">
+      <div class="auth-head">
+        <p class="auth-kicker mb-1">New account</p>
+        <h1 class="auth-title m-0">Create Account</h1>
+        <p class="auth-subtitle mb-0">Set up your profile to start booking tickets quickly.</p>
+      </div>
+
+      <form @submit.prevent="handleSubmit" :class="{ 'was-validated': validated }" novalidate>
+        <div class="row g-3">
+          <div class="col-12">
+            <label for="userName" class="form-label">Full name <span class="required-mark">*</span></label>
             <input
+              id="userName"
+              v-model.trim="userName"
               type="text"
               class="form-control"
-              id="userName"
-              v-model="userName"
               @input="clearError('name')"
-             
               required
             />
             <div v-if="!serverErrors.name" class="invalid-feedback">
-              A user név kötelező, vagy 2-nél hosszabb kell legyen
+              Please enter your name (at least 2 characters).
             </div>
             <div v-if="serverErrors.name" class="invalid-feedback d-block">
               {{ serverErrors.name[0] }}
             </div>
           </div>
-          <!-- Email -->
-          <div class="mb-3">
-            <label for="email" class="form-label">Email címed:</label>
+
+          <div class="col-12">
+            <label for="email" class="form-label">Email address <span class="required-mark">*</span></label>
             <input
+              id="email"
+              v-model.trim="email"
               type="email"
               class="form-control"
-              id="email"
-              v-model="email"
-               @input="clearError('email')"
+              @input="clearError('email')"
               required
             />
             <div v-if="!serverErrors.email" class="invalid-feedback">
-              A email kötelező, vagy nem szabályos
+              Please enter a valid email address.
             </div>
             <div v-if="serverErrors.email" class="invalid-feedback d-block">
               {{ serverErrors.email[0] }}
             </div>
           </div>
-          <!-- Billing Address Fields -->
-          <div class="mb-3">
-            <label for="billingCity" class="form-label">Település:</label>
+
+          <div class="col-12 col-md-6">
+            <label for="billingCity" class="form-label">City</label>
             <input
+              id="billingCity"
+              v-model.trim="billingCity"
               type="text"
               class="form-control"
-              id="billingCity"
-              v-model="billingCity"
               @input="clearError('billing_city')"
             />
             <div v-if="serverErrors.billing_city" class="invalid-feedback d-block">
@@ -60,13 +59,13 @@
             </div>
           </div>
 
-          <div class="mb-3">
-            <label for="billingZip" class="form-label">Irányítószám:</label>
+          <div class="col-12 col-md-6">
+            <label for="billingZip" class="form-label">ZIP code</label>
             <input
+              id="billingZip"
+              v-model.trim="billingZip"
               type="text"
               class="form-control"
-              id="billingZip"
-              v-model="billingZip"
               inputmode="numeric"
               pattern="[0-9]*"
               @input="clearError('billing_zip')"
@@ -76,13 +75,13 @@
             </div>
           </div>
 
-          <div class="mb-3">
-            <label for="billingAddress" class="form-label">Cím:</label>
+          <div class="col-12">
+            <label for="billingAddress" class="form-label">Address</label>
             <input
+              id="billingAddress"
+              v-model.trim="billingAddress"
               type="text"
               class="form-control"
-              id="billingAddress"
-              v-model="billingAddress"
               @input="clearError('billing_address')"
             />
             <div v-if="serverErrors.billing_address" class="invalid-feedback d-block">
@@ -90,51 +89,52 @@
             </div>
           </div>
 
-          <!-- Password1 -->
-          <PasswordField
-            class="mb-3"
-            ref="pass1Comp"
-            v-model="password"
-            :label="'Jelszavad'"
-            :inputRef="'firstInput'"
-            :label-id="'password'"
-            :serverErrors="serverErrors"
-          />
-          <!-- Password2 -->
-          <PasswordField
-            ref="pass2Comp"
-            v-model="confirmPassword"
-            :label="'Jelszavad mégegyszer'"
-            :inputRef="'confirmInput'"
-            :label-id="'confirmPassword'"
-            :passwordErrorMessage="passwordErrorMessage"
-            :serverErrors="serverErrors"
-          />
-          <!-- Regisztrálás -->
-          <button type="submit" class="btn btn-success">Regisztrálás</button>
-          <!-- Mégse -->
-          <button
-            type="button"
-            class="btn btn-primary ms-2"
-            @click="this.$router.push('/login')"
-          >
-            Mégsem
+          <div class="col-12">
+            <PasswordField
+              ref="pass1Comp"
+              v-model="password"
+              :label="'Password'"
+              :required="true"
+              :input-ref="'firstInput'"
+              :label-id="'password'"
+              :server-errors="serverErrors"
+            />
+          </div>
+
+          <div class="col-12">
+            <PasswordField
+              ref="pass2Comp"
+              v-model="confirmPassword"
+              :label="'Confirm password'"
+              :required="true"
+              :input-ref="'confirmInput'"
+              :label-id="'confirmPassword'"
+              :password-error-message="passwordErrorMessage"
+              :server-errors="serverErrors"
+            />
+          </div>
+        </div>
+
+        <p class="required-note mt-2 mb-0">Fields marked with <span class="required-mark">*</span> are required.</p>
+
+        <div class="auth-actions mt-3">
+          <button type="submit" class="btn btn-primary">Create account</button>
+          <button type="button" class="btn btn-outline-secondary" @click="$router.push('/login')">
+            Back to sign in
           </button>
-        </form>
-        <ToastContainer />
-      </div>
+        </div>
+      </form>
     </div>
-  </div>
+  </section>
 </template>
 
 <script>
-import ToastContainer from "../Message/ToastContanier.vue";
 import PasswordField from "./PasswordField.vue";
+
 export default {
   name: "UserRegistration",
   components: {
     PasswordField,
-    ToastContainer,
   },
   data() {
     return {
@@ -150,19 +150,16 @@ export default {
       serverErrors: {},
     };
   },
-
   methods: {
     validatePasswords() {
       const comp2 = this.$refs.pass2Comp;
       const input2 = comp2?.$refs[comp2.inputRef];
+      if (!input2) return;
 
       if (this.password !== this.confirmPassword) {
-        // Ha nem egyeznek, hibát állítunk be (ezzel invalid lesz)
-        input2.setCustomValidity("A jelszavak nem egyeznek!");
-        //Ez a hibaüzenetet jelenítjük meg
-        this.passwordErrorMessage = "A jelszavak nem egyeznek!";
+        input2.setCustomValidity("Passwords do not match.");
+        this.passwordErrorMessage = "Passwords do not match.";
       } else {
-        // Ha egyeznek, töröljük a hibát (ezzel valid lesz)
         input2.setCustomValidity("");
         this.passwordErrorMessage = "";
       }
@@ -170,43 +167,33 @@ export default {
     handleSubmit(event) {
       this.validatePasswords();
       const form = event.target;
-      //Bekapcsolja a bootstrap hiba színező logikáját
       this.validated = true;
 
       if (form.checkValidity() === false) {
-        console.log("Hiba:");
-      } else {
-        console.log("Sikeres validáció!");
-        //user létrehozás
-        const data = {
-          name: this.userName,
-          email: this.email,
-          billing_city: this.billingCity,
-          billing_zip: this.billingZip,
-          billing_address: this.billingAddress,
-          password: this.password,
-        };
-        this.$emit("createUser", 
-        {
-          data: data,
-          done: (success) => {
-            if (success) {
-              this.$router.push('/login');
-            }else{
-              console.log("Server oldali hiba, űrlap marad");
-            }
-          }
-        } 
-      );
-        
+        return;
       }
+
+      const data = {
+        name: this.userName,
+        email: this.email,
+        billing_city: this.billingCity,
+        billing_zip: this.billingZip,
+        billing_address: this.billingAddress,
+        password: this.password,
+      };
+
+      this.$emit("createUser", {
+        data,
+        done: (success) => {
+          if (success) {
+            this.$router.push("/login");
+          }
+        },
+      });
     },
-    //422-es hiba kezelés
-    // View hívja, ha 422-es hiba van
     setServerErrors(errors) {
       this.serverErrors = errors;
     },
-    //Mező (field) eltüntetése a serverErrors objektumból
     clearError(field) {
       if (this.serverErrors[field]) {
         delete this.serverErrors[field];
@@ -216,4 +203,63 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.auth-shell {
+  display: flex;
+  justify-content: center;
+  padding: 1.2rem 0.8rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 720px;
+  border: 1px solid #d8e2f0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  box-shadow: 0 14px 30px rgba(16, 48, 86, 0.12);
+  padding: 1.2rem;
+}
+
+.auth-head {
+  margin-bottom: 0.9rem;
+}
+
+.auth-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0b57d0;
+  font-weight: 700;
+}
+
+.auth-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #153a69;
+}
+
+.auth-subtitle {
+  color: #516a8f;
+  margin-top: 0.3rem;
+}
+
+.auth-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.auth-actions .btn {
+  min-width: 150px;
+}
+
+.required-mark {
+  color: #d14343;
+  font-weight: 700;
+}
+
+.required-note {
+  font-size: 0.8rem;
+  color: #5f7698;
+}
+</style>

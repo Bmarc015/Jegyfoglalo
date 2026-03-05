@@ -1,9 +1,9 @@
 <template>
-  <section class="buy-tickets-view container py-4">
-    <div class="match-calendar full-page-calendar">
+  <div class="match-calendar container mt-auto pt-5 mb-4">
+    <div class="home-calendar-panel">
       <div class="calendar-toolbar mb-3">
         <div class="calendar-title-wrap">
-          <h1 class="m-0">Buy Tickets</h1>
+          <h5 class="m-0">Select a Week</h5>
           <span class="selected-month">{{ selectedMonthLabel }}</span>
         </div>
         <div class="calendar-picker-wrap">
@@ -84,7 +84,7 @@
                   </div>
                 </div>
                 <div v-if="match.venue" class="match-venue">{{ match.venue }}</div>
-                <button class="btn btn-sm btn-outline-primary mt-3">Buy Tickets</button>
+                <RouterLink class="btn btn-sm btn-outline-primary mt-3" to="/adatok/buytickets">Buy Tickets</RouterLink>
               </div>
             </article>
           </div>
@@ -98,7 +98,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -106,7 +106,7 @@ import gameService from "@/api/gameService";
 import { resolveTeamLogo } from "@/constants/teamLogos";
 
 export default {
-  name: "BuyTicketsView",
+  name: "HomeMatchCalendar",
   data() {
     return {
       selectedDay: 0,
@@ -128,11 +128,8 @@ export default {
     },
   },
   async mounted() {
-    const today = new Date();
-    this.selectedWeek = this.getISOWeekValue(today);
-    this.generateWeekDays(this.getISOWeekStartDate(today));
     await this.fetchGames();
-    this.loadMatches();
+    this.goToFirstMatchDay();
   },
   methods: {
     generateWeekDays(startDate = new Date()) {
@@ -196,8 +193,38 @@ export default {
       const startOfWeek = this.getISOWeekStartDate(today);
       this.selectedWeek = this.getISOWeekValue(today);
       this.generateWeekDays(startOfWeek);
-      this.selectedDay = (today.getDay() + 6) % 7; // Monday=0 ... Sunday=6
+      this.selectedDay = (today.getDay() + 6) % 7;
       this.loadMatches();
+    },
+    goToFirstMatchDay() {
+      const firstMatchDate = this.getFirstMatchDate();
+      if (!firstMatchDate) {
+        this.goToToday();
+        return;
+      }
+
+      const startOfWeek = this.getISOWeekStartDate(firstMatchDate);
+      this.selectedWeek = this.getISOWeekValue(firstMatchDate);
+      this.generateWeekDays(startOfWeek);
+      this.selectedDay = (firstMatchDate.getDay() + 6) % 7; // Monday=0 ... Sunday=6
+      this.loadMatches();
+    },
+    getFirstMatchDate() {
+      if (!Array.isArray(this.allGames) || this.allGames.length === 0) {
+        return null;
+      }
+
+      let firstDate = null;
+      for (const game of this.allGames) {
+        if (!game?.game_date) continue;
+        const parsed = new Date(String(game.game_date).replace(" ", "T"));
+        if (Number.isNaN(parsed.getTime())) continue;
+        if (!firstDate || parsed < firstDate) {
+          firstDate = parsed;
+        }
+      }
+
+      return firstDate;
     },
     async fetchGames() {
       this.loadingMatches = true;
@@ -288,11 +315,7 @@ export default {
 </script>
 
 <style scoped>
-.buy-tickets-view {
-  min-height: calc(100vh - var(--app-menu-height, 92px));
-}
-
-.full-page-calendar {
+.home-calendar-panel {
   background: #ffffff;
   border: 1px solid #dfe6ef;
   border-radius: 12px;

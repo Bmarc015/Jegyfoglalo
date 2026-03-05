@@ -34,8 +34,8 @@
             <li class="nav-item" v-if="hasMenuAccess('/adatok/users')">
               <RouterLink class="nav-link" to="/adatok/users">Users</RouterLink>
             </li>
-            <li class="nav-item" v-if="hasMenuAccess('/adatok/users')">
-              <RouterLink class="btn btn-outline-primary ms-2" to="/adatok/buytickets">Buy Tickets</RouterLink>
+            <li class="nav-item">
+              <RouterLink class="btn btn-outline-primary ms-2" :to="buyTicketsMenuLink">Buy Tickets</RouterLink>
             </li>
           </ul>
 
@@ -43,6 +43,11 @@
             <li class="nav-item" v-if="!isLoggedIn">
               <RouterLink class="nav-link" to="/login">
                 <i class="bi bi-person"></i> Sign In
+              </RouterLink>
+            </li>
+            <li class="nav-item" v-if="!isLoggedIn">
+              <RouterLink class="nav-link" to="/registration">
+                <i class="bi bi-person-plus"></i> Registration
               </RouterLink>
             </li>
             <li class="nav-item dropdown" v-if="isLoggedIn">
@@ -108,6 +113,10 @@ export default {
   computed: {
     ...mapState(useSearchStore, ["searchWord"]),
     ...mapState(useUserLoginLogoutStore, ["isLoggedIn", "userNameWithRole"]),
+    buyTicketsMenuLink() {
+      if (this.isLoggedIn) return "/adatok/buytickets";
+      return { path: "/login", query: { redirect: "/adatok/buytickets" } };
+    },
   },
   methods: {
     ...mapActions(useSearchStore, ["resetSearchWord", "setSearchWord"]),
