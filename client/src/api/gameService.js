@@ -17,6 +17,15 @@ export default {
     return await apiClient.get(`${route}`);
   },
 
+  // GET: Lapozható lista
+  async getPaging(page = 1, perPage = 10, sortColumn = 'game_date', direction = 'asc', search = '') {
+    let url = `${route}paging?page=${page}&per_page=${perPage}&sort_column=${sortColumn}&direction=${direction}`;
+    if (search) {
+      url += `&search=${search}`;
+    }
+    return await apiClient.get(url);
+  },
+
   // GET: Egy rekord (ID alapján)
   async getById(id) {
     const url = `${route}/${id}`

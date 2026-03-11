@@ -80,16 +80,6 @@ const router = createRouter({
           },
         },
         {
-          path: "plaingsport",
-          name: "plaingsport",
-          component: () => import("@/views/PlayngSportView.vue"),
-          beforeEnter: [checkIfNotLogged],
-          meta: {
-            title: (route) => "Sportolás",
-            roles: [1, 2],
-          },
-        },
-        {
           path: "users",
           name: "users",
           component: () => import("@/views/UsersView.vue"),

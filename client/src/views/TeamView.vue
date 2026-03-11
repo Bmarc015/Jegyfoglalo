@@ -2,10 +2,6 @@
   <div>
     <!-- oldal fejléc -->
     <div class="team-header mb-3">
-      <div class="team-header-left">
-        <h1 class="m-0">{{ pageTitle }}</h1>
-      </div>
-
       <div class="team-header-center">
         <Pagination :useCollectionStore="useCollectionStore" />
       </div>
@@ -17,7 +13,7 @@
           class="bi bi-hourglass-split fs-3 col-auto p-0 pe-1"
         ></i>
         <!-- új rekord ikon -->
-        <ButtonsCrudCreate v-if="!loading" @create="createHandler" />
+        <ButtonsCrudCreate v-if="!loading && crudButtonsVisible" @create="createHandler" />
         <p class="m-0 ms-2 records-pill">{{ getItemsLength }} rekord</p>
 
         <!-- sor/oldal -->
@@ -33,6 +29,10 @@
         :items="items"
         :columns="visibleTableColumns"
         :useCollectionStore="useCollectionStore"
+        :cButtonVisible="crudButtonsVisible"
+        :uButtonVisible="crudButtonsVisible"
+        :dButtonVisible="crudButtonsVisible"
+        :toolsColumnVisible="crudButtonsVisible"
         @delete="deleteHandler"
         @update="updateHandler"
         @create="createHandler"
@@ -94,6 +94,7 @@ export default {
       tableColumns: [
         // { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
         { key: "id", label: "ID", debug: 2 },
+        { key: "team_logo", label: "Logo", debug: 2, type: "image" },
         { key: "team_name", label: "Team_Name", debug: 2 },
         { key: "team_city", label: "Team_City", debug: 2 },
       ],
@@ -120,6 +121,12 @@ export default {
     visibleTableColumns() {
       if (this.role === 1) return this.tableColumns;
       return this.tableColumns.filter((column) => column.key !== "id");
+    },
+    isAdmin() {
+      return this.role === 1;
+    },
+    crudButtonsVisible() {
+      return this.isAdmin;
     },
   },
   methods: {
@@ -216,21 +223,15 @@ export default {
   border-radius: 12px;
   background: linear-gradient(180deg, #ffffff 0%, #f3f6fb 100%);
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-}
-
-.team-header-left {
-  flex: 0 0 auto;
-}
-
-.team-header-left h1 {
-  font-size: 2.1rem;
-  letter-spacing: 0.01em;
+  justify-content: space-between;
 }
 
 .team-header-center {
   flex: 1 1 auto;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .team-header-center :deep(nav) {
@@ -269,6 +270,7 @@ export default {
   border: 1px solid #e0e7f1;
   border-radius: 10px;
   padding: 0.35rem 0.45rem;
+  margin-left: auto;
 }
 
 .records-pill {

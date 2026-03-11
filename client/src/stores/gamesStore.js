@@ -13,13 +13,24 @@ class Item {
   }
 }
 
+class Pagination {
+  constructor(current_page = 1, last_page = 1, total = 10) {
+    this.current_page = current_page;
+    this.last_page = last_page;
+    this.total = total;
+  }
+}
+
 export const useGamesStore = defineStore("games", {
   state: () => ({
     item: new Item(),
     items: [new Item()],
+    pagination: new Pagination(),
+    selectedPerPage: 10,
+    selectedPerPageList: [10, 30, 50],
     loading: false,
     error: null,
-    sortColumn: "id",
+    sortColumn: "game_date",
     sortDirection: "asc",
     searchStore: useSearchStore(),
   }),
@@ -29,17 +40,77 @@ export const useGamesStore = defineStore("games", {
     },
   },
   actions: {
+    async setSelectedPerPage(value) {
+      this.selectedPerPage = value;
+      this.loading = true;
+      await this.getPaging();
+      this.loading = false;
+    },
+    setColumn(column) {
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = "asc";
+      }
+
+      this.getPaging(this.pagination?.current_page || 1);
+    },
+
     clearItem() {
       this.item = new Item();
     },
+
+    // Paging - Lapozás
+    async getPaging(page = null) {
+      this.loading = true;
+      this.error = null;
+
+      const logicalPage = page || this.pagination?.current_page || 1;
+
+      try {
+        const response = await service.getPaging(
+          logicalPage,
+          this.selectedPerPage,
+          this.sortColumn,
+          this.sortDirection,
+          this.searchStore.searchWord || "",
+        );
+
+        const payload =
+          response && typeof response === "object" && "data" in response && "meta" in response
+            ? response
+            : response?.data ?? response ?? {};
+
+        // Átalakítjuk az adatokat, hogy a táblázat könnyen kiolvashassa
+        this.items =
+          payload.data?.map((game) => ({
+            ...game,
+            team_home_name: game.home_team ? game.home_team.team_name : "N/A",
+            team_away_name: game.away_team ? game.away_team.team_name : "N/A",
+            team_home_logo: game.home_team ? game.home_team.team_logo : null,
+            team_away_logo: game.away_team ? game.away_team.team_logo : null,
+          })) || [];
+
+        this.pagination = payload.meta || this.pagination;
+
+        return true;
+      } catch (err) {
+        this.error = err;
+        console.error("Hiba a getPaging-ben:", err);
+        return false;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     // READ - Összes adat lekérése
     async getAllAbc() {
-      //   const toast = useToastStore();
       this.loading = true;
       this.error = null;
       try {
         const response = await service.getAllAbc();
-        this.items = response.data;
+        this.items = response?.data ?? response ?? [];
       } catch (err) {
         this.error = err;
         throw err;
@@ -47,61 +118,28 @@ export const useGamesStore = defineStore("games", {
         this.loading = false;
       }
     },
-    //Ha a direction meg van aadva, akkor ez lesz a sorrend
-    //Ha nincs megadva, akkor ellentettjére vált
-    async getAllSortSearch(column = "id", direction = null) {
-      //   const toast = useToastStore();
-      this.loading = true;
-      this.error = null;
-      this.sortColumn = column;
-      if (!direction) {
-        direction =
-          this.sortColumn === column && this.sortDirection === "asc"
-            ? "desc"
-            : "asc";
-      }
-      this.sortDirection = direction;
-      try {
-        const response = await service.getAllSortSearch(
-          this.sortColumn,
-          this.sortDirection,
-          this.searchStore.searchWord,
-        );
-        this.items = response.data;
-      } catch (err) {
-        this.error = err;
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-    async getAll() {
-      this.loading = true;
-      try {
-        const response = await service.getAll();
 
-        // Átalakítjuk az adatokat, hogy a táblázat könnyen kiolvashassa
-        this.items = response.data.map((game) => ({
-          ...game,
-          // Létrehozunk két új kulcsot, amik pontosan egyeznek a View-ban lévő kulcsokkal
-          team_home_name: game.home_team ? game.home_team.team_name : "N/A",
-          team_away_name: game.away_team ? game.away_team.team_name : "N/A",
-        }));
-      } catch (err) {
-        this.error = err;
-      } finally {
-        this.loading = false;
+    // Rendezés és keresés
+    async getAllSortSearch(column = "game_date", direction = null) {
+      this.sortColumn = column;
+      if (direction) {
+        this.sortDirection = direction;
       }
+      return await this.getPaging(1);
+    },
+
+    // READ - Összes adat (régi, nem használt)
+    async getAll() {
+      return await this.getPaging(1);
     },
 
     // READ - Egy adat lekérése
     async getById(id) {
       this.loading = true;
       this.error = null;
-      //   const toast = useToastStore();
       try {
         const response = await service.getById(id);
-        this.item = response.data;
+        this.item = response?.data ?? response ?? null;
       } catch (err) {
         this.error = err;
         throw err;
@@ -115,70 +153,44 @@ export const useGamesStore = defineStore("games", {
       this.loading = true;
       this.error = null;
       try {
-        const newItem = await service.create(data);
-        const response = await service.getAllSortSearch(
-          this.sortColumn,
-          this.sortDirection,
-          this.searchStore.searchWord,
-        );
-        this.items = response.data;
-        // toast.messages.push("Sikeresen létrehozva!");
-        // toast.show("Success");
+        await service.create(data);
+        await this.getPaging(this.pagination?.current_page || 1);
         return true;
       } catch (err) {
-        this.error = err.response.data.errors.osztalyNev[0];
+        this.error = err.response?.data?.errors?.osztalyNev?.[0] || err.message;
         throw err;
-        return false;
       } finally {
         this.loading = false;
       }
     },
 
-    // 3. UPDATE - Módosítás (Helyi frissítéssel, újraolvasás nélkül)
+    // UPDATE - Módosítás
     async update(id, updateData) {
       this.loading = true;
       this.error = null;
       try {
-        const updatedItem = await service.update(id, updateData);
-        // const response = await service.getAll();
-        const response = await service.getAllSortSearch(
-          this.sortColumn,
-          this.sortDirection,
-          this.searchStore.searchWord,
-        );
-        this.items = response.data;
-        // toast.messages.push(`Sikeresen módosítva`);
-        // toast.show("Success");
+        await service.update(id, updateData);
+        await this.getPaging(this.pagination?.current_page || 1);
         return true;
       } catch (err) {
         this.error = err;
         throw err;
-        return false;
       } finally {
         this.loading = false;
       }
     },
 
-    // 4. DELETE - Törlés
+    // DELETE - Törlés
     async delete(id) {
       this.loading = true;
       this.error = null;
       try {
         await service.delete(id);
-        //const response = await service.getAll();
-        const response = await service.getAllSortSearch(
-          this.sortColumn,
-          this.sortDirection,
-          this.searchStore.searchWord,
-        );
-        this.items = response.data;
-        // toast.messages.push(`Sikeresen törölve`);
-        // toast.show("Success");
+        await this.getPaging(this.pagination?.current_page || 1);
         return true;
       } catch (err) {
         this.error = err;
         throw err;
-        return false;
       } finally {
         this.loading = false;
       }

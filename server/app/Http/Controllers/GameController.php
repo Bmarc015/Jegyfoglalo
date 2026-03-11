@@ -78,14 +78,36 @@ class GameController extends Controller
     public function getPaging(Request $request)
     {
         $perPage = $request->input('per_page', 10);
+        $sortColumn = $request->input('sort_column', 'game_date');
+        $direction = $request->input('direction', 'asc');
+        $search = $request->input('search', '');
 
-        // Próbáld ki a load() helyett a with()-et közvetlenül a lekérdezésnél
-        $games = CurrentModel::with(['homeTeam', 'awayTeam'])
-            ->orderBy($request->input('sort_column', 'id'), 'asc')
-            ->paginate($perPage);
+        // Validáljuk az oszlopnevet
+        $allowedColumns = ['id', 'game_date', 'home_team_id', 'away_team_id'];
+        if (!in_array($sortColumn, $allowedColumns)) {
+            $sortColumn = 'game_date';
+        }
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        $query = CurrentModel::with(['homeTeam', 'awayTeam']);
+
+        // Keresés támogatása
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('game_date', 'like', "%{$search}%")
+                  ->orWhereHas('homeTeam', function ($q) use ($search) {
+                      $q->where('team_name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('awayTeam', function ($q) use ($search) {
+                      $q->where('team_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $games = $query->orderBy($sortColumn, $direction)->paginate($perPage);
 
         return response()->json([
-            'data' => $games->items(), // Itt ellenőrizd, hogy az items() tartalmazza-e a relációkat!
+            'data' => $games->items(),
             'meta' => [
                 'current_page' => $games->currentPage(),
                 'last_page' => $games->lastPage(),

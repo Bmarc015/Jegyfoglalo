@@ -13,7 +13,8 @@ class Team extends Model
 
         protected $fillable = [
             'team_name',
-            'team_city'
+            'team_city',
+            'team_logo',
         ];
 
 }

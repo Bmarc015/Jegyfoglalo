@@ -4,7 +4,7 @@
       <table class="table table-hover my-table">
         <thead class="sticky-top my-table-head">
           <tr class="align-middle text-center">
-            <th>Tools</th>
+            <th v-if="toolsColumnVisible">Tools</th>
             <template v-for="col in columns">
               <th
                 v-if="col.debug >= 1"
@@ -33,7 +33,7 @@
             :class="{ 'table-primary': selectedId === item.id }"
             @click="onClickRow(item.id)"
           >
-            <td>
+            <td v-if="toolsColumnVisible">
               <ButtonsCrud
                 :id="item.id"
                 :cButtonVisible="cButtonVisible"
@@ -53,7 +53,14 @@
                 :key="col.key"
                 :class="{ 'my-debug': col.debug == 1 }"
               >
-                {{ item[col.key] }}
+                <!-- Custom slot for image columns -->
+                <img 
+                  v-if="col.type === 'image' && item[col.key]" 
+                  :src="'/csapat kepek/' + item[col.key]" 
+                  :alt="col.label"
+                  style="max-height: 40px; max-width: 50px; object-fit: contain;"
+                />
+                <span v-else>{{ item[col.key] }}</span>
               </td>
             </template>
           </tr>
@@ -79,6 +86,7 @@ export default {
     uButtonVisible: { type: Boolean, default: true },
     dButtonVisible: { type: Boolean, default: true },
     pButtonVisible: { type: Boolean, default: false },
+    toolsColumnVisible: { type: Boolean, default: true },
   },
   data() {
     return {

@@ -60,6 +60,7 @@ Route::get('usersme', [UserController::class, 'indexSelf'])
 
 ////////////////////////////////Games/////////////////////////////////////////////// 
 Route::get('games', [GameController::class, 'index']);
+Route::get('gamespaging', [GameController::class, 'getPaging']);
 
 Route::get('games/{id}', [GameController::class, 'show'])
     ->middleware('auth:sanctum', 'ability:admin');
