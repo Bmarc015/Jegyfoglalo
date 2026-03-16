@@ -1,84 +1,91 @@
 <template>
   <div class="home-view">
-    <!-- Carousel -->
-    <div
-      id="homeCarousel"
-      class="carousel slide carousel-fade"
-      data-bs-ride="carousel"
-      data-bs-interval="3000"
-    >
-      <div class="carousel-indicators">
-        <button
-          type="button"
-          data-bs-target="#homeCarousel"
-          data-bs-slide-to="0"
-          class="active"
-          aria-current="true"
-          aria-label="Slide 1"
-        ></button>
-        <button
-          type="button"
-          data-bs-target="#homeCarousel"
-          data-bs-slide-to="1"
-          aria-label="Slide 2"
-        ></button>
-        <button
-          type="button"
-          data-bs-target="#homeCarousel"
-          data-bs-slide-to="2"
-          aria-label="Slide 3"
-        ></button>
+    <section class="home-hero">
+      <!-- Carousel -->
+      <div
+        id="homeCarousel"
+        class="carousel slide carousel-fade"
+        data-bs-ride="carousel"
+        data-bs-interval="3000"
+      >
+        <div class="carousel-indicators">
+          <button
+            type="button"
+            data-bs-target="#homeCarousel"
+            data-bs-slide-to="0"
+            class="active"
+            aria-current="true"
+            aria-label="Slide 1"
+          ></button>
+          <button
+            type="button"
+            data-bs-target="#homeCarousel"
+            data-bs-slide-to="1"
+            aria-label="Slide 2"
+          ></button>
+          <button
+            type="button"
+            data-bs-target="#homeCarousel"
+            data-bs-slide-to="2"
+            aria-label="Slide 3"
+          ></button>
+        </div>
+        <!-- Carousel Pics -->
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img
+              src="/carousel_santiago.jpg"
+              class="d-block w-100 carousel-img"
+              alt="Football 1"
+            />
+          </div>
+          <div class="carousel-item">
+            <img
+              src="/carousel2_santiago.jpg"
+              class="d-block w-100 carousel-img"
+              alt="Football 2"
+            />
+          </div>
+          <div class="carousel-item">
+            <img
+              src="/carousel3_santiago.jpg"
+              class="d-block w-100 carousel-img"
+              alt="Football 3"
+            />
+          </div>
+        </div>
       </div>
-      <!-- Carousel Pics -->
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-          <img
-            src="/carousel_santiago.jpg"
-            class="d-block w-100 carousel-img"
-            alt="Football 1"
-          />
-        </div>
-        <div class="carousel-item">
-          <img
-            src="/carousel2_santiago.jpg"
-            class="d-block w-100 carousel-img"
-            alt="Football 2"
-          />
-        </div>
-        <div class="carousel-item">
-          <img
-            src="/carousel3_santiago.jpg"
-            class="d-block w-100 carousel-img"
-            alt="Football 3"
-          />
+      <!-- Carousel Text -->
+      <div class="content-overlay flex-grow-0">
+        <h1 class="text-center mt-5">Welcome to TicketMaster!</h1>
+        <p class="text-center mt-3">
+          Discover the best football events and get your tickets now.
+        </p>
+        <p>Don't miss out on the action!</p>
+        <div class="d-flex justify-content-center mt-4">
+          <a href="#featured-games" class="btn btn-primary btn-lg">
+            Featured Matches
+          </a>
         </div>
       </div>
+    </section>
+
+    <div class="featured-gap">
+      <QuickStatsBar />
+      <FeaturedGames />
     </div>
-    <!-- Carousel Text -->
-    <div class="content-overlay flex-grow-0">
-      <h1 class="text-center mt-5">Welcome to TicketMaster!</h1>
-      <p class="text-center mt-3">
-        Discover the best football events and get your tickets now.
-      </p>
-      <p>Don't miss out on the action!</p>
-      <div class="d-flex justify-content-center mt-4">
-        <RouterLink to="/tickets" class="btn btn-primary btn-lg">
-          Featured Matches
-        </RouterLink>
-      </div>
-    </div>
-    <!-- Calendar -->
-    <HomeMatchCalendar />
   </div>
 </template>
 
 <script>
-import HomeMatchCalendar from "@/components/Home/HomeMatchCalendar.vue";
+import FeaturedGames from "@/components/Home/FeaturedGames.vue";
+import QuickStatsBar from "@/components/Home/QuickStatsBar.vue";
 
 export default {
   name: "HomeView",
   components: {
-    HomeMatchCalendar,
+    FeaturedGames,
+    QuickStatsBar,
   },
 };
 </script>
@@ -88,6 +95,44 @@ export default {
   display: flex;
   flex-direction: column;
   min-height: 80vh;
+}
+
+.home-hero {
+  position: relative;
+  height: 80vh;
+}
+
+.featured-gap {
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  padding: 2.5rem 0 4rem;
+  background: radial-gradient(circle at top, #1e2a5f 0%, #0b1026 70%);
+  position: relative;
+  overflow: hidden;
+}
+
+.featured-gap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 55%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.07) 0,
+      rgba(255, 255, 255, 0.07) 1px,
+      transparent 1px,
+      transparent 14px
+    );
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.featured-gap > * {
+  position: relative;
+  z-index: 1;
 }
 
 .carousel-img {
