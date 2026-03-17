@@ -1,52 +1,20 @@
 <template>
   <div class="match-calendar container mt-auto pt-5 mb-4">
     <div class="home-calendar-panel">
-      <div class="calendar-toolbar mb-3">
-        <div class="calendar-title-wrap">
-          <h5 class="m-0">Select a Week</h5>
-          <span class="selected-month">{{ selectedMonthLabel }}</span>
-        </div>
-        <div class="calendar-picker-wrap">
-          <button class="calendar-pick-btn" type="button" @click="openCalendarPicker">
-            <i class="bi bi-calendar2-week me-2"></i>
-            Choose Week
-          </button>
-          <input
-            ref="weekPicker"
-            type="week"
-            class="day-picker-input"
-            :value="selectedWeek"
-            @change="onWeekChange"
-          />
-        </div>
-      </div>
+<CalendarToolbar
+        :selected-month-label="selectedMonthLabel"
+        :model-value="selectedWeek"
+        @update:model-value="selectedWeek = $event"
+      />
 
-      <div class="week-nav mb-4">
-        <button type="button" class="today-btn" @click="goToToday">
-          Today
-        </button>
-
-        <button type="button" class="week-arrow-btn" @click="goToPreviousWeek" aria-label="Previous week">
-          <i class="bi bi-chevron-left"></i>
-        </button>
-
-        <div class="week-days d-flex justify-content-center flex-wrap gap-2">
-          <div v-for="(day, index) in weekDays" :key="index">
-            <div
-              class="calendar-day text-center"
-              :class="{ active: selectedDay === index }"
-              @click="selectDay(index)"
-            >
-              <div class="day-name">{{ day.name }}</div>
-              <div class="day-date">{{ day.date }}</div>
-            </div>
-          </div>
-        </div>
-
-        <button type="button" class="week-arrow-btn" @click="goToNextWeek" aria-label="Next week">
-          <i class="bi bi-chevron-right"></i>
-        </button>
-      </div>
+<WeekNavigation
+        :week-days="weekDays"
+        :selected-day="selectedDay"
+        @day-select="selectDay"
+        @prev-week="goToPreviousWeek"
+        @next-week="goToNextWeek"
+        @go-today="goToToday"
+      />
 
       <div class="matches-section">
         <h5 class="mb-3">Matches on {{ weekDays[selectedDay]?.name }} {{ weekDays[selectedDay]?.date }}</h5>
@@ -57,36 +25,7 @@
             :key="match.id"
             class="col-12 col-md-6 col-lg-4 mb-3"
           >
-            <article class="card match-card h-100">
-              <div class="card-body text-center">
-                <div class="match-time">{{ match.time }}</div>
-                <div class="match-teams">
-                  <div class="team-side">
-                    <img
-                      v-if="match.homeLogo"
-                      class="team-logo"
-                      :src="match.homeLogo"
-                      :alt="`${match.homeTeam} logo`"
-                      @error="onLogoError"
-                    />
-                    <span class="team-name">{{ match.homeTeam }}</span>
-                  </div>
-                  <span class="vs">vs</span>
-                  <div class="team-side">
-                    <img
-                      v-if="match.awayLogo"
-                      class="team-logo"
-                      :src="match.awayLogo"
-                      :alt="`${match.awayTeam} logo`"
-                      @error="onLogoError"
-                    />
-                    <span class="team-name">{{ match.awayTeam }}</span>
-                  </div>
-                </div>
-                <div v-if="match.venue" class="match-venue">{{ match.venue }}</div>
-                <RouterLink class="btn btn-sm btn-outline-primary mt-3" to="/adatok/buytickets">Buy Tickets</RouterLink>
-              </div>
-            </article>
+            <MatchCard :match="match" @logo-error="onLogoError" />
           </div>
         </div>
 
@@ -102,8 +41,11 @@
 </template>
 
 <script>
-import gameService from "@/api/gameService";
-import { resolveTeamLogo } from "@/constants/teamLogos";
+import gameService from "@/api/gameService"
+import { resolveTeamLogo } from "@/constants/teamLogos"
+import CalendarToolbar from './CalendarToolbar.vue'
+import WeekNavigation from './WeekNavigation.vue'
+import MatchCard from './MatchCard.vue'
 
 export default {
   name: "HomeMatchCalendar",
@@ -152,26 +94,7 @@ export default {
       this.selectedDay = index;
       this.loadMatches();
     },
-    openCalendarPicker() {
-      const picker = this.$refs.weekPicker;
-      if (!picker) return;
 
-      if (typeof picker.showPicker === "function") {
-        picker.showPicker();
-      } else {
-        picker.click();
-      }
-    },
-    onWeekChange(event) {
-      const selected = event?.target?.value;
-      if (!selected) return;
-
-      const startOfWeek = this.getDateFromISOWeekValue(selected);
-      this.selectedWeek = selected;
-      this.generateWeekDays(startOfWeek);
-      this.selectedDay = 0;
-      this.loadMatches();
-    },
     setWeekFromStartDate(startOfWeek) {
       this.selectedWeek = this.getISOWeekValue(startOfWeek);
       this.generateWeekDays(startOfWeek);
@@ -444,62 +367,5 @@ export default {
   font-weight: bold;
 }
 
-.match-card {
-  border: 1px solid #dee2e6;
-  border-radius: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
 
-.match-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.match-time {
-  font-size: 0.9rem;
-  color: #6c757d;
-  font-weight: bold;
-}
-
-.match-teams {
-  font-size: 1rem;
-  font-weight: bold;
-  margin: 10px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  flex-wrap: wrap;
-}
-
-.team-side {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.team-logo {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 1px solid #dbe3ef;
-  padding: 2px;
-}
-
-.team-name {
-  color: #212529;
-}
-
-.vs {
-  color: #6c757d;
-  margin: 0 8px;
-  font-size: 0.85rem;
-}
-
-.match-venue {
-  font-size: 0.85rem;
-  color: #6c757d;
-}
 </style>

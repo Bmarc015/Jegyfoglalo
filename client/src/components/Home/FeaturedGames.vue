@@ -135,7 +135,7 @@ export default {
         const fallbackTime = String(dateTimeValue).split(" ")[1];
         return fallbackTime ? fallbackTime.slice(0, 5) : "--:--";
       }
-      return parsedDate.toLocaleTimeString("hu-HU", {
+      return parsedDate.toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
@@ -148,7 +148,7 @@ export default {
       if (Number.isNaN(parsedDate.getTime())) {
         return String(dateTimeValue).split(" ")[0] || "--.--.--";
       }
-      return parsedDate.toLocaleDateString("hu-HU", {
+      return parsedDate.toLocaleDateString("en-GB", {
         year: "numeric",
         month: "short",
         day: "2-digit",
