@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bernabéu demo interaktív térkép</title>
+    <style>
+        [class^="cls-"] {
+            cursor: pointer;
+            font-size: 0.5rem !important;
+        }
+
+        /* .cls-7,
+        .cls-3,      */
+        /* .cls-2{
+           
+        } */
+        /* .cls-3{
+            
+         } */
+        svg {
+            width: 80%;
+            height: auto;
+        }
+
+        #sector-map,
+        .seat-map {
+            width: 600px;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .seat-map {
+            display: none;
+        }
+
+        .seat {
+            cursor: pointer;
+            fill: lightgray;
+            stroke: black;
+        }
+
+        .seat.selected {
+            fill: green;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2 style="text-align:center;">Bernabéu Szektor Térkép (Demo)</h2>
+
+    <svg id="svg-stadium" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        viewBox="0 0 800 776">
+        <defs>
+            <style>
+                .cls-1 {
+                    fill: none;
+                }
+
+                .cls-2 {
+                    fill: #ccc;
+                    stroke: #fff;
+                    stroke-linecap: round;
+                    stroke-linejoin: round;
+                    stroke-width: 2px;
+                    fill-rule: evenodd;
+                }
+
+                .cls-15,
+                .cls-3,
+                .cls-5,
+                .cls-6,
+                .cls-7 {
+                    isolation: isolate;
+                }
+
+                .cls-3 {
+                    font-size: 16.67px;
+                }
+
+                .cls-15,
+                .cls-3,
+                .cls-5,
+                .cls-6 {
+                    fill: #1d1d1b;
+                    font-family: ArialNarrow, Arial;
+                }
+
+                .cls-4 {
+                    letter-spacing: -0.06em;
+                }
+
+                .cls-5 {
+                    font-size: 14.58px;
+                }
+
+                .cls-6 {
+                    font-size: 16.54px;
+                }
+
+                .cls-7 {
+                    font-size: 20.83px;
+                    fill: gray;
+                    font-family: ArialMT, Arial;
+                }
+
+                .cls-8 {
+                    letter-spacing: -0.07em;
+                }
+
+                .cls-9 {
+                    letter-spacing: 0em;
+                }
+
+                .cls-10 {
+                    letter-spacing: -0.04em;
+                }
+
+                .cls-11 {
+                    letter-spacing: -0.06em;
+                }
+
+                .cls-12 {
+                    letter-spacing: -0.02em;
+                }
+
+                .cls-13 {
+                    clip-path: url(#clip-path);
+                }
+
+                .cls-14 {
+                    fill: #0f2145;
+                }
+
+                .cls-15 {
+                    font-size: 15.04px;
+                }
+                .cls-16{
+                        fill: #ccc;
+                    stroke: #fff;
+                    stroke-linecap: round;
+                    stroke-linejoin: round;
+                    stroke-width: 2px;
+                    fill-rule: evenodd;
+                    cursor: default;
+                }
+            </style>
+            <clipPath id="clip-path">
+                <rect class="cls-1" x="331.8" y="295.3" width="133.5" height="189.4" />
+            </clipPath>
+        </defs>
+        <polygon class="cls-16" points="381.7 278.1 381.7 240.2 418.3 240.2 418.3 278.1 381.7 278.1" />
+        <polygon class="cls-16" points="418.3 216.4 418.3 240.2 381.7 240.2 381.7 216.4 418.3 216.4" />
+        <polygon class="cls-16" points="318.5 149.3 481.5 149.3 481.5 162.1 318.5 162.1 318.5 149.3" />
+        <polygon class="cls-16" points="422.6 59.5 377.3 59.5 377.3 92.2 422.6 92.2 422.6 59.5" />
+        <polygon class="cls-16" points="165 10.9 113.5 57.2 172.8 156.3 191.8 147.3 165 10.9" />
+        <polygon class="cls-16" points="635 10.9 686.5 57.2 627.2 156.3 608.2 147.3 635 10.9" />
+        <polygon class="cls-16" points="635 10.9 686.5 57.2 627.2 156.3 608.2 147.3 635 10.9" />
+        <g id="sector-101">
+            <polygon id="sector-101-2" data-name="sector-101" class="cls-2"
+                points="400 517.9 400 555.8 365.7 555.8 365.7 517.9 400 517.9" /><text class="cls-3"
+                transform="translate(371.4 542.97)">101</text>
+        </g>
+        <g id="sector-102">
+            <polygon id="sector-102-2" data-name="sector-102" class="cls-2"
+                points="400 518 400 555.9 434.3 555.9 434.3 518 400 518" /><text class="cls-3"
+                transform="translate(405.7 543.07)">102</text>
+        </g>
+        <g id="sector-104">
+            <polygon id="sector-104-2" data-name="sector-104" class="cls-2"
+                points="434.3 518 434.3 555.9 468.7 555.9 468.7 518 434.3 518" /><text class="cls-3"
+                transform="translate(440.1 543.07)">104</text>
+        </g>
+        <g id="sector-106">
+            <polygon id="sector-106-2" data-name="sector-106" class="cls-2"
+                points="468.7 518 468.7 555.9 503 555.9 503 518 468.7 518" /><text class="cls-3"
+                transform="translate(474.4 543.07)">106</text>
+        </g>
+        <g id="sector-108">
+            <path id="sector-108-2" data-name="sector-108" class="cls-2"
+                d="M535.4,514.3l7.9,39.2a70.36,70.36,0,0,1-18.4,2.4H503V518h13.9A47.36,47.36,0,0,0,535.4,514.3Z" /><text
+                class="cls-3" transform="translate(511.7 542.47)">108</text>
+        </g>
+        <g id="sector-110">
+            <path id="sector-110-2" data-name="sector-110" class="cls-2"
+                d="M588.8,518.3l-33.3-19.8a49.45,49.45,0,0,1-20.1,15.8l7.9,39.2A74,74,0,0,0,588.8,518.3Z" /><text
+                class="cls-3" transform="translate(547.5 529.17)">
+                <tspan class="cls-4">1</tspan>
+                <tspan x="6.6" y="0">10</tspan>
+            </text>
+        </g>
+        <g id="sector-112">
+            <path id="sector-112-2" data-name="sector-112" class="cls-2"
+                d="M555.5,498.5l33.3,19.7a72.55,72.55,0,0,0,9.2-35.6v-1.2l-33.6-4.2A48.69,48.69,0,0,1,555.5,498.5Z" />
+            <text class="cls-3" transform="translate(568.6 500.57)">
+                <tspan class="cls-4">1</tspan>
+                <tspan x="6.6" y="0">12</tspan>
+            </text>
+        </g>
+        <g id="sector-114">
+            <path id="sector-114-2" data-name="sector-114" class="cls-2"
+                d="M598,448.5H564.9v21.4a44,44,0,0,1-.5,7.3l33.6,4.2Z" /><text class="cls-3"
+                transform="translate(570.6 471.07)">
+                <tspan class="cls-4">1</tspan>
+                <tspan x="6.6" y="0">14</tspan>
+            </text>
+        </g>
+        <g id="sector-116">
+            <polygon id="sector-116-2" data-name="sector-116" class="cls-2"
+                points="598 412.5 564.9 412.5 564.9 448.5 598 448.5 598 412.5" /><text class="cls-3"
+                transform="translate(570.6 436.57)">
+                <tspan class="cls-4">1</tspan>
+                <tspan x="6.6" y="0">16</tspan>
+            </text>
+        </g>
+        <g id="sector-118">
+            <polygon id="sector-118-2" data-name="sector-118" class="cls-2"
+                points="564.9 398 564.9 412.5 598 412.5 598 398 598 383.5 564.9 383.5 564.9 398" /><text class="cls-3"
+                transform="translate(570.6 404.07)">
+                <tspan class="cls-4">1</tspan>
+                <tspan x="6.6" y="0">18</tspan>
+            </text>
+        </g>
+        <g id="sector-120">
+            <polygon id="sector-120-2" data-name="sector-120" class="cls-2"
+                points="598 383.5 564.9 383.5 564.9 347.5 598 347.5 598 383.5" /><text class="cls-3"
+                transform="translate(570.1 371.57)">120</text>
+        </g>
+        <g id="sector-122">
+            <path id="sector-122-2" data-name="sector-122" class="cls-2"
+                d="M598,347.5H564.9V326.1a44,44,0,0,0-.5-7.3l33.6-4.2Z" /><text class="cls-3"
+                transform="translate(569.8 337.17)">122</text>
+        </g>
+        <g id="sector-124">
+            <path id="sector-124-2" data-name="sector-124" class="cls-2"
+                d="M555.5,297.5l33.3-19.7a72.55,72.55,0,0,1,9.2,35.6v1.2l-33.6,4.2A48.69,48.69,0,0,0,555.5,297.5Z" />
+            <text class="cls-3" transform="translate(567.5 308.87)">124</text>
+        </g>
+        <g id="sector-126">
+            <path id="sector-126-2" data-name="sector-126" class="cls-2"
+                d="M562.8,250.8,544.7,287a48.91,48.91,0,0,1,10.8,10.5l33.3-19.7A74.85,74.85,0,0,0,562.8,250.8Z" /><text
+                class="cls-3" transform="matrix(0.72, -0.69, 0.69, 0.72, 561.04, 289.26)">126</text>
+        </g>
+        <g id="sector-128">
+            <path id="sector-128-2" data-name="sector-128" class="cls-2"
+                d="M540.4,241.9l-8.8,38.5a48.87,48.87,0,0,1,13.1,6.6h0l18.1-36.2A72,72,0,0,0,540.4,241.9Z" /><text
+                class="cls-3" transform="translate(547.55 276.19) rotate(-67.57)">128</text>
+        </g>
+        <g id="sector-128-3" data-name="sector-128">
+            <path id="sector-128-4" data-name="sector-128" class="cls-2"
+                d="M514.4,240.2v37.9h2.5a47.14,47.14,0,0,1,14.7,2.3l8.8-38.5a72.17,72.17,0,0,0-15.5-1.7Z" /><text
+                class="cls-3" transform="translate(530.95 269.92) rotate(-83.72)">128</text>
+        </g>
+        <g id="sector-130">
+            <polygon id="sector-130-2" data-name="sector-130" class="cls-2"
+                points="488.1 240.2 488.1 278.1 514.4 278.1 514.4 240.2 488.1 240.2" /><text class="cls-3"
+                transform="translate(489.63 262.82)">130</text>
+        </g>
+        <g id="sector-132">
+            <polygon id="sector-132-2" data-name="sector-132" class="cls-2"
+                points="453.3 240.2 453.3 278.1 488.2 278.1 488.2 240.2 453.3 240.2" /><text class="cls-3"
+                transform="translate(459.3 265.27)">132</text>
+        </g>
+        <g id="sector-134">
+            <polygon id="sector-134-2" data-name="sector-134" class="cls-2"
+                points="418.3 240.2 418.3 278.1 453.2 278.1 453.2 240.2 418.3 240.2" /><text class="cls-3"
+                transform="translate(424.3 265.27)">134</text>
+        </g>
+        <g id="sector-103">
+            <polygon id="sector-103-2" data-name="sector-103" class="cls-2"
+                points="365.7 517.9 365.7 555.8 331.3 555.8 331.3 517.9 365.7 517.9" /><text class="cls-3"
+                transform="translate(337.1 542.97)">103</text>
+        </g>
+        <g id="sector-105">
+            <polygon id="sector-105-2" data-name="sector-105" class="cls-2"
+                points="331.3 517.9 331.3 555.8 297 555.8 297 517.9 331.3 517.9" /><text class="cls-3"
+                transform="translate(302.7 542.97)">105</text>
+        </g>
+        <g id="sector-107">
+            <path id="sector-107-2" data-name="sector-107" class="cls-2"
+                d="M264.6,514.2l-7.9,39.3a74.8,74.8,0,0,0,18.4,2.3H297V517.9H283.1A47.36,47.36,0,0,1,264.6,514.2Z" />
+            <text class="cls-3" transform="translate(268.3 542.47)">107</text>
+        </g>
+        <g id="sector-109">
+            <path id="sector-109-2" data-name="sector-109" class="cls-2"
+                d="M211.2,518.2l33.3-19.7a49.22,49.22,0,0,0,20.1,15.7l-7.9,39.3A74.2,74.2,0,0,1,211.2,518.2Z" /><text
+                class="cls-3" transform="translate(231.4 529.67)">109</text>
+        </g>
+        <g id="sector-111">
+            <path id="sector-111-2" data-name="sector-111" class="cls-2"
+                d="M244.5,498.5l-33.3,19.7a72.55,72.55,0,0,1-9.2-35.6v-1.2l33.6-4.2A48.69,48.69,0,0,0,244.5,498.5Z" />
+            <text class="cls-3" transform="translate(211.7 500.67)">
+                <tspan class="cls-4">11</tspan>
+                <tspan x="13.2" y="0">1</tspan>
+            </text>
+        </g>
+        <g id="sector-113">
+            <path id="sector-113-2" data-name="sector-113" class="cls-2"
+                d="M202,448.5h33.1v21.4a44,44,0,0,0,.5,7.3L202,481.4Z" /><text class="cls-3"
+                transform="translate(207.9 471.07)">
+                <tspan class="cls-4">1</tspan>
+                <tspan x="6.6" y="0">13</tspan>
+            </text>
+        </g>
+        <g id="sector-115">
+            <polygon id="sector-115-2" data-name="sector-115" class="cls-2"
+                points="202 412.5 235.1 412.5 235.1 448.5 202 448.5 202 412.5" /><text class="cls-3"
+                transform="translate(207.6 436.57)">
+                <tspan class="cls-4">1</tspan>
+                <tspan x="6.6" y="0">15</tspan>
+            </text>
+        </g>
+        <g id="sector-117">
+            <polygon id="sector-117-2" data-name="sector-117" class="cls-2"
+                points="235.1 398 235.1 412.5 202 412.5 202 398 202 383.5 235.1 383.5 235.1 398" /><text class="cls-3"
+                transform="translate(207.6 404.07)">
+                <tspan class="cls-4">1</tspan>
+                <tspan x="6.6" y="0">17</tspan>
+            </text>
+        </g>
+        <g id="sector-119">
+            <polygon id="sector-119-2" data-name="sector-119" class="cls-2"
+                points="202 383.5 235.1 383.5 235.1 347.5 202 347.5 202 383.5" /><text class="cls-3"
+                transform="translate(207.6 371.57)">
+                <tspan class="cls-4">1</tspan>
+                <tspan x="6.6" y="0">19</tspan>
+            </text>
+        </g>
+        <g id="sector-121">
+            <path id="sector-121-2" data-name="sector-121" class="cls-2"
+                d="M202,347.5h33.1V326.1a44,44,0,0,1,.5-7.3L202,314.6Z" /><text class="cls-3"
+                transform="translate(207.4 338.17)">121</text>
+        </g>
+        <g id="sector-123">
+            <path id="sector-123-2" data-name="sector-123" class="cls-2"
+                d="M244.5,297.5l-33.3-19.7a72.55,72.55,0,0,0-9.2,35.6v1.2l33.6,4.2A48.69,48.69,0,0,1,244.5,297.5Z" />
+            <text class="cls-3" transform="translate(211 308.47)">123</text>
+        </g>
+        <g id="sector-125">
+            <path id="sector-125-2" data-name="sector-125" class="cls-2"
+                d="M237.2,250.8,255.3,287a48.91,48.91,0,0,0-10.8,10.5l-33.3-19.7A74.85,74.85,0,0,1,237.2,250.8Z" /><text
+                class="cls-3" transform="translate(222.49 272.05) rotate(45.16)">125</text>
+        </g>
+        <g id="sector-127">
+            <path id="sector-127-2" data-name="sector-127" class="cls-2"
+                d="M259.6,241.9l8.8,38.5a48.87,48.87,0,0,0-13.1,6.6h0l-18.1-36.2A72,72,0,0,1,259.6,241.9Z" /><text
+                class="cls-3" transform="translate(244.73 253.58) rotate(66.99)">127</text>
+        </g>
+        <g id="sector-127-3" data-name="sector-127">
+            <path id="sector-127-4" data-name="sector-127" class="cls-2"
+                d="M285.6,240.2v37.9h-2.5a47.14,47.14,0,0,0-14.7,2.3l-8.8-38.5a72.17,72.17,0,0,1,15.5-1.7Z" /><text
+                class="cls-3" transform="translate(267.81 247.86) rotate(86.99)">127</text>
+        </g>
+        <g id="sector-129">
+            <polygon id="sector-129-2" data-name="sector-129" class="cls-2"
+                points="311.9 240.2 311.9 278.1 285.6 278.1 285.6 240.2 311.9 240.2" /><text class="cls-3"
+                transform="translate(287 264.17)">129</text>
+        </g>
+        <g id="sector-131">
+            <polygon id="sector-131-2" data-name="sector-131" class="cls-2"
+                points="346.8 240.2 346.8 278.1 311.9 278.1 311.9 240.2 346.8 240.2" /><text class="cls-3"
+                transform="translate(317.9 265.27)">131</text>
+        </g>
+        <g id="sector-133">
+            <polygon id="sector-133-2" data-name="sector-133" class="cls-2"
+                points="381.6 239.67 381.6 277.57 346.7 277.57 346.7 239.67 381.6 239.67" /><text class="cls-3"
+                transform="translate(352.9 265.27)">133</text>
+        </g>
+        <g id="sector-200">
+            <polygon id="sector-200-2" data-name="sector-200" class="cls-2"
+                points="400 555.8 400 555.9 422.8 555.9 422.8 579.7 400 579.7 400 579.6 377.2 579.6 377.2 555.8 400 555.8" />
+            <text class="cls-3" transform="translate(388.6 573.87)">200</text>
+        </g>
+        <g id="sector-201">
+            <polygon id="sector-201-2" data-name="sector-201" class="cls-2"
+                points="344.2 555.8 344.2 579.6 377.2 579.6 377.2 555.8 344.2 555.8" /><text class="cls-3"
+                transform="translate(349.3 573.87)">201</text>
+        </g>
+        <g id="sector-203">
+            <polygon id="sector-203-2" data-name="sector-203" class="cls-2"
+                points="311.2 555.8 311.2 579.6 344.2 579.6 344.2 555.8 311.2 555.8" /><text class="cls-3"
+                transform="translate(316.3 573.87)">203</text>
+        </g>
+        <g id="sector-205">
+            <polygon id="sector-205-2" data-name="sector-205" class="cls-2"
+                points="278.2 555.8 278.2 579.6 311.2 579.6 311.2 555.8 278.2 555.8" /><text class="cls-3"
+                transform="translate(283.3 573.87)">205</text>
+        </g>
+        <g id="sector-207">
+            <path id="sector-207-2" data-name="sector-207" class="cls-2"
+                d="M256.7,553.5l-4.8,24.3a91.34,91.34,0,0,0,18.2,1.8h8.1V555.8h-3.1A74.8,74.8,0,0,1,256.7,553.5Z" />
+            <text class="cls-5" transform="translate(256.5 572.77)">207</text>
+        </g>
+        <g id="sector-207-3" data-name="sector-207">
+            <path id="sector-207-4" data-name="sector-207" class="cls-2"
+                d="M234.7,543.5l-12.9,22.3a90.91,90.91,0,0,0,30.1,12l4.8-24.3A72,72,0,0,1,234.7,543.5Z" /><text
+                class="cls-3" transform="translate(229.8 566.27)">207</text>
+        </g>
+        <g id="sector-209">
+            <path id="sector-209-2" data-name="sector-209" class="cls-2"
+                d="M234.7,543.5l-12.9,22.3a93.09,93.09,0,0,1-32.6-34.5l22-13.1A73.08,73.08,0,0,0,234.7,543.5Z" /><text
+                class="cls-3" transform="translate(201.3 546.97)">209</text>
+        </g>
+        <g id="sector-211">
+            <path id="sector-211-2" data-name="sector-211" class="cls-2"
+                d="M211.2,518.2l-22,13.1a90.9,90.9,0,0,1-11.1-43.7v-3.2l23.9-3v1.2A72.55,72.55,0,0,0,211.2,518.2Z" />
+            <text class="cls-3" transform="translate(202.37 512.36) rotate(-103.45)">2<tspan class="cls-4" x="7.6"
+                    y="0">1</tspan>
+                <tspan x="14.2" y="0">1</tspan>
+            </text>
+        </g>
+        <g id="sector-213">
+            <polygon id="sector-213-2" data-name="sector-213" class="cls-2"
+                points="178.1 484.4 202 481.4 202 448.5 178.1 448.5 178.1 484.4" /><text class="cls-3"
+                transform="translate(195.6 478.25) rotate(-90.18)">213</text>
+        </g>
+        <g id="sector-215">
+            <polygon id="sector-215-2" data-name="sector-215" class="cls-2"
+                points="178.1 415.1 202 415.1 202 448.5 178.1 448.5 178.1 415.1" /><text class="cls-3"
+                transform="translate(196.23 443.38) rotate(-90)">215</text>
+        </g>
+        <g id="sector-217">
+            <polygon id="sector-217-2" data-name="sector-217" class="cls-2"
+                points="202 415.1 178.1 415.1 178.1 380.9 202 380.9 202 415.1" /><text class="cls-3"
+                transform="translate(195.6 407.04) rotate(-90)">217</text>
+        </g>
+        <g id="sector-219">
+            <polygon id="sector-219-2" data-name="sector-219" class="cls-2"
+                points="178.1 380.9 202 380.9 202 347.5 178.1 347.5 178.1 380.9" /><text class="cls-3"
+                transform="translate(195.6 373.73) rotate(-90)">219</text>
+        </g>
+        <g id="sector-221">
+            <polygon id="sector-221-2" data-name="sector-221" class="cls-2"
+                points="178.1 311.6 202 314.6 202 347.5 178.1 347.5 178.1 311.6" /><text class="cls-3"
+                transform="translate(196.23 341.17) rotate(-90)">221</text>
+        </g>
+        <g id="sector-223">
+            <path id="sector-223-2" data-name="sector-223" class="cls-2"
+                d="M211.2,277.8l-22-13.1a90.9,90.9,0,0,0-11.1,43.7v3.2l23.9,3v-1.2A72.55,72.55,0,0,1,211.2,277.8Z" />
+            <text class="cls-3" transform="translate(196.62 303.69) rotate(-73.47)">223</text>
+        </g>
+        <g id="sector-225">
+            <path id="sector-225-2" data-name="sector-225" class="cls-2"
+                d="M237.2,250.8l-11.5-22.9a93,93,0,0,0-36.3,36.5l-.2.3,22,13.1A74,74,0,0,1,237.2,250.8Z" /><text
+                class="cls-3" transform="translate(210.61 265.23) rotate(-45.57)">225</text>
+        </g>
+        <g id="sector-227">
+            <path id="sector-227-2" data-name="sector-227" class="cls-2"
+                d="M255.2,243l-6.9-24a90.18,90.18,0,0,0-22.6,8.9l11.5,22.9A72.15,72.15,0,0,1,255.2,243Z" /><text
+                class="cls-5" transform="matrix(0.36, 0.93, -0.93, 0.36, 233.19, 226.7)">227</text>
+        </g>
+        <g id="sector-227-3" data-name="sector-227">
+            <path id="sector-227-4" data-name="sector-227" class="cls-2"
+                d="M275.1,216.4v23.8a72.48,72.48,0,0,0-19.9,2.8l-6.9-24a92.27,92.27,0,0,1,21.8-2.6Z" /><text
+                class="cls-5" transform="translate(257.67 219.91) rotate(79.63)">227</text>
+        </g>
+        <g id="sector-229">
+            <polygon id="sector-229-2" data-name="sector-229" class="cls-2"
+                points="311.9 216.4 311.9 240.2 275.1 240.2 275.1 216.4 311.9 216.4" /><text class="cls-3"
+                transform="translate(282.1 234.37)">229</text>
+        </g>
+        <g id="sector-231">
+            <polygon id="sector-231-2" data-name="sector-231" class="cls-2"
+                points="346.8 216.4 346.8 240.2 311.9 240.2 311.9 216.4 346.8 216.4" /><text class="cls-3"
+                transform="translate(317.9 234.37)">231</text>
+        </g>
+        <g id="sector-233">
+            <polygon id="sector-233-2" data-name="sector-233" class="cls-2"
+                points="381.7 216.4 381.7 240.2 346.8 240.2 346.8 216.4 381.7 216.4" /><text class="cls-3"
+                transform="translate(352.9 234.37)">233</text>
+        </g>
+        <g id="sector-234">
+            <polygon id="sector-234-2" data-name="sector-234" class="cls-2"
+                points="418.3 216.4 418.3 240.2 453.3 240.2 453.3 216.4 418.3 216.4" /><text class="cls-3"
+                transform="translate(424.4 234.37)">234</text>
+        </g>
+        <g id="sector-232">
+            <polygon id="sector-232-2" data-name="sector-232" class="cls-2"
+                points="453.3 216.4 453.3 240.2 488.2 240.2 488.2 216.4 453.3 216.4" /><text class="cls-3"
+                transform="translate(459.3 234.37)">232</text>
+        </g>
+        <g id="sector-230">
+            <polygon id="sector-230-2" data-name="sector-230" class="cls-2"
+                points="488.2 216.4 488.2 240.2 524.9 240.2 525 240.2 525 216.4 488.2 216.4" /><text class="cls-3"
+                transform="translate(493.6 233.37)">230</text>
+        </g>
+        <g id="sector-228">
+            <path id="sector-228-2" data-name="sector-228" class="cls-2"
+                d="M525,216.4v23.8a73,73,0,0,1,19.9,2.8l6.9-24a93.75,93.75,0,0,0-21.9-2.6Z" /><text class="cls-5"
+                transform="translate(540.62 239.49) rotate(-78.17)">228</text>
+        </g>
+        <g id="sector-228-3" data-name="sector-228">
+            <path id="sector-228-4" data-name="sector-228" class="cls-2"
+                d="M544.9,243l6.9-24a93.42,93.42,0,0,1,22.5,8.9l-11.4,23A72.43,72.43,0,0,0,544.9,243Z" /><text
+                class="cls-5" transform="translate(559.8 245.14) rotate(-68.1)">228</text>
+        </g>
+        <g id="sector-226">
+            <path id="sector-226-2" data-name="sector-226" class="cls-2"
+                d="M562.9,250.9l11.4-23a92.85,92.85,0,0,1,36.4,36.6l.2.3-22.1,13A74.21,74.21,0,0,0,562.9,250.9Z" /><text
+                class="cls-3" transform="matrix(0.67, 0.75, -0.75, 0.67, 575.06, 249.91)">226</text>
+        </g>
+        <g id="sector-224">
+            <path id="sector-224-2" data-name="sector-224" class="cls-2"
+                d="M588.8,277.8l22.1-13a91.57,91.57,0,0,1,11,43.6v3.2l-23.8,3v-1.2A72.91,72.91,0,0,0,588.8,277.8Z" />
+            <text class="cls-3" transform="translate(599.7 281.64) rotate(77.59)">224</text>
+        </g>
+        <g id="sector-222">
+            <polygon id="sector-222-2" data-name="sector-222" class="cls-2"
+                points="621.9 311.6 598.1 314.6 598.1 347.6 621.9 347.6 621.9 311.6" /><text class="cls-3"
+                transform="translate(604.51 321.27) rotate(90)">222</text>
+        </g>
+        <g id="sector-220">
+            <polygon id="sector-220-2" data-name="sector-220" class="cls-2"
+                points="621.9 380.9 598.1 380.9 598.1 347.6 621.9 347.6 621.9 380.9" /><text class="cls-3"
+                transform="translate(604.33 351.87) rotate(90)">220</text>
+        </g>
+        <g id="sector-218">
+            <polygon id="sector-218-2" data-name="sector-218" class="cls-2"
+                points="598.1 415.2 621.9 415.2 621.9 380.9 598.1 380.9 598.1 415.2" /><text class="cls-3"
+                transform="translate(604.33 387.47) rotate(90)">218</text>
+        </g>
+        <g id="sector-216">
+            <polygon id="sector-216-2" data-name="sector-216" class="cls-2"
+                points="621.9 415.2 598.1 415.2 598.1 448.5 621.9 448.5 621.9 415.2" /><text class="cls-3"
+                transform="translate(603.8 420.57) rotate(90)">216</text>
+        </g>
+        <g id="sector-214">
+            <polygon id="sector-214-2" data-name="sector-214" class="cls-2"
+                points="621.9 484.5 598.1 481.5 598.1 448.5 621.9 448.5 621.9 484.5" /><text class="cls-3"
+                transform="translate(604.33 452.85) rotate(90)">214</text>
+        </g>
+        <g id="sector-212">
+            <path id="sector-212-2" data-name="sector-212" class="cls-2"
+                d="M588.8,518.2l22.1,13.1a91.87,91.87,0,0,0,11-43.6v-3.2l-23.8-3v1.2A72.24,72.24,0,0,1,588.8,518.2Z" />
+            <text class="cls-3" transform="matrix(-0.25, 0.97, -0.97, -0.25, 604.51, 491.38)">212</text>
+        </g>
+        <g id="sector-210">
+            <path id="sector-210-2" data-name="sector-210" class="cls-2"
+                d="M565.4,543.6l12.8,22.3a92.84,92.84,0,0,0,32.7-34.6l-22.1-13.1A74,74,0,0,1,565.4,543.6Z" /><text
+                class="cls-3" transform="translate(576.7 546.67)">210</text>
+        </g>
+        <g id="sector-208">
+            <path id="sector-208-2" data-name="sector-208" class="cls-2"
+                d="M565.3,543.6l12.9,22.3a90.91,90.91,0,0,1-30.1,12l-4.8-24.4A69.49,69.49,0,0,0,565.3,543.6Z" /><text
+                class="cls-3" transform="translate(548.2 566.47)">208</text>
+        </g>
+        <g id="sector-208-3" data-name="sector-208">
+            <path id="sector-208-4" data-name="sector-208" class="cls-2"
+                d="M543.3,553.5l4.8,24.4a91.34,91.34,0,0,1-18.2,1.8h-8.1V555.9h3.1A70.36,70.36,0,0,0,543.3,553.5Z" />
+            <text class="cls-5" transform="translate(527.94 557.92) rotate(85.52)">208</text>
+        </g>
+        <g id="sector-206">
+            <polygon id="sector-206-2" data-name="sector-206" class="cls-2"
+                points="521.8 555.9 521.8 579.7 488.8 579.7 488.8 555.9 521.8 555.9" /><text class="cls-3"
+                transform="translate(493.9 573.87)">206</text>
+        </g>
+        <g id="sector-204">
+            <polygon id="sector-204-2" data-name="sector-204" class="cls-2"
+                points="488.8 555.9 488.8 579.7 455.8 579.7 455.8 555.9 488.8 555.9" /><text class="cls-3"
+                transform="translate(460.9 573.87)">204</text>
+        </g>
+        <g id="sector-202">
+            <polygon id="sector-202-2" data-name="sector-202" class="cls-2"
+                points="455.8 555.9 455.8 579.7 422.8 579.7 422.8 555.9 455.8 555.9" /><text class="cls-3"
+                transform="translate(427.9 573.87)">202</text>
+        </g>
+        <g id="sector-301">
+            <polygon id="sector-301-2" data-name="sector-301" class="cls-2"
+                points="400 579.6 400 602.7 377.2 602.7 377.2 579.6 400 579.6" /><text class="cls-5"
+                transform="translate(378.6 595.77)">301</text>
+        </g>
+        <g id="sector-302">
+            <polygon id="sector-302-2" data-name="sector-302" class="cls-2"
+                points="400 579.6 400 602.7 422.8 602.7 422.8 579.6 400 579.6" /><text class="cls-5"
+                transform="translate(401.4 595.77)">302</text>
+        </g>
+        <g id="sector-303">
+            <polygon id="sector-303-2" data-name="sector-303" class="cls-2"
+                points="377.2 579.6 377.2 602.7 344.2 602.7 344.2 579.6 377.2 579.6" /><text class="cls-3"
+                transform="translate(349.3 597.27)">303</text>
+        </g>
+        <g id="sector-305">
+            <polygon id="sector-305-2" data-name="sector-305" class="cls-2"
+                points="344.2 579.6 344.2 602.7 302.6 602.7 302.6 579.6 344.2 579.6" /><text class="cls-3"
+                transform="translate(312 597.27)">305</text>
+        </g>
+        <g id="sector-307">
+            <path id="sector-307-2" data-name="sector-307" class="cls-2"
+                d="M302.6,579.6v23.1H265.7V579.5c1.5.1,2.9.1,4.4.1Z" /><text class="cls-3"
+                transform="translate(272.7 597.17)">307</text>
+        </g>
+        <g id="sector-309">
+            <path id="sector-309-2" data-name="sector-309" class="cls-2"
+                d="M245.9,576.4l-7.1,25.2a104.51,104.51,0,0,0,14.9,1.1h12V579.5A92.92,92.92,0,0,1,245.9,576.4Z" /><text
+                class="cls-5" transform="translate(244.1 595.57)">309</text>
+        </g>
+        <g id="sector-309-3" data-name="sector-309">
+            <path id="sector-309-4" data-name="sector-309" class="cls-2"
+                d="M204.1,590l15.6-25.5a94.23,94.23,0,0,0,26.2,11.9l-7.1,25.2A103.05,103.05,0,0,1,204.1,590Z" /><text
+                class="cls-3" transform="translate(216.3 590.07)">309</text>
+        </g>
+        <g id="sector-311">
+            <path id="sector-311-2" data-name="sector-311" class="cls-2"
+                d="M162,547.4l27.2-16.1a93.44,93.44,0,0,0,30.5,33.2L204.1,590A105.9,105.9,0,0,1,162,547.4Z" /><text
+                class="cls-3" transform="translate(179.9 565.97)">3<tspan class="cls-4" x="7.6" y="0">1</tspan>
+                <tspan x="14.2" y="0">1</tspan>
+            </text>
+        </g>
+        <g id="sector-313">
+            <path id="sector-313-2" data-name="sector-313" class="cls-2"
+                d="M150,488l28.1-3.6v3.2a90.9,90.9,0,0,0,11.1,43.7L162,547.4A104.14,104.14,0,0,1,150,499Z" /><text
+                class="cls-3" transform="translate(155.3 519.77)">313</text>
+        </g>
+        <g id="sector-315">
+            <polygon id="sector-315-2" data-name="sector-315" class="cls-2"
+                points="150 488 178.1 484.4 178.1 433.9 150 433.9 150 488" /><text class="cls-3"
+                transform="translate(152.6 466.27)">315</text>
+        </g>
+        <g id="sector-317">
+            <polygon id="sector-317-2" data-name="sector-317" class="cls-2"
+                points="150 398 178.1 398 178.1 433.9 150 433.9 150 398" /><text class="cls-3"
+                transform="translate(152.6 421.27)">317</text>
+        </g>
+        <g id="sector-319">
+            <polygon id="sector-319-2" data-name="sector-319" class="cls-2"
+                points="150 398 178.1 398 178.1 362.1 150 362.1 150 398" /><text class="cls-3"
+                transform="translate(152.6 385.47)">319</text>
+        </g>
+        <g id="sector-321">
+            <polygon id="sector-321-2" data-name="sector-321" class="cls-2"
+                points="150 308 178.1 311.6 178.1 362.1 150 362.1 150 308" /><text class="cls-3"
+                transform="translate(152.6 342.47)">321</text>
+        </g>
+        <g id="sector-323">
+            <path id="sector-323-2" data-name="sector-323" class="cls-2"
+                d="M150,308l28.1,3.6v-3.2a90.9,90.9,0,0,1,11.1-43.7L162,248.6A104.14,104.14,0,0,0,150,297Z" /><text
+                class="cls-3" transform="translate(156.2 286.47)">323</text>
+        </g>
+        <g id="sector-325">
+            <path id="sector-325-2" data-name="sector-325" class="cls-2"
+                d="M207.5,241.1l-22-22A105.19,105.19,0,0,0,162,248.6l27.2,16.1A93.47,93.47,0,0,1,207.5,241.1Z" /><text
+                class="cls-3" transform="translate(173.3 247.27)">325</text>
+        </g>
+        <g id="sector-325-3" data-name="sector-325">
+            <path id="sector-325-4" data-name="sector-325" class="cls-2"
+                d="M207.5,241.1l-22-22a103,103,0,0,1,27.2-17.3l13,26.1A90.93,90.93,0,0,0,207.5,241.1Z" /><text
+                class="cls-3" transform="translate(196.75 214.4) rotate(56.1)">325</text>
+        </g>
+        <g id="sector-327">
+            <path id="sector-327-2" data-name="sector-327" class="cls-2"
+                d="M225.7,227.9l-13-26.1a100.94,100.94,0,0,1,28.5-7.7l7.1,24.9A94.14,94.14,0,0,0,225.7,227.9Z" /><text
+                class="cls-3" transform="translate(222.78 200.82) rotate(70.62)">327</text>
+        </g>
+        <g id="sector-329">
+            <path id="sector-329-2" data-name="sector-329" class="cls-2"
+                d="M280.9,193.3v23.1H270.1a92.27,92.27,0,0,0-21.8,2.6l-7.1-24.9a102.28,102.28,0,0,1,12.5-.8Z" /><text
+                class="cls-3" transform="translate(251.2 209.47)">329</text>
+        </g>
+        <g id="sector-331">
+            <polygon id="sector-331-2" data-name="sector-331" class="cls-2"
+                points="320.6 193.3 320.6 216.4 280.9 216.4 280.9 193.3 320.6 193.3" /><text class="cls-3"
+                transform="translate(289.3 210.17)">331</text>
+        </g>
+        <g id="sector-333">
+            <polygon id="sector-333-2" data-name="sector-333" class="cls-2"
+                points="360.3 193.3 360.3 216.4 320.6 216.4 320.6 193.3 360.3 193.3" /><text class="cls-3"
+                transform="translate(329 210.17)">333</text>
+        </g>
+        <g id="sector-335">
+            <polygon id="sector-335-2" data-name="sector-335" class="cls-2"
+                points="400 193.3 400 216.4 360.3 216.4 360.3 193.3 400 193.3" /><text class="cls-3"
+                transform="translate(368.7 210.17)">335</text>
+        </g>
+        <g id="sector-336">
+            <polygon id="sector-336-2" data-name="sector-336" class="cls-2"
+                points="400 193.3 400 216.4 439.7 216.4 439.7 193.3 400 193.3" /><text class="cls-3"
+                transform="translate(408.4 210.17)">336</text>
+        </g>
+        <g id="sector-334">
+            <polygon id="sector-334-2" data-name="sector-334" class="cls-2"
+                points="439.7 193.3 439.7 216.4 479.4 216.4 479.4 193.3 439.7 193.3" /><text class="cls-3"
+                transform="translate(448.1 210.17)">334</text>
+        </g>
+        <g id="sector-332">
+            <polygon id="sector-332-2" data-name="sector-332" class="cls-2"
+                points="479.4 193.3 479.4 216.4 519.1 216.4 519.1 193.3 479.4 193.3" /><text class="cls-3"
+                transform="translate(487.8 210.17)">332</text>
+        </g>
+        <g id="sector-330">
+            <path id="sector-330-2" data-name="sector-330" class="cls-2"
+                d="M519.1,193.3v23.1h10.8a92.27,92.27,0,0,1,21.8,2.6l7.1-24.9a102.28,102.28,0,0,0-12.5-.8Z" /><text
+                class="cls-3" transform="translate(525.4 210.37)">330</text>
+        </g>
+        <g id="sector-328">
+            <path id="sector-328-2" data-name="sector-328" class="cls-2"
+                d="M574.3,227.9l13-26.1a100.94,100.94,0,0,0-28.5-7.7L551.7,219A94.14,94.14,0,0,1,574.3,227.9Z" /><text
+                class="cls-3" transform="translate(570.47 223.22) rotate(-66.98)">328</text>
+        </g>
+        <g id="sector-326">
+            <path id="sector-326-2" data-name="sector-326" class="cls-2"
+                d="M592.5,241.1l22-22a103,103,0,0,0-27.2-17.3l-13,26.1A90.93,90.93,0,0,1,592.5,241.1Z" /><text
+                class="cls-3" transform="matrix(0.63, -0.78, 0.78, 0.63, 591.37, 235.35)">326</text>
+        </g>
+        <g id="sector-326-3" data-name="sector-326">
+            <path id="sector-326-4" data-name="sector-326" class="cls-2"
+                d="M592.5,241.1l22-22A105.19,105.19,0,0,1,638,248.6l-27.2,16.1A93.47,93.47,0,0,0,592.5,241.1Z" /><text
+                class="cls-3" transform="translate(603.8 247.27)">326</text>
+        </g>
+        <g id="sector-324">
+            <path id="sector-324-2" data-name="sector-324" class="cls-2"
+                d="M650,308l-28.1,3.6v-3.2a90.9,90.9,0,0,0-11.1-43.7L638,248.6A104.14,104.14,0,0,1,650,297v11Z" /><text
+                class="cls-3" transform="translate(623 288.87)">324</text>
+        </g>
+        <g id="sector-322">
+            <polygon id="sector-322-2" data-name="sector-322" class="cls-2"
+                points="650 308 621.9 311.6 621.9 362.1 650 362.1 650 308" /><text class="cls-3"
+                transform="translate(624.5 341.47)">322</text>
+        </g>
+        <g id="sector-320">
+            <polygon id="sector-320-2" data-name="sector-320" class="cls-2"
+                points="650 398 621.9 398 621.9 362.1 650 362.1 650 398" /><text class="cls-3"
+                transform="translate(624.5 385.47)">320</text>
+        </g>
+        <g id="sector-318">
+            <polygon id="sector-318-2" data-name="sector-318" class="cls-2"
+                points="650 398 621.9 398 621.9 433.9 650 433.9 650 398" /><text class="cls-3"
+                transform="translate(624.5 421.27)">318</text>
+        </g>
+        <g id="sector-316">
+            <polygon id="sector-316-2" data-name="sector-316" class="cls-2"
+                points="650 488 621.9 484.4 621.9 433.9 650 433.9 650 488" /><text class="cls-3"
+                transform="translate(624.5 466.27)">316</text>
+        </g>
+        <g id="sector-314">
+            <path id="sector-314-2" data-name="sector-314" class="cls-2"
+                d="M650,488l-28.1-3.6v3.2a90.9,90.9,0,0,1-11.1,43.7L638,547.4A104.14,104.14,0,0,0,650,499V488Z" /><text
+                class="cls-3" transform="translate(622 520.27)">314</text>
+        </g>
+        <g id="sector-312">
+            <path id="sector-312-2" data-name="sector-312" class="cls-2"
+                d="M638,547.4l-27.2-16.1a93.44,93.44,0,0,1-30.5,33.2L595.9,590A105.9,105.9,0,0,0,638,547.4Z" /><text
+                class="cls-3" transform="translate(597.7 565.97)">312</text>
+        </g>
+        <g id="sector-310">
+            <path id="sector-310-2" data-name="sector-310" class="cls-2"
+                d="M595.9,590l-15.6-25.5a94.23,94.23,0,0,1-26.2,11.9l7.1,25.2A103.05,103.05,0,0,0,595.9,590Z" /><text
+                class="cls-3" transform="translate(562.3 589.77)">310</text>
+        </g>
+        <g id="sector-310-3" data-name="sector-310">
+            <path id="sector-310-4" data-name="sector-310" class="cls-2"
+                d="M554.1,576.4l7.1,25.2a104.51,104.51,0,0,1-14.9,1.1h-12V579.5A92.92,92.92,0,0,0,554.1,576.4Z" /><text
+                class="cls-5" transform="translate(536.3 596.17)">310</text>
+        </g>
+        <g id="sector-308">
+            <path id="sector-308-2" data-name="sector-308" class="cls-2"
+                d="M497.4,579.6v23.1h36.9V579.5c-1.5.1-2.9.1-4.4.1Z" /><text class="cls-3"
+                transform="translate(504.4 596.47)">308</text>
+        </g>
+        <g id="sector-306">
+            <polygon id="sector-306-2" data-name="sector-306" class="cls-2"
+                points="455.8 579.6 455.8 602.7 497.4 602.7 497.4 579.6 455.8 579.6" /><text class="cls-3"
+                transform="translate(465.2 596.57)">306</text>
+        </g>
+        <g id="sector-304">
+            <polygon id="sector-304-2" data-name="sector-304" class="cls-2"
+                points="422.8 579.6 422.8 602.7 455.8 602.7 455.8 579.6 422.8 579.6" /><text class="cls-3"
+                transform="translate(427.9 596.57)">304</text>
+        </g>
+        <g id="sector-401">
+            <polygon id="sector-401-2" data-name="sector-401" class="cls-2"
+                points="400 602.7 358.4 602.7 358.4 633.9 400 633.9 400 602.7" /><text class="cls-3"
+                transform="translate(367.8 623.67)">401</text>
+        </g>
+        <g id="sector-403">
+            <polygon id="sector-403-2" data-name="sector-403" class="cls-2"
+                points="358.4 602.7 316.7 602.7 316.7 633.9 358.4 633.9 358.4 602.7" /><text class="cls-3"
+                transform="translate(326.1 623.67)">403</text>
+        </g>
+        <g id="sector-405">
+            <polygon id="sector-405-2" data-name="sector-405" class="cls-2"
+                points="316.7 602.7 275.1 602.7 275.1 633.9 316.7 633.9 316.7 602.7" /><text class="cls-3"
+                transform="translate(284.5 623.67)">405</text>
+        </g>
+        <g id="sector-407">
+            <path id="sector-407-2" data-name="sector-407" class="cls-2"
+                d="M275.1,602.7v31.2H250.6a129.58,129.58,0,0,1-40.5-6.4l11.5-29.9a103.24,103.24,0,0,0,32.1,5.1Z" /><text
+                class="cls-3" transform="translate(233.2 622.07)">407</text>
+        </g>
+        <g id="sector-409">
+            <path id="sector-409-2" data-name="sector-409" class="cls-2"
+                d="M180.9,613.8l17.5-27.2a102.84,102.84,0,0,0,23.2,11l-11.5,29.9A134.28,134.28,0,0,1,180.9,613.8Z" />
+            <text class="cls-3" transform="translate(191.2 613.17)">409</text>
+        </g>
+        <g id="sector-409-3" data-name="sector-409">
+            <path id="sector-409-4" data-name="sector-409" class="cls-2"
+                d="M157.4,594.9l23.4-22.4a99.9,99.9,0,0,0,17.6,14.1l-17.5,27.2A134.28,134.28,0,0,1,157.4,594.9Z" /><text
+                class="cls-3" transform="translate(166.5 598.47)">409</text>
+        </g>
+        <g id="sector-411">
+            <path id="sector-411-2" data-name="sector-411" class="cls-2"
+                d="M134.4,563.7,162,547.4a103,103,0,0,0,18.8,25.1l-23.4,22.4A133.21,133.21,0,0,1,134.4,563.7Z" /><text
+                class="cls-3" transform="translate(146.7 576.47)">4<tspan class="cls-4" x="7.6" y="0">1</tspan>
+                <tspan x="14.2" y="0">1</tspan>
+            </text>
+        </g>
+        <g id="sector-413">
+            <path id="sector-413-2" data-name="sector-413" class="cls-2"
+                d="M119.9,516.6l31.3-2.1A102.7,102.7,0,0,0,162,547.4l-27.6,16.3A129.5,129.5,0,0,1,119.9,516.6Z" /><text
+                class="cls-3" transform="translate(129.5 544.47)">413</text>
+        </g>
+        <g id="sector-415">
+            <path id="sector-415-2" data-name="sector-415" class="cls-2"
+                d="M119.1,473.5H150V499a98.3,98.3,0,0,0,1.2,15.5l-31.3,2.1a132.18,132.18,0,0,1-.8-14.2Z" /><text
+                class="cls-3" transform="translate(123.7 500.47)">415</text>
+        </g>
+        <g id="sector-417">
+            <polygon id="sector-417-2" data-name="sector-417" class="cls-2"
+                points="119.1 433.1 150 433.1 150 473.5 119.1 473.5 119.1 433.1" /><text class="cls-3"
+                transform="translate(123.1 458.67)">417</text>
+        </g>
+        <g id="sector-419">
+            <polygon id="sector-419-2" data-name="sector-419" class="cls-2"
+                points="119.1 392.7 150 392.7 150 433.1 119.1 433.1 119.1 392.7" /><text class="cls-3"
+                transform="translate(123.1 418.27)">419</text>
+        </g>
+        <g id="sector-421">
+            <polygon id="sector-421-2" data-name="sector-421" class="cls-2"
+                points="119.1 352.4 150 352.4 150 392.7 119.1 392.7 119.1 352.4" /><text class="cls-3"
+                transform="translate(123.1 377.97)">421</text>
+        </g>
+        <g id="sector-423">
+            <polygon id="sector-423-2" data-name="sector-423" class="cls-2"
+                points="119.1 312 150 312 150 352.4 119.1 352.4 119.1 312" /><text class="cls-3"
+                transform="translate(123.1 337.57)">423</text>
+        </g>
+        <g id="sector-425">
+            <path id="sector-425-2" data-name="sector-425" class="cls-2"
+                d="M153.1,271.9l-30.2-9.6a134.12,134.12,0,0,0-3.8,31.3V312H150V297A103.33,103.33,0,0,1,153.1,271.9Z" />
+            <text class="cls-3" transform="translate(123.7 296.47)">425</text>
+        </g>
+        <g id="sector-427">
+            <path id="sector-427-2" data-name="sector-427" class="cls-2"
+                d="M162,248.6l-27.6-16.3a127.64,127.64,0,0,0-11.5,30l30.2,9.6A109,109,0,0,1,162,248.6Z" /><text
+                class="cls-3" transform="translate(131.1 259.47)">427</text>
+        </g>
+        <g id="sector-429">
+            <path id="sector-429-2" data-name="sector-429" class="cls-2"
+                d="M162.6,196.1l22.9,23A105.19,105.19,0,0,0,162,248.6l-27.6-16.3A132.84,132.84,0,0,1,162.6,196.1Z" />
+            <text class="cls-3" transform="translate(148.5 227.77)">429</text>
+        </g>
+        <g id="sector-431">
+            <path id="sector-431-2" data-name="sector-431" class="cls-2"
+                d="M186.6,178.8l16.8,27.6a107.36,107.36,0,0,0-17.9,12.7l-22.9-23h0A133.17,133.17,0,0,1,186.6,178.8Z" />
+            <text class="cls-3" transform="translate(171.8 193.84) rotate(54.73)">431</text>
+        </g>
+        <g id="sector-433">
+            <path id="sector-433-2" data-name="sector-433" class="cls-2"
+                d="M215.1,167l-.4.1a131.22,131.22,0,0,0-28.1,11.7l16.8,27.6a100.09,100.09,0,0,1,22.1-9.2Z" /><text
+                class="cls-3" transform="translate(195.6 191.17)">433</text>
+        </g>
+        <g id="sector-435">
+            <path id="sector-435-2" data-name="sector-435" class="cls-2"
+                d="M259.8,162.1v31.2h-6.1a104.94,104.94,0,0,0-28.2,3.9L215.1,167a130.06,130.06,0,0,1,35.5-4.9Z" /><text
+                class="cls-3" transform="translate(228.1 183.87)">435</text>
+        </g>
+        <g id="sector-437">
+            <polygon id="sector-437-2" data-name="sector-437" class="cls-2"
+                points="299.1 162.1 299.1 193.3 259.8 193.3 259.8 162.1 299.1 162.1" /><text class="cls-3"
+                transform="translate(268 183.07)">437</text>
+        </g>
+        <g id="sector-439">
+            <polygon id="sector-439-2" data-name="sector-439" class="cls-2"
+                points="338.3 162.1 338.3 193.3 299.1 193.3 299.1 162.1 338.3 162.1" /><text class="cls-3"
+                transform="translate(307.3 183.07)">439</text>
+        </g>
+        <g id="sector-441">
+            <polygon id="sector-441-2" data-name="sector-441" class="cls-2"
+                points="377.5 162.1 377.5 193.3 338.3 193.3 338.3 162.1 377.5 162.1" /><text class="cls-3"
+                transform="translate(346.5 183.07)">441</text>
+        </g>
+        <g id="sector-443">
+            <polygon id="sector-443-2" data-name="sector-443" class="cls-2"
+                points="377.5 193.3 377.5 162.1 400 162.1 400 193.3 377.5 193.3" /><text class="cls-3"
+                transform="translate(382.75 166.47) rotate(90)">443</text>
+        </g>
+        <g id="sector-444">
+            <polygon id="sector-444-2" data-name="sector-444" class="cls-2"
+                points="400 162.1 422.5 162.1 422.5 193.3 400 193.3 400 162.1" /><text class="cls-3"
+                transform="translate(405.7 166.47) rotate(90)">444</text>
+        </g>
+        <g id="sector-442">
+            <polygon id="sector-442-2" data-name="sector-442" class="cls-2"
+                points="422.5 162.1 422.5 193.3 461.7 193.3 461.7 162.1 422.5 162.1" /><text class="cls-3"
+                transform="translate(430.7 183.07)">442</text>
+        </g>
+        <g id="sector-440">
+            <polygon id="sector-440-2" data-name="sector-440" class="cls-2"
+                points="461.7 162.1 461.7 193.3 500.9 193.3 500.9 162.1 461.7 162.1" /><text class="cls-3"
+                transform="translate(469.9 183.07)">440</text>
+        </g>
+        <g id="sector-438">
+            <polygon id="sector-438-2" data-name="sector-438" class="cls-2"
+                points="500.9 162.1 500.9 193.3 540.2 193.3 540.2 162.1 500.9 162.1" /><text class="cls-3"
+                transform="translate(509.1 183.07)">438</text>
+        </g>
+        <g id="sector-436">
+            <path id="sector-436-2" data-name="sector-436" class="cls-2"
+                d="M540.2,162.1v31.2h6.1a104.94,104.94,0,0,1,28.2,3.9L584.9,167a130.06,130.06,0,0,0-35.5-4.9Z" /><text
+                class="cls-3" transform="translate(549.1 183.97)">436</text>
+        </g>
+        <g id="sector-434">
+            <path id="sector-434-2" data-name="sector-434" class="cls-2"
+                d="M584.9,167l-10.4,30.2a100.09,100.09,0,0,1,22.1,9.2L615.4,180A126.83,126.83,0,0,0,584.9,167Z" /><text
+                class="cls-3" transform="translate(582.8 192.17)">434</text>
+        </g>
+        <g id="sector-434-3" data-name="sector-434">
+            <path id="sector-434-4" data-name="sector-434" class="cls-2"
+                d="M615.4,180l-18.8,26.4a107.36,107.36,0,0,1,17.9,12.7l22.9-23A129.44,129.44,0,0,0,615.4,180Z" /><text
+                class="cls-3" transform="translate(614.01 211.44) rotate(-49.31)">434</text>
+        </g>
+        <g id="sector-432">
+            <path id="sector-432-2" data-name="sector-432" class="cls-2"
+                d="M637.4,196.1l-22.9,23A105.19,105.19,0,0,1,638,248.6l27.6-16.3A132.84,132.84,0,0,0,637.4,196.1Z" />
+            <text class="cls-3" transform="translate(629.6 228.77)">432</text>
+        </g>
+        <g id="sector-430">
+            <path id="sector-430-2" data-name="sector-430" class="cls-2"
+                d="M638,248.6l27.6-16.3a127.64,127.64,0,0,1,11.5,30l-30.2,9.6A109,109,0,0,0,638,248.6Z" /><text
+                class="cls-3" transform="translate(647.1 260.47)">430</text>
+        </g>
+        <g id="sector-428">
+            <path id="sector-428-2" data-name="sector-428" class="cls-2"
+                d="M646.9,271.9l30.2-9.6a134.12,134.12,0,0,1,3.8,31.3V312H650V297A103.33,103.33,0,0,0,646.9,271.9Z" />
+            <text class="cls-3" transform="translate(654.4 295.47)">428</text>
+        </g>
+        <g id="sector-426">
+            <polygon id="sector-426-2" data-name="sector-426" class="cls-2"
+                points="680.9 312 650 312 650 352.4 680.9 352.4 680.9 312" /><text class="cls-3"
+                transform="translate(654 337.57)">426</text>
+        </g>
+        <g id="sector-424">
+            <polygon id="sector-424-2" data-name="sector-424" class="cls-2"
+                points="680.9 352.4 650 352.4 650 392.7 680.9 392.7 680.9 352.4" /><text class="cls-3"
+                transform="translate(654 377.97)">424</text>
+        </g>
+        <g id="sector-422">
+            <polygon id="sector-422-2" data-name="sector-422" class="cls-2"
+                points="680.9 392.7 650 392.7 650 433.1 680.9 433.1 680.9 392.7" /><text class="cls-3"
+                transform="translate(654 418.27)">422</text>
+        </g>
+        <g id="sector-420">
+            <polygon id="sector-420-2" data-name="sector-420" class="cls-2"
+                points="680.9 433.1 650 433.1 650 473.5 680.9 473.5 680.9 433.1" /><text class="cls-3"
+                transform="translate(654 458.67)">420</text>
+        </g>
+        <g id="sector-418">
+            <path id="sector-418-2" data-name="sector-418" class="cls-2"
+                d="M680.9,473.5H650V499a98.3,98.3,0,0,1-1.2,15.5l31.3,2.1a132.18,132.18,0,0,0,.8-14.2V473.5Z" /><text
+                class="cls-3" transform="translate(653.4 500.47)">418</text>
+        </g>
+        <g id="sector-416">
+            <path id="sector-416-2" data-name="sector-416" class="cls-2"
+                d="M680.1,516.6l-31.3-2.1A102.7,102.7,0,0,1,638,547.4l27.6,16.3A129.5,129.5,0,0,0,680.1,516.6Z" /><text
+                class="cls-3" transform="translate(649.6 541.47)">416</text>
+        </g>
+        <g id="sector-414">
+            <path id="sector-414-2" data-name="sector-414" class="cls-2"
+                d="M665.6,563.7,638,547.4a103,103,0,0,1-18.8,25.1l23.4,22.4A133.21,133.21,0,0,0,665.6,563.7Z" /><text
+                class="cls-3" transform="translate(631 576.47)">414</text>
+        </g>
+        <g id="sector-412">
+            <path id="sector-412-2" data-name="sector-412" class="cls-2"
+                d="M642.6,594.9l-23.4-22.4a99.9,99.9,0,0,1-17.6,14.1l17.5,27.2A134.28,134.28,0,0,0,642.6,594.9Z" /><text
+                class="cls-3" transform="translate(610.4 598.97)">412</text>
+        </g>
+        <g id="sector-410">
+            <path id="sector-410-2" data-name="sector-410" class="cls-2"
+                d="M619.1,613.8l-17.5-27.2a102.84,102.84,0,0,1-23.2,11l11.5,29.9A134.28,134.28,0,0,0,619.1,613.8Z" />
+            <text class="cls-3" transform="translate(587.3 612.37)">410</text>
+        </g>
+        <g id="sector-410-3" data-name="sector-410">
+            <path id="sector-410-4" data-name="sector-410" class="cls-2"
+                d="M564.6,633.1a134.31,134.31,0,0,0,25.3-5.6l-11.5-29.9a100,100,0,0,1-17.2,4Z" /><text class="cls-3"
+                transform="translate(565.79 604.67) rotate(78.89)">410</text>
+        </g>
+        <g id="sector-408">
+            <path id="sector-408-2" data-name="sector-408" class="cls-2"
+                d="M524.9,602.7v31.2h24.5c5.1,0,10.2-.3,15.2-.8l-3.4-31.5a104.51,104.51,0,0,1-14.9,1.1Z" /><text
+                class="cls-3" transform="translate(533.3 623.17)">408</text>
+        </g>
+        <g id="sector-406">
+            <polygon id="sector-406-2" data-name="sector-406" class="cls-2"
+                points="483.3 602.7 524.9 602.7 524.9 633.9 483.3 633.9 483.3 602.7" /><text class="cls-3"
+                transform="translate(492.6 623.67)">406</text>
+        </g>
+        <g id="sector-404">
+            <polygon id="sector-404-2" data-name="sector-404" class="cls-2"
+                points="441.6 602.7 483.3 602.7 483.3 633.9 441.6 633.9 441.6 602.7" /><text class="cls-3"
+                transform="translate(451 623.67)">404</text>
+        </g>
+        <g id="sector-402">
+            <polygon id="sector-402-2" data-name="sector-402" class="cls-2"
+                points="400 602.7 441.6 602.7 441.6 633.9 400 633.9 400 602.7" /><text class="cls-3"
+                transform="translate(409.4 623.67)">402</text>
+        </g>
+        <g id="sector-501">
+            <polygon id="sector-501-2" data-name="sector-501" class="cls-2"
+                points="377.2 633.6 377.2 678.9 399.7 678.9 399.7 633.6 377.2 633.6" /><text class="cls-3"
+                transform="translate(378.19 662.17)">501</text>
+        </g>
+        <g id="sector-503">
+            <polygon id="sector-503-2" data-name="sector-503" class="cls-2"
+                points="332.5 633.9 332.5 679.2 377.5 679.2 377.5 633.9 332.5 633.9" /><text class="cls-3"
+                transform="translate(343.6 661.87)">503</text>
+        </g>
+        <g id="sector-505">
+            <polygon id="sector-505-2" data-name="sector-505" class="cls-2"
+                points="287.5 633.9 287.5 679.2 332.5 679.2 332.5 633.9 287.5 633.9" /><text class="cls-3"
+                transform="translate(298.6 661.87)">505</text>
+        </g>
+        <g id="sector-507">
+            <path id="sector-507-2" data-name="sector-507" class="cls-2"
+                d="M242.6,633.7v45.4c.6,0,1.2.1,1.8.1h43.1V633.9H250.6C247.9,633.9,245.2,633.8,242.6,633.7Z" /><text
+                class="cls-3" transform="translate(253.6 661.77)">507</text>
+        </g>
+        <g id="sector-509">
+            <path id="sector-509-2" data-name="sector-509" class="cls-2"
+                d="M206.9,626.4l-10.8,45.5a165.59,165.59,0,0,0,46.5,7.2V633.7A131.74,131.74,0,0,1,206.9,626.4Z" /><text
+                class="cls-3" transform="translate(209.9 660.17)">509</text>
+        </g>
+        <g id="sector-511">
+            <path id="sector-511-2" data-name="sector-511" class="cls-2"
+                d="M173.2,608.5l-26.5,38.3a164.56,164.56,0,0,0,49.4,25.1l10.8-45.5A131.26,131.26,0,0,1,173.2,608.5Z" />
+            <text class="cls-3" transform="translate(168 645.17)">5<tspan class="cls-4" x="7.6" y="0">1</tspan>
+                <tspan x="14.2" y="0">1</tspan>
+            </text>
+        </g>
+        <g id="sector-513">
+            <path id="sector-513-2" data-name="sector-513" class="cls-2"
+                d="M114.1,614.9l35.4-28.7a128.48,128.48,0,0,0,23.7,22.3l-26.5,38.3A167,167,0,0,1,114.1,614.9Z" /><text
+                class="cls-3" transform="translate(133.9 620.37)">513</text>
+        </g>
+        <g id="sector-515">
+            <path id="sector-515-2" data-name="sector-515" class="cls-2"
+                d="M89.2,569.3,129,552.2a130.57,130.57,0,0,0,20.5,34l-35.4,28.7A161.65,161.65,0,0,1,89.2,569.3Z" /><text
+                class="cls-3" transform="translate(107.9 588.87)">515</text>
+        </g>
+        <g id="sector-517">
+            <path id="sector-517-2" data-name="sector-517" class="cls-2"
+                d="M79.7,512.7l39.7-2.2a129.53,129.53,0,0,0,9.6,41.7L89.2,569.3a161.18,161.18,0,0,1-9.5-54.9Z" /><text
+                class="cls-3" transform="translate(90.5 542.77)">517</text>
+        </g>
+        <g id="sector-519">
+            <path id="sector-519-2" data-name="sector-519" class="cls-2"
+                d="M79.7,465h39.4v37.4q0,4.05.3,8.1l-39.7,2.2Z" /><text class="cls-3"
+                transform="translate(88.1 494.17)">519</text>
+        </g>
+        <g id="sector-521">
+            <polygon id="sector-521-2" data-name="sector-521" class="cls-2"
+                points="79.7 417.3 119.1 417.3 119.1 465 79.7 465 79.7 417.3" /><text class="cls-3"
+                transform="translate(88 446.57)">521</text>
+        </g>
+        <g id="sector-523">
+            <polygon id="sector-523-2" data-name="sector-523" class="cls-2"
+                points="79.7 369.5 119.1 369.5 119.1 417.3 79.7 417.3 79.7 369.5" /><text class="cls-3"
+                transform="translate(88 398.77)">523</text>
+        </g>
+        <g id="sector-525">
+            <polygon id="sector-525-2" data-name="sector-525" class="cls-2"
+                points="79.7 321.8 119.1 321.8 119.1 369.5 79.7 369.5 79.7 321.8" /><text class="cls-3"
+                transform="translate(88 351.07)">525</text>
+        </g>
+        <g id="sector-527">
+            <path id="sector-527-2" data-name="sector-527" class="cls-2"
+                d="M119.1,321.8H79.7V281.5c0-3.4.1-6.9.3-10.3l40.5,3.8a127.27,127.27,0,0,0-1.4,18.6Z" /><text
+                class="cls-3" transform="translate(88.6 301.87)">527</text>
+        </g>
+        <g id="sector-529">
+            <path id="sector-529-2" data-name="sector-529" class="cls-2"
+                d="M131.5,238,91.4,220.7A163.72,163.72,0,0,0,80,271.2l40.5,3.8A128.79,128.79,0,0,1,131.5,238Z" /><text
+                class="cls-3" transform="translate(91.6 256.97)">529</text>
+        </g>
+        <g id="sector-531">
+            <path id="sector-531-2" data-name="sector-531" class="cls-2"
+                d="M131.5,238,91.4,220.7a166.37,166.37,0,0,1,25.7-43.4l35.3,29.1a131.52,131.52,0,0,0-13.2,17.5l-.3.5A137.27,137.27,0,0,0,131.5,238Z" />
+            <text class="cls-3" transform="translate(109.6 215.67)">531</text>
+        </g>
+        <g id="sector-533">
+            <path id="sector-533-2" data-name="sector-533" class="cls-2"
+                d="M162.3,138.9l24.3,39.9v.1c-.8.4-1.6.9-2.4,1.3h0l-.6.4c-.8.4-1.5.9-2.3,1.4l-.2.1a133.57,133.57,0,0,0-28.7,24.3l-35.3-29.1A166.89,166.89,0,0,1,162.3,138.9Z" />
+            <text class="cls-3" transform="translate(141 180.07)">533</text>
+        </g>
+        <g id="sector-535">
+            <path id="sector-535-2" data-name="sector-535" class="cls-2"
+                d="M186.6,178.8l-13.8-22.5a132,132,0,0,1,19-9l-4-20.4a163.87,163.87,0,0,1,33.1-8.4l2.7,20.9a141.47,141.47,0,0,1,14.5-1.1v24.4A129.5,129.5,0,0,0,186.6,178.8Z" />
+            <text class="cls-3" transform="translate(201.4 157.07)">535</text>
+        </g>
+        <g id="sector-537">
+            <path id="sector-537-2" data-name="sector-537" class="cls-2"
+                d="M290,138.3v23.8H247.1c-.9,0-1.9.1-2.8.1l-.9.1a14.77,14.77,0,0,0-2.1.1c-.5,0-1.1.1-1.6.1s-1,.1-1.6.2V138.3c-4.7,0-13.3.9-14.5,1.1l-2.7-20.9a164.53,164.53,0,0,1,23.5-1.7h22.4v21.5Z" />
+            <text class="cls-3" transform="translate(233 133.27)">537</text>
+        </g>
+        <g id="sector-539">
+            <polygon id="sector-539-2" data-name="sector-539" class="cls-2"
+                points="335.5 138.3 335.5 149.3 318.5 149.3 318.5 162.1 290 162.1 290 138.3 266.8 138.3 266.8 116.8 312.6 116.8 312.6 138.3 335.5 138.3" />
+            <text class="cls-3" transform="translate(277.2 133.27)">539</text>
+        </g>
+        <g id="sector-541">
+            <polygon id="sector-541-2" data-name="sector-541" class="cls-2"
+                points="379.8 138.3 379.8 149.3 335.5 149.3 335.5 138.3 312.6 138.3 312.6 116.8 361.1 116.8 361.1 138.3 379.8 138.3" />
+            <text class="cls-3" transform="translate(325.2 133.27)">541</text>
+        </g>
+        <g id="sector-543">
+            <polygon id="sector-543-2" data-name="sector-543" class="cls-2"
+                points="400 138.3 400 149.3 379.8 149.3 379.8 138.3 361.1 138.3 361.1 116.8 400 116.8 400 138.3" /><text
+                class="cls-3" transform="translate(369.3 133.27)">543</text>
+        </g>
+        <g id="sector-544">
+            <polygon id="sector-544-2" data-name="sector-544" class="cls-2"
+                points="400 138.3 400 149.3 420.2 149.3 420.2 138.3 438.9 138.3 438.9 116.8 400 116.8 400 138.3" /><text
+                class="cls-3" transform="translate(409 133.27)">544</text>
+        </g>
+        <g id="sector-542">
+            <polygon id="sector-542-2" data-name="sector-542" class="cls-2"
+                points="420.2 138.3 420.2 149.3 464.5 149.3 464.5 138.3 487.4 138.3 487.4 116.8 438.9 116.8 438.9 138.3 420.2 138.3" />
+            <text class="cls-3" transform="translate(452 133.27)">542</text>
+        </g>
+        <g id="sector-540">
+            <polygon id="sector-540-2" data-name="sector-540" class="cls-2"
+                points="464.5 138.3 464.5 149.3 481.5 149.3 481.5 162.1 510 162.1 510 138.3 533.2 138.3 533.2 116.8 487.4 116.8 487.4 138.3 464.5 138.3" />
+            <text class="cls-3" transform="translate(499.6 133.27)">540</text>
+        </g>
+        <g id="sector-538">
+            <path id="sector-538-2" data-name="sector-538" class="cls-2"
+                d="M510,138.3v23.8h42.9c.9,0,1.9.1,2.8.1l.9.1a14.77,14.77,0,0,1,2.1.1c.5,0,1.1.1,1.6.1s1,.1,1.6.2V138.3c4.7,0,13.3.9,14.5,1.1l2.7-20.9a164.53,164.53,0,0,0-23.5-1.7H533.2v21.5Z" />
+            <text class="cls-3" transform="translate(543.8 133.27)">538</text>
+        </g>
+        <g id="sector-536">
+            <path id="sector-536-2" data-name="sector-536" class="cls-2"
+                d="M613.4,178.8l13.8-22.5a132,132,0,0,0-19-9l4-20.4a163.87,163.87,0,0,0-33.1-8.4l-2.7,20.9a141.47,141.47,0,0,0-14.5-1.1v24.4A129.5,129.5,0,0,1,613.4,178.8Z" />
+            <text class="cls-3" transform="translate(574.6 157.67)">536</text>
+        </g>
+        <g id="sector-534">
+            <path id="sector-534-2" data-name="sector-534" class="cls-2"
+                d="M637.7,138.9l-24.3,39.9v.1c.8.4,1.6.9,2.4,1.3h0l.6.4c.8.4,1.5.9,2.3,1.4l.2.1a133.57,133.57,0,0,1,28.7,24.3l35.3-29.1A166.89,166.89,0,0,0,637.7,138.9Z" />
+            <text class="cls-3" transform="translate(636.7 178.07)">534</text>
+        </g>
+        <g id="sector-532">
+            <path id="sector-532-2" data-name="sector-532" class="cls-2"
+                d="M668.5,238l40.1-17.3a166.37,166.37,0,0,0-25.7-43.4l-35.3,29.1a131.52,131.52,0,0,1,13.2,17.5l.3.5A137.27,137.27,0,0,1,668.5,238Z" />
+            <text class="cls-3" transform="translate(666.8 217.07)">532</text>
+        </g>
+        <g id="sector-530">
+            <path id="sector-530-2" data-name="sector-530" class="cls-2"
+                d="M668.5,238l40.1-17.3A163.72,163.72,0,0,1,720,271.2L679.5,275A128.79,128.79,0,0,0,668.5,238Z" /><text
+                class="cls-3" transform="translate(685.6 256.47)">530</text>
+        </g>
+        <g id="sector-528">
+            <path id="sector-528-2" data-name="sector-528" class="cls-2"
+                d="M680.9,321.8h39.4V281.5c0-3.4-.1-6.9-.3-10.3L679.5,275a127.27,127.27,0,0,1,1.4,18.6v28.2Z" /><text
+                class="cls-3" transform="translate(688.5 302.87)">528</text>
+        </g>
+        <g id="sector-526">
+            <polygon id="sector-526-2" data-name="sector-526" class="cls-2"
+                points="720.3 321.8 680.9 321.8 680.9 369.5 720.3 369.5 720.3 321.8" /><text class="cls-3"
+                transform="translate(689.2 351.07)">526</text>
+        </g>
+        <g id="sector-524">
+            <polygon id="sector-524-2" data-name="sector-524" class="cls-2"
+                points="720.3 369.5 680.9 369.5 680.9 417.3 720.3 417.3 720.3 369.5" /><text class="cls-3"
+                transform="translate(689.2 398.77)">524</text>
+        </g>
+        <g id="sector-522">
+            <polygon id="sector-522-2" data-name="sector-522" class="cls-2"
+                points="720.3 417.3 680.9 417.3 680.9 465 720.3 465 720.3 417.3" /><text class="cls-3"
+                transform="translate(689.2 446.57)">522</text>
+        </g>
+        <g id="sector-520">
+            <path id="sector-520-2" data-name="sector-520" class="cls-2"
+                d="M720.3,465H680.9v37.4q0,4.05-.3,8.1l39.7,2.2Z" /><text class="cls-3"
+                transform="translate(689 493.17)">520</text>
+        </g>
+        <g id="sector-518">
+            <path id="sector-518-2" data-name="sector-518" class="cls-2"
+                d="M720.3,512.7l-39.7-2.2a129.53,129.53,0,0,1-9.6,41.7l39.8,17.1a161.18,161.18,0,0,0,9.5-54.9Z" /><text
+                class="cls-3" transform="translate(686.3 541.57)">518</text>
+        </g>
+        <g id="sector-516">
+            <path id="sector-516-2" data-name="sector-516" class="cls-2"
+                d="M710.8,569.3,671,552.2a130.57,130.57,0,0,1-20.5,34l35.4,28.7A161.65,161.65,0,0,0,710.8,569.3Z" />
+            <text class="cls-3" transform="translate(670.3 587.87)">516</text>
+        </g>
+        <g id="sector-514">
+            <path id="sector-514-2" data-name="sector-514" class="cls-2"
+                d="M685.9,614.9l-35.4-28.7a128.48,128.48,0,0,1-23.7,22.3l26.5,38.3A167,167,0,0,0,685.9,614.9Z" /><text
+                class="cls-3" transform="translate(643.9 619.87)">514</text>
+        </g>
+        <g id="sector-512">
+            <path id="sector-512-2" data-name="sector-512" class="cls-2"
+                d="M626.8,608.5l26.5,38.3a164.56,164.56,0,0,1-49.4,25.1l-10.8-45.5A131.26,131.26,0,0,0,626.8,608.5Z" />
+            <text class="cls-3" transform="translate(608.8 644.57)">512</text>
+        </g>
+        <g id="sector-510">
+            <path id="sector-510-2" data-name="sector-510" class="cls-2"
+                d="M593.1,626.4l10.8,45.5a165.59,165.59,0,0,1-46.5,7.2V633.7A131.74,131.74,0,0,0,593.1,626.4Z" /><text
+                class="cls-3" transform="translate(566.5 659.87)">510</text>
+        </g>
+        <g id="sector-508">
+            <path id="sector-508-2" data-name="sector-508" class="cls-2"
+                d="M557.4,633.7v45.4c-.6,0-1.2.1-1.8.1H512.5V633.9h36.9C552.1,633.9,554.8,633.8,557.4,633.7Z" /><text
+                class="cls-3" transform="translate(523.5 661.77)">508</text>
+        </g>
+        <g id="sector-506">
+            <polygon id="sector-506-2" data-name="sector-506" class="cls-2"
+                points="512.5 633.9 512.5 679.2 467.5 679.2 467.5 633.9 512.5 633.9" /><text class="cls-3"
+                transform="translate(478.5 661.87)">506</text>
+        </g>
+        <g id="sector-504">
+            <polygon id="sector-504-2" data-name="sector-504" class="cls-2"
+                points="467.5 633.9 467.5 679.2 422.5 679.2 422.5 633.9 467.5 633.9" /><text class="cls-3"
+                transform="translate(433.5 661.87)">504</text>
+        </g>
+        <g id="sector-601">
+            <polygon id="sector-601-2" data-name="sector-601" class="cls-2"
+                points="354.5 679.2 354.5 716.6 400 716.6 400 679.2 354.5 679.2" /><text class="cls-3"
+                transform="translate(365.8 703.27)">601</text>
+        </g>
+        <g id="sector-603">
+            <polygon id="sector-603-2" data-name="sector-603" class="cls-2"
+                points="308.9 679.2 308.9 716.6 354.5 716.6 354.5 679.2 308.9 679.2" /><text class="cls-3"
+                transform="translate(320.3 703.27)">603</text>
+        </g>
+        <g id="sector-605">
+            <polygon id="sector-605-2" data-name="sector-605" class="cls-2"
+                points="263.4 679.2 263.4 716.6 308.9 716.6 308.9 679.2 263.4 679.2" /><text class="cls-3"
+                transform="translate(274.7 703.27)">605</text>
+        </g>
+        <g id="sector-607">
+            <path id="sector-607-2" data-name="sector-607" class="cls-2"
+                d="M217.8,677l-5.5,36.4a218.33,218.33,0,0,0,37.3,3.2h13.8V679.2h-19A165.57,165.57,0,0,1,217.8,677Z" />
+            <text class="cls-3" transform="translate(227.4 703.17)">607</text>
+        </g>
+        <g id="sector-609">
+            <path id="sector-609-2" data-name="sector-609" class="cls-2"
+                d="M217.8,677l-5.5,36.4a209.57,209.57,0,0,1-51.6-16.2l12.2-34.5A163.58,163.58,0,0,0,217.8,677Z" /><text
+                class="cls-3" transform="translate(179.8 695.37)">609</text>
+        </g>
+        <g id="sector-611">
+            <path id="sector-611-2" data-name="sector-611" class="cls-2"
+                d="M172.9,662.7l-12.2,34.5a216.88,216.88,0,0,1-56.8-37.9L130,632.6A163.47,163.47,0,0,0,172.9,662.7Z" />
+            <text class="cls-3" transform="translate(129.5 671.27)">6<tspan class="cls-4" x="7.6" y="0">1</tspan>
+                <tspan x="14.2" y="0">1</tspan>
+            </text>
+        </g>
+        <g id="sector-613">
+            <path id="sector-613-2" data-name="sector-613" class="cls-2"
+                d="M130,632.6l-26.1,26.7a218.46,218.46,0,0,1-41.7-52.9l35.4-17.5A163.94,163.94,0,0,0,130,632.6Z" /><text
+                class="cls-3" transform="translate(84.7 629.47)">613</text>
+        </g>
+        <g id="sector-615">
+            <path id="sector-615-2" data-name="sector-615" class="cls-2"
+                d="M39.7,546.7,82,542.1a165.35,165.35,0,0,0,15.6,46.8L62.2,606.4A212.7,212.7,0,0,1,39.7,546.7Z" /><text
+                class="cls-3" transform="translate(57.2 579.57)">615</text>
+        </g>
+        <g id="sector-617">
+            <path id="sector-617-2" data-name="sector-617" class="cls-2"
+                d="M82.1,542.3l-42.4,4.5A214.18,214.18,0,0,1,35,502v-7.7H79.7v20.1A160.82,160.82,0,0,0,82.1,542.3Z" />
+            <text class="cls-3" transform="translate(47.1 525.97)">617</text>
+        </g>
+        <g id="sector-619">
+            <polygon id="sector-619-2" data-name="sector-619" class="cls-2"
+                points="35 443.4 79.7 443.4 79.7 494.3 35 494.3 35 443.4" /><text class="cls-3"
+                transform="translate(45.9 474.27)">619</text>
+        </g>
+        <g id="sector-621">
+            <polygon id="sector-621-2" data-name="sector-621" class="cls-2"
+                points="35 392.6 79.7 392.6 79.7 443.4 35 443.4 35 392.6" /><text class="cls-3"
+                transform="translate(45.9 423.37)">621</text>
+        </g>
+        <g id="sector-623">
+            <polygon id="sector-623-2" data-name="sector-623" class="cls-2"
+                points="35 341.7 79.7 341.7 79.7 392.6 35 392.6 35 341.7" /><text class="cls-3"
+                transform="translate(45.9 372.47)">623</text>
+        </g>
+        <g id="sector-625">
+            <polygon id="sector-625-2" data-name="sector-625" class="cls-2"
+                points="35 290.8 79.7 290.8 79.7 341.7 35 341.7 35 290.8" /><text class="cls-3"
+                transform="translate(45.9 321.57)">625</text>
+        </g>
+        <g id="sector-627">
+            <path id="sector-627-2" data-name="sector-627" class="cls-2"
+                d="M40.2,235.9l42.7,13.6a161.54,161.54,0,0,0-3.2,32v9.3H35v-8.1A213.11,213.11,0,0,1,40.2,235.9Z" /><text
+                class="cls-3" transform="translate(45.2 272.77)">627</text>
+        </g>
+        <g id="sector-629">
+            <path id="sector-629-2" data-name="sector-629" class="cls-2"
+                d="M40.2,235.9l42.7,13.6A161.24,161.24,0,0,1,101,200.8L62.4,178A215.71,215.71,0,0,0,40.2,235.9Z" /><text
+                class="cls-3" transform="translate(58.1 222.17)">629</text>
+        </g>
+        <g id="sector-631">
+            <path id="sector-631-2" data-name="sector-631" class="cls-2"
+                d="M101,200.8,62.4,178a216.5,216.5,0,0,1,40.9-51.9l30.4,33.7A168.75,168.75,0,0,0,101,200.8Z" /><text
+                class="cls-3" transform="translate(86.6 170.77)">631</text>
+        </g>
+        <g id="sector-633">
+            <path id="sector-633-2" data-name="sector-633" class="cls-2"
+                d="M138.3,99.4l24,39.5a173.35,173.35,0,0,0-28.6,20.9l-30.4-33.7A217.25,217.25,0,0,1,138.3,99.4Z" /><text
+                class="cls-3" transform="translate(121.3 134.97)">633</text>
+        </g>
+        <g id="sector-635">
+            <path id="sector-635-2" data-name="sector-635" class="cls-2"
+                d="M183,102.4l4.8,24.5a161.75,161.75,0,0,1,50.3-9.9V92.4A189.83,189.83,0,0,0,183,102.4Z" /><text
+                class="cls-3" transform="matrix(0.99, -0.16, 0.16, 0.99, 200.82, 114.83)">635</text>
+        </g>
+        <g id="sector-701">
+            <path id="sector-701-2" data-name="sector-701" class="cls-2"
+                d="M178.6,80.2l4.4,22.2a207,207,0,0,1,30.8-7.7l-3.7-22.9A221.17,221.17,0,0,0,178.6,80.2Z" /><text
+                class="cls-3" transform="matrix(0.96, -0.27, 0.27, 0.96, 186.97, 95.6)">701</text>
+        </g>
+        <g id="sector-703">
+            <path id="sector-703-2" data-name="sector-703" class="cls-2"
+                d="M263.9,68.1V92.2H244.8a197.49,197.49,0,0,0-31,2.5l-3.7-22.9a214.16,214.16,0,0,1,39.5-3.7Z" /><text
+                class="cls-3" transform="translate(225.6 85.57)">703</text>
+        </g>
+        <g id="sector-637">
+            <path id="sector-637-2" data-name="sector-637" class="cls-2"
+                d="M238.1,92.4V117c2.1-.1,4.2-.2,6.3-.2h27.5V92.2H244.8C242.5,92.2,240.3,92.3,238.1,92.4Z" /><text
+                class="cls-3" transform="translate(243.6 109.97)">637</text>
+        </g>
+        <g id="sector-705">
+            <polygon id="sector-705-2" data-name="sector-705" class="cls-2"
+                points="309.3 68.1 309.3 92.2 263.9 92.2 263.9 68.1 309.3 68.1" /><text class="cls-3"
+                transform="translate(275.2 85.57)">705</text>
+        </g>
+        <g id="sector-639">
+            <polygon id="sector-639-2" data-name="sector-639" class="cls-2"
+                points="271.9 92.2 271.9 116.8 305.7 116.8 305.7 92.2 271.9 92.2" /><text class="cls-6"
+                transform="translate(277.57 109.76)">639</text>
+        </g>
+        <g id="sector-707">
+            <polygon id="sector-707-2" data-name="sector-707" class="cls-2"
+                points="354.7 68.1 354.7 92.2 309.3 92.2 309.3 68.1 354.7 68.1" /><text class="cls-3"
+                transform="translate(320.6 85.57)">707</text>
+        </g>
+        <g id="sector-641">
+            <polygon id="sector-641-2" data-name="sector-641" class="cls-2"
+                points="305.7 92.2 305.7 116.8 339.6 116.8 339.6 92.2 305.7 92.2" /><text class="cls-3"
+                transform="translate(311.2 109.87)">641</text>
+        </g>
+        <g id="sector-643">
+            <polygon id="sector-643-2" data-name="sector-643" class="cls-2"
+                points="339.6 92.2 339.6 116.8 373.4 116.8 373.4 92.2 339.6 92.2" /><text class="cls-3"
+                transform="translate(345 109.87)">643</text>
+        </g>
+        <g id="sector-645">
+            <polygon id="sector-645-2" data-name="sector-645" class="cls-2"
+                points="400 92.2 400 116.8 373.4 116.8 373.4 92.2 400 92.2" /><text class="cls-5"
+                transform="translate(376.9 109.77)">645</text>
+        </g>
+        <g id="sector-646">
+            <polygon id="sector-646-2" data-name="sector-646" class="cls-2"
+                points="399.8 92.2 399.8 116.8 426.5 116.8 426.5 92.2 399.8 92.2" /><text class="cls-5"
+                transform="translate(403.1 109.87)">646</text>
+        </g>
+        <g id="sector-644">
+            <polygon id="sector-644-2" data-name="sector-644" class="cls-2"
+                points="460.3 92.2 460.3 116.8 426.5 116.8 426.5 92.2 460.3 92.2" /><text class="cls-3"
+                transform="translate(431.9 109.87)">644</text>
+        </g>
+        <g id="sector-708">
+            <polygon id="sector-708-2" data-name="sector-708" class="cls-2"
+                points="445.1 68.1 445.1 92.2 490.5 92.2 490.5 68.1 445.1 68.1" /><text class="cls-3"
+                transform="translate(456.4 85.57)">708</text>
+        </g>
+        <g id="sector-642">
+            <polygon id="sector-642-2" data-name="sector-642" class="cls-2"
+                points="494.1 92.2 494.1 116.8 460.3 116.8 460.3 92.2 494.1 92.2" /><text class="cls-3"
+                transform="translate(465.8 109.87)">642</text>
+        </g>
+        <g id="sector-706">
+            <polygon id="sector-706-2" data-name="sector-706" class="cls-2"
+                points="490.5 68.1 490.5 92.2 535.9 92.2 535.9 68.1 490.5 68.1" /><text class="cls-3"
+                transform="translate(501.8 85.57)">706</text>
+        </g>
+        <g id="sector-640">
+            <polygon id="sector-640-2" data-name="sector-640" class="cls-2"
+                points="527.9 92.2 527.9 116.8 494.1 116.8 494.1 92.2 527.9 92.2" /><text class="cls-3"
+                transform="translate(499.6 109.87)">640</text>
+        </g>
+        <g id="sector-704">
+            <path id="sector-704-2" data-name="sector-704" class="cls-2"
+                d="M535.9,68.1V92.2h19.2A197.19,197.19,0,0,1,586,94.7l3.7-22.9a214.16,214.16,0,0,0-39.5-3.7Z" /><text
+                class="cls-3" transform="translate(551.4 86.77)">704</text>
+        </g>
+        <g id="sector-638">
+            <path id="sector-638-2" data-name="sector-638" class="cls-2"
+                d="M561.7,92.4V117c-2.1-.1-4.2-.2-6.3-.2H527.9V92.2h27.2C557.3,92.2,559.5,92.3,561.7,92.4Z" /><text
+                class="cls-3" transform="translate(533.4 109.97)">638</text>
+        </g>
+        <g id="sector-702">
+            <path id="sector-702-2" data-name="sector-702" class="cls-2"
+                d="M621.2,80.2l-4.3,22.2A211.49,211.49,0,0,0,586,94.7l3.7-22.9A217.68,217.68,0,0,1,621.2,80.2Z" /><text
+                class="cls-3" transform="translate(591.13 89.68) rotate(13.44)">702</text>
+        </g>
+        <g id="sector-636">
+            <path id="sector-636-2" data-name="sector-636" class="cls-2"
+                d="M616.9,102.4l-4.8,24.5a163,163,0,0,0-50.4-9.9V92.4A191.12,191.12,0,0,1,616.9,102.4Z" /><text
+                class="cls-3" transform="translate(575.74 110.92) rotate(9.78)">636</text>
+        </g>
+        <g id="sector-634">
+            <path id="sector-634-2" data-name="sector-634" class="cls-2"
+                d="M661.7,99.4l-24,39.5a173.35,173.35,0,0,1,28.6,20.9l30.4-33.7A217.25,217.25,0,0,0,661.7,99.4Z" /><text
+                class="cls-3" transform="translate(655.8 134.97)">634</text>
+        </g>
+        <g id="sector-632">
+            <path id="sector-632-2" data-name="sector-632" class="cls-2"
+                d="M699,200.8,737.6,178a216.5,216.5,0,0,0-40.9-51.9l-30.4,33.7A168.75,168.75,0,0,1,699,200.8Z" /><text
+                class="cls-3" transform="translate(690.5 168.77)">632</text>
+        </g>
+        <g id="sector-630">
+            <path id="sector-630-2" data-name="sector-630" class="cls-2"
+                d="M759.8,235.9l-42.7,13.6A161.24,161.24,0,0,0,699,200.8L737.6,178A215.71,215.71,0,0,1,759.8,235.9Z" />
+            <text class="cls-3" transform="translate(718 219.17)">630</text>
+        </g>
+        <g id="sector-628">
+            <path id="sector-628-2" data-name="sector-628" class="cls-2"
+                d="M759.8,235.9l-42.7,13.6a161.54,161.54,0,0,1,3.2,32v9.3H765v-8.1A213.11,213.11,0,0,0,759.8,235.9Z" />
+            <text class="cls-3" transform="translate(732.3 273.37)">628</text>
+        </g>
+        <g id="sector-626">
+            <polygon id="sector-626-2" data-name="sector-626" class="cls-2"
+                points="765 290.8 720.3 290.8 720.3 341.7 765 341.7 765 290.8" /><text class="cls-3"
+                transform="translate(731.2 321.57)">626</text>
+        </g>
+        <g id="sector-624">
+            <polygon id="sector-624-2" data-name="sector-624" class="cls-2"
+                points="765 341.7 720.3 341.7 720.3 392.6 765 392.6 765 341.7" /><text class="cls-3"
+                transform="translate(731.2 372.47)">624</text>
+        </g>
+        <g id="sector-622">
+            <polygon id="sector-622-2" data-name="sector-622" class="cls-2"
+                points="765 392.6 720.3 392.6 720.3 443.4 765 443.4 765 392.6" /><text class="cls-3"
+                transform="translate(731.2 423.37)">622</text>
+        </g>
+        <g id="sector-620">
+            <polygon id="sector-620-2" data-name="sector-620" class="cls-2"
+                points="765 443.4 720.3 443.4 720.3 494.3 765 494.3 765 443.4" /><text class="cls-3"
+                transform="translate(731.2 474.27)">620</text>
+        </g>
+        <g id="sector-618">
+            <path id="sector-618-2" data-name="sector-618" class="cls-2"
+                d="M717.9,542.3l42.4,4.5A214.18,214.18,0,0,0,765,502v-7.7H720.3v20.1A160.82,160.82,0,0,1,717.9,542.3Z" />
+            <text class="cls-3" transform="translate(730.1 524.97)">618</text>
+        </g>
+        <g id="sector-616">
+            <path id="sector-616-2" data-name="sector-616" class="cls-2"
+                d="M760.3,546.7,718,542.1a165.35,165.35,0,0,1-15.6,46.8l35.4,17.5A212.7,212.7,0,0,0,760.3,546.7Z" />
+            <text class="cls-3" transform="translate(720.9 577.57)">616</text>
+        </g>
+        <g id="_614" data-name="614">
+            <path id="sector-614" class="cls-2"
+                d="M670,632.6l26.1,26.7a218.46,218.46,0,0,0,41.7-52.9l-35.4-17.5A163.94,163.94,0,0,1,670,632.6Z" /><text
+                class="cls-3" transform="translate(692.5 627.47)">614</text>
+        </g>
+        <g id="sector-612">
+            <path id="sector-612-2" data-name="sector-612" class="cls-2"
+                d="M627.1,662.7l12.2,34.5a216.88,216.88,0,0,0,56.8-37.9L670,632.6A163.47,163.47,0,0,1,627.1,662.7Z" />
+            <text class="cls-3" transform="translate(650.1 669.27)">612</text>
+        </g>
+        <g id="sector-610">
+            <path id="sector-610-2" data-name="sector-610" class="cls-2"
+                d="M582.2,677l5.5,36.4a209.57,209.57,0,0,0,51.6-16.2l-12.2-34.5A163.58,163.58,0,0,1,582.2,677Z" /><text
+                class="cls-3" transform="translate(600.4 695.37)">610</text>
+        </g>
+        <g id="sector-608">
+            <path id="sector-608-2" data-name="sector-608" class="cls-2"
+                d="M582.2,677l5.5,36.4a218.33,218.33,0,0,1-37.3,3.2H536.6V679.2h19A165.57,165.57,0,0,0,582.2,677Z" />
+            <text class="cls-3" transform="translate(548.6 703.67)">608</text>
+        </g>
+        <g id="sector-606">
+            <polygon id="sector-606-2" data-name="sector-606" class="cls-2"
+                points="536.6 679.2 536.6 716.6 491.1 716.6 491.1 679.2 536.6 679.2" /><text class="cls-3"
+                transform="translate(502.4 703.27)">606</text>
+        </g>
+        <g id="sector-604">
+            <polygon id="sector-604-2" data-name="sector-604" class="cls-2"
+                points="491.1 679.2 491.1 716.6 445.5 716.6 445.5 679.2 491.1 679.2" /><text class="cls-3"
+                transform="translate(456.9 703.27)">604</text>
+        </g>
+        <g id="sector-602">
+            <polygon id="sector-602-2" data-name="sector-602" class="cls-2"
+                points="445.5 679.2 445.5 716.6 400 716.6 400 679.2 445.5 679.2" /><text class="cls-3"
+                transform="translate(411.3 703.27)">602</text>
+        </g>
+        <g id="names"><text class="cls-7" transform="translate(324.2 42.4)"><tspan class="cls-8" x="11.59" y="0">
+                </tspan>
+                <tspan class="cls-9" x="23.93" y="0"></tspan>
+                <tspan class="cls-10" x="79.49" y="0"></tspan>
+            </text><text class="cls-7" transform="translate(421 42.4)"></text><text class="cls-7"
+                transform="translate(415.2 42.4)"> </text><text class="cls-7" transform="translate(313.1 742.9)"><tspan
+                    class="cls-8" x="11.59" y="0"></tspan>
+                <tspan class="cls-9" x="23.93" y="0"></tspan>
+                <tspan class="cls-10" x="79.49" y="0"></tspan>
+            </text><text class="cls-7" transform="translate(415.8 742.9)"></text><text class="cls-7"
+                transform="translate(324.7 742.9)"> </text><text class="cls-7" transform="translate(410 742.9)">
+            </text><text class="cls-7" transform="translate(287.1 766.2)"></text><text class="cls-7"
+                transform="translate(364.2 766.2)"> </text><text class="cls-7" transform="translate(505.5 766.2)">
+            </text><text class="cls-7" transform="translate(294 766.2)">
+                <tspan class="cls-8"></tspan>
+                <tspan x="12.35" y="0"></tspan>
+            </text><text class="cls-7" transform="translate(370 766.2)"><tspan class="cls-11" x="121.57" y="0">
+                    </tspan></text><text class="cls-7" transform="matrix(0, -1, 1, 0, 28.38, 453)"></text><text
+                class="cls-7" transform="matrix(0, -1, 1, 0, 28.34, 372)"><tspan class="cls-12" x="31.25" y="0">
+                </tspan>
+                <tspan x="45.92" y="0"></tspan>
+            </text><text class="cls-7" transform="matrix(0, -1, 1, 0, 28.35, 377.8)"> </text><text class="cls-7"
+                transform="translate(773.68 326.57) rotate(90.71)"></text><text class="cls-7"
+                transform="translate(772.67 407.57) rotate(90.71)"></text><text class="cls-7"
+                transform="translate(772.75 401.77) rotate(90.71)"> </text>
+            <g class="cls-13">
+                <path class="cls-14"
+                    d="M424.3,327.6a3.08,3.08,0,0,1,.2,1.7c1.8.8,1.9,2.2,1.5,3.7-.5,1.8-1.5,3-4.3,2.4a2.8,2.8,0,0,0,2.5,3.1,2.88,2.88,0,0,0,2.6-1.1c0-.2.1-.4.1-.6a2.89,2.89,0,1,1,5.6,1.4,3.37,3.37,0,0,1-.6,1.2,3,3,0,0,0,1.5,2.8,2.7,2.7,0,0,0,2.3.2c-2.1-1.1-2.1-2.5-1.5-4.1a4.83,4.83,0,0,1,1.4-2,11.88,11.88,0,0,0-11.3-8.7m9.4-.8c-1.7-2.9-4.4-5.2-8.6-7.4A3,3,0,0,1,424,322a2.87,2.87,0,0,1,2.3,2.5c.3,0,.4.2.4.6a14.11,14.11,0,0,1,8.4,4.7,20.18,20.18,0,0,0-1.4-3m-55.5-2.5a8.75,8.75,0,0,0-.2,1.6,2.41,2.41,0,0,1,1.5,1.6,2.71,2.71,0,0,1,3.1,2.5c.5,1.8.1,3.4-2.6,4.1a2.9,2.9,0,0,0,3.3,1.6,2.79,2.79,0,0,0,2.1-2.7,2.91,2.91,0,0,1,1-4,2.41,2.41,0,0,1,1.5-.4,2.9,2.9,0,0,1,2.9,2.9,2,2,0,0,1-.1.8,2.88,2.88,0,0,0,2.7,2,2.8,2.8,0,0,0,2.8-2.4c-2.8,0-3.6-1.5-3.6-3.4a3,3,0,0,1,2.4-3.3c.3-1.6.8-2.2,2-2.5a2.53,2.53,0,0,1-1.5-2.3,8.94,8.94,0,0,0-4.8-1.1,22.64,22.64,0,0,0-12.5,5m1.3-4.3a22.13,22.13,0,0,1,11.2-3,22.42,22.42,0,0,1,5.2.6V317a2.3,2.3,0,0,1-.4-1.4,3.26,3.26,0,0,1,.4-1.4v-2.3a2.3,2.3,0,0,1-.4-1.4c-7.4-.7-13.2,3.5-16,9.5Zm-13.4,26.8a1.57,1.57,0,0,1-2.1-.8,1.71,1.71,0,0,1,0-1.4,4.94,4.94,0,0,1-4.7-.9,3.45,3.45,0,0,1-4.2-.4c-1.2-.9-2.2-3.2-.8-4.4a3,3,0,0,1,.5-4.3,2.6,2.6,0,0,1-.4-1.5,2.89,2.89,0,0,1,2.3-2.8,2.42,2.42,0,0,1-1.1-2.2,2.92,2.92,0,0,1,2.6-2.9,2.9,2.9,0,0,1,.8-4,3,3,0,0,1,1.6-.5c.2,0,.5.1.8.1a2.54,2.54,0,0,1-.2-1.2,2.9,2.9,0,0,1,2.9-2.9,2.77,2.77,0,0,1,1.3.3c-.1-2.1,1.2-3.4,2.8-3.4a3.37,3.37,0,0,1,1.7.5,3,3,0,0,1,2.8-2.3,2.69,2.69,0,0,1,2.4,1.4,2.81,2.81,0,0,1,2.1-1,1.27,1.27,0,0,1,.6.1,3.59,3.59,0,0,1-.2-1.1,2.9,2.9,0,0,1,2.9-2.9,3.31,3.31,0,0,1,1.5.4c-.1-2.1,1.2-3.4,2.8-3.4a2.72,2.72,0,0,1,1.7.6,2.78,2.78,0,0,1,2.8-2.2,3.23,3.23,0,0,1,2.1.8,3,3,0,0,1,2.6-1.7,2.39,2.39,0,0,1,.9.2,7.48,7.48,0,0,1,2.4-1.5v-2.2h-2.2v-2.2h2.2v-1.9h2.4v1.9h2.2v2.2h-2.2v2.2a5.83,5.83,0,0,1,2.4,1.5,2.92,2.92,0,0,1,.9-.2,2.87,2.87,0,0,1,2.6,1.7,2.86,2.86,0,0,1,2.1-.8,2.91,2.91,0,0,1,2.8,2.2,2.87,2.87,0,0,1,4,.5,2.79,2.79,0,0,1,.6,1.8c.4.2.9,0,1.5,0a2.9,2.9,0,0,1,2.9,2.9,4.25,4.25,0,0,1-.2,1.1,1.27,1.27,0,0,1,.6-.1,2.81,2.81,0,0,1,2.1,1,3.16,3.16,0,0,1,2.4-1.4,2.89,2.89,0,0,1,2.8,2.3,2.88,2.88,0,0,1,4,.7,3,3,0,0,1,.5,1.6c.4.3.8.1,1.3.1a2.9,2.9,0,0,1,2.9,2.9,5,5,0,0,1-.2,1.2,2,2,0,0,1,.8-.1,2.9,2.9,0,0,1,2.9,2.9,3,3,0,0,1-.5,1.6,2.93,2.93,0,0,1,1.5,5.2,2.88,2.88,0,0,1,2.2,3.5,6.89,6.89,0,0,1-.3.8,2.85,2.85,0,0,1,.5,4.3c1.5,1.2.4,3.5-.8,4.4a3.45,3.45,0,0,1-4.2.4,5.6,5.6,0,0,1-4.7.9,1.7,1.7,0,0,1,0,1.4,1.68,1.68,0,0,1-2.2.8,75.59,75.59,0,0,0-32.4-7.3,79.58,79.58,0,0,0-32.4,7.5m-4.4-10.5a3.81,3.81,0,0,1,1.3,1.9c.6,1.6.5,3.1-1.5,4.1a2.65,2.65,0,0,0,2.3-.2,2.92,2.92,0,0,0,1.5-2.8,3.38,3.38,0,0,1-.6-1.2,2.89,2.89,0,1,1,5.6-1.4,1.27,1.27,0,0,1,.1.6,2.8,2.8,0,0,0,3,1.1,2.92,2.92,0,0,0,2.1-3c-2.8.7-3.8-.6-4.3-2.4-.4-1.5-.2-2.9,1.5-3.7a3.23,3.23,0,0,1,.3-1.7,11.88,11.88,0,0,0-11.3,8.7m9.2-11.8a2.87,2.87,0,0,1,2.3-2.5,3,3,0,0,1-1.1-2.3c-4.4,1.9-7.1,4.2-8.8,7.2-.6,1.5-.8,1.9-1,2.6a14.34,14.34,0,0,1,8.4-4.6Zm30.7-3.7a2.33,2.33,0,0,1-1.5,2.3c1.2.2,1.7.9,2,2.5a2.85,2.85,0,0,1,2.4,3.2c0,1.8-.7,3.3-3.6,3.4a2.83,2.83,0,0,0,5.5.4,2.89,2.89,0,0,1,1.9-3.6,2.2,2.2,0,0,1,.8-.1,2.9,2.9,0,0,1,2.9,2.9,2.3,2.3,0,0,1-.4,1.4,2.82,2.82,0,0,0,5.4,1.1c-2.8-.7-3.1-2.4-2.7-4.1.4-1.5,1.2-2.7,3.1-2.5a3,3,0,0,1,1.5-1.6c-.1-.5-.1-1.1-.2-1.6a19.53,19.53,0,0,0-12.7-4.7,19.13,19.13,0,0,0-4.8.6Zm16-.8a16.2,16.2,0,0,0-16.1-9.9,2.67,2.67,0,0,1-.4,1.7v2.3a2.3,2.3,0,0,1,.4,1.4,3.26,3.26,0,0,1-.4,1.4v.6a22.42,22.42,0,0,1,5.2-.6,23.23,23.23,0,0,1,11.3,3.1m-45.4,20.7a4.93,4.93,0,0,1-2.9-1.1,3.13,3.13,0,0,1-1,.5,16,16,0,0,1-1.8,2.9,48.42,48.42,0,0,1,5.7-2.3m47.2-5.8a5.2,5.2,0,0,1-3.8,3.1c1.9.4,3.7.9,5.6,1.4a5,5,0,0,1-1.8-4.5m-7.7,2.4a5.65,5.65,0,0,1-2.3-2.8c-.5,0-.7-.1-1-.1a5.81,5.81,0,0,1-2.9,2.2,45.27,45.27,0,0,1,6.2.7m-20-.8a5.81,5.81,0,0,1-2.9-2.2,2.2,2.2,0,0,1-.8.1,5.52,5.52,0,0,1-2.4,2.8c1.9-.3,4-.5,6.1-.7m-13.9-1.6a5,5,0,0,1-1.8,4.5c1.8-.5,3.7-1,5.6-1.4a5.2,5.2,0,0,1-3.8-3.1m17.9,1.4a27.15,27.15,0,0,1,2.9-.1,28.1,28.1,0,0,1,2.9.1,5.53,5.53,0,0,1-2.9-3.9,5.74,5.74,0,0,1-2.9,3.9m29.4,4.4c1.9.7,3.9,1.5,5.8,2.3a6.19,6.19,0,0,1-1.4-2.8,9.33,9.33,0,0,1-1.4-.5,6.68,6.68,0,0,1-3,1m11.8-2.1a2.8,2.8,0,0,0,4.9,2.7,2.89,2.89,0,0,0-1.1-3.8,2.68,2.68,0,0,0-3.6.9c-.2.1-.2.1-.2.2m-19.1-8.3a2.79,2.79,0,1,0,3.4-2,2.65,2.65,0,0,0-3.3,1.9.1.1,0,0,0-.1.1m-57.1,8a2.8,2.8,0,1,0-4.9,2.7,2.77,2.77,0,0,0,3.8,1.1,2.69,2.69,0,0,0,1.2-3.6.31.31,0,0,1-.1-.2m18.7-8a2.79,2.79,0,1,0-2,3.4,2.63,2.63,0,0,0,2-3.3v-.1m21.9-2.1a2.8,2.8,0,0,0-2.8-2.8,2.8,2.8,0,0,0,0,5.6,2.8,2.8,0,0,0,2.8-2.8m29.1,22.1.5,2.2-2.2,1.2c.4.2.5.6.3,1.1a.73.73,0,0,1-1,.4h0a68.78,68.78,0,0,0-58.8,0,.87.87,0,0,1-1.1-.4,1,1,0,0,1,.3-1.1l-2.2-1.2.5-2.2a.68.68,0,0,1-.8-.4.61.61,0,0,1,.3-.9h0a76.28,76.28,0,0,1,64.7,0,.69.69,0,0,1,.3.9,1,1,0,0,1-.8.4m-31.8,8.4a59.1,59.1,0,1,0,58.9,59.1,59.11,59.11,0,0,0-58.9-59.1m0-7.9c36.8,0,66.7,30.1,66.7,67s-30,66.9-66.7,66.9a67,67,0,0,1,0-133.9m55.9,66.6a56.15,56.15,0,0,1-13,35.9l-6.4-6.4c6.9-8.4,11.4-16.7,11.4-30,0-14-7.3-29.9-19-38l-7.5,7.7a36,36,0,0,1,9.8,10.4l-6.4,5.5a27.87,27.87,0,0,0-9.2-9.8l-15.6,16.5-16.2-16.7a29.63,29.63,0,0,0-13.2,24.3c-.2,13.5,8.4,23.2,20.7,27.3V416.4h19.5v6.1H397.7v7h11.5v7H397.7v8.9c8.4.4,17.6-4.7,23-10.8l6.1,6.1a37.66,37.66,0,0,1-29,13.1v8.6H390v-9.5c-16.9-4.3-29.1-19.3-28.8-36.9.2-12,6.5-22.2,15.9-29.2l-7.6-7.9c-12.1,10-18.7,22.2-19.2,38-.4,14.2,7,25.5,11.5,30.2l-5.6,5.8a53.23,53.23,0,0,1-13.3-35.5,56.28,56.28,0,0,1,28.3-48.7l13.2,13.8a38.69,38.69,0,0,1,28.4,0l.6-.6,12.8-13.3a56.38,56.38,0,0,1,28.3,48.8Zm-48-28.3a38,38,0,0,0-8.1-1.3,32.4,32.4,0,0,0-8.2,1.1l7.6,7.9.8.6,7.9-8.3m-.2,15.1,32.4,33.6a69.28,69.28,0,0,1-6.8,9.3l8.1,8.1a59.83,59.83,0,0,1-19.2,13.9l-13.6-14a41.55,41.55,0,0,0,22.6-14.5l-9.3-9.4c-4.9,5.9-12.5,11.4-20.5,11.9v-4.4h11.5V427.1H400v-2.4h11.7V414H387.6v21l-16.1-16.5a9.63,9.63,0,0,1,0-1.7,27.24,27.24,0,0,1,10.7-21.4l15.1,15.7,1.3,1.3,7.7-8.2ZM360,406.7l-4.8-5a46.77,46.77,0,0,1,13.9-19.8l4.4,4.5A41.05,41.05,0,0,0,360,406.7" />
+            </g>
+        </g>
+        <g id="sector-502">
+            <polygon id="sector-502-2" data-name="sector-502" class="cls-2"
+                points="422.5 633.9 422.5 679.2 400 679.2 400 633.9 422.5 633.9" /><text class="cls-15"
+                transform="translate(401.5 661.5) scale(0.97 1)">502</text>
+        </g>
+        <g id="sector-709">
+            <polygon id="sector-709-2" data-name="sector-709" class="cls-2"
+                points="377.3 55.7 377.3 92.2 354.6 92.2 354.6 55.7 377.3 55.7" /><text class="cls-3"
+                transform="translate(372.95 86.1) rotate(-90)">709</text>
+        </g>
+        <g id="sector-710">
+            <polygon id="sector-710-2" data-name="sector-710" class="cls-2"
+                points="422.6 55.7 422.6 92.2 445.2 92.2 445.2 55.7 422.6 55.7" /><text class="cls-3"
+                transform="translate(440.2 86.1) rotate(-90)">710</text>
+        </g>
+    </svg>
+    </div>
+    </svg>
+    <script>
+        // Kiválasztunk minden szektort, aminek az id-je "szektor-" prefixszel kezdődik
+        document.querySelectorAll("[id^='sector-']").forEach(szektor => {
+
+            // Kattintás esemény hozzáadása
+            szektor.addEventListener("click", () => {
+
+                // Kiírja az id-t a konzolra
+                console.log("Kattintottál a szektorra:", szektor.id);
+
+                // Vagy kiírhatod a képernyőre a HTML-ben
+                let kiir = document.getElementById("szektor-kiiras");
+                if (!kiir) {
+                    // Ha még nincs elem, létrehozunk egyet
+                    kiir = document.createElement("div");
+                    kiir.id = "szektor-kiiras";
+                    kiir.style.position = "absolute";
+                    kiir.style.top = "10px";
+                    kiir.style.left = "10px";
+                    kiir.style.backgroundColor = "white";
+                    kiir.style.padding = "5px 10px";
+                    kiir.style.border = "1px solid black";
+                    document.body.appendChild(kiir);
+                }
+
+                // Kiírja az aktuális szektor id-jét
+                kiir.textContent = "Kattintottál a szektorra: " + szektor.id;
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

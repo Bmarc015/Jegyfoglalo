@@ -84,7 +84,9 @@
                   </div>
                 </div>
                 <div v-if="match.venue" class="match-venue">{{ match.venue }}</div>
-                <button class="btn btn-sm btn-outline-primary mt-3">Buy Tickets</button>
+                <button class="btn btn-sm btn-outline-primary mt-3" @click="openMapModal(match)">
+                  Buy Tickets
+                </button>
               </div>
             </article>
           </div>
@@ -98,15 +100,19 @@
         </div>
       </div>
     </div>
+
+    <TicketMapModal v-model="showMapModal" :match="selectedMatch" />
   </section>
 </template>
 
 <script>
 import gameService from "@/api/gameService";
 import { resolveTeamLogo } from "@/constants/teamLogos";
+import TicketMapModal from "@/components/Modal/TicketMapModal.vue";
 
 export default {
   name: "BuyTicketsView",
+  components: { TicketMapModal },
   data() {
     return {
       selectedDay: 0,
@@ -115,6 +121,8 @@ export default {
       allGames: [],
       matches: [],
       loadingMatches: false,
+      showMapModal: false,
+      selectedMatch: null,
     };
   },
   computed: {
@@ -135,6 +143,10 @@ export default {
     this.loadMatches();
   },
   methods: {
+    openMapModal(match) {
+      this.selectedMatch = match;
+      this.showMapModal = true;
+    },
     generateWeekDays(startDate = new Date()) {
       const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
       this.weekDays = [];
@@ -284,199 +296,13 @@ export default {
       });
     },
   },
+  beforeUnmount() {
+    document.body.style.overflow = "";
+  },
 };
 </script>
 
-<style scoped>
-.buy-tickets-view {
-  min-height: calc(100vh - var(--app-menu-height, 92px));
-}
+<style scoped src="@/assets/buy-tickets.css"></style>
 
-.full-page-calendar {
-  background: #ffffff;
-  border: 1px solid #dfe6ef;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(34, 63, 95, 0.08);
-  padding: 1.25rem;
-}
 
-.calendar-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
 
-.calendar-title-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.2;
-}
-
-.selected-month {
-  margin-top: 0.15rem;
-  font-size: 0.85rem;
-  color: #40638f;
-  font-weight: 600;
-}
-
-.calendar-pick-btn {
-  border: 1px solid #c9d6ea;
-  background: linear-gradient(135deg, #f8fbff 0%, #eaf2ff 100%);
-  color: #163a6b;
-  border-radius: 10px;
-  padding: 0.45rem 0.9rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(22, 58, 107, 0.12);
-  transition: all 0.2s ease;
-}
-
-.calendar-pick-btn:hover {
-  background: linear-gradient(135deg, #eaf2ff 0%, #dce9ff 100%);
-  transform: translateY(-1px);
-}
-
-.day-picker-input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-
-.week-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-}
-
-.week-arrow-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  border: 1px solid #c9d6ea;
-  background: linear-gradient(135deg, #f8fbff 0%, #eaf2ff 100%);
-  color: #163a6b;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(22, 58, 107, 0.12);
-  transition: all 0.2s ease;
-}
-
-.week-arrow-btn:hover {
-  background: linear-gradient(135deg, #eaf2ff 0%, #dce9ff 100%);
-  transform: translateY(-1px);
-}
-
-.today-btn {
-  height: 38px;
-  border-radius: 10px;
-  border: 1px solid #c9d6ea;
-  background: #ffffff;
-  color: #163a6b;
-  font-weight: 600;
-  padding: 0 0.9rem;
-  box-shadow: 0 4px 12px rgba(22, 58, 107, 0.08);
-  transition: all 0.2s ease;
-}
-
-.today-btn:hover {
-  background: #f3f8ff;
-  transform: translateY(-1px);
-}
-
-.calendar-day {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid #dee2e6;
-  background-color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  min-width: 70px;
-}
-
-.calendar-day:hover {
-  border-color: #0d6efd;
-  background-color: #f8f9fa;
-}
-
-.calendar-day.active {
-  background-color: #0d6efd;
-  color: white;
-  border-color: #0d6efd;
-}
-
-.day-name {
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.day-date {
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.match-card {
-  border: 1px solid #dee2e6;
-  border-radius: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.match-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.match-time {
-  font-size: 0.9rem;
-  color: #6c757d;
-  font-weight: bold;
-}
-
-.match-teams {
-  font-size: 1rem;
-  font-weight: bold;
-  margin: 10px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  flex-wrap: wrap;
-}
-
-.team-side {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.team-logo {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 1px solid #dbe3ef;
-  padding: 2px;
-}
-
-.team-name {
-  color: #212529;
-}
-
-.vs {
-  color: #6c757d;
-  margin: 0 8px;
-  font-size: 0.85rem;
-}
-
-.match-venue {
-  font-size: 0.85rem;
-  color: #6c757d;
-}
-</style>
