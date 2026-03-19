@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button type="button" class="btn btn-outline-danger btn-sm"
+    <button type="button" class="btn btn-outline-danger btn-sm crud-action-btn crud-delete"
         @click="onClickButton()"
     >
         <i class="bi bi-trash3"></i>

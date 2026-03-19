@@ -12,15 +12,19 @@
               v-model="searchWordInput"
               type="text"
               class="form-control"
-              placeholder="Keresés meccsek között..."
+              placeholder="Search games..."
               @keyup.enter="onClickSearchButton"
             />
             <button class="btn btn-primary" type="button" @click="onClickSearchButton">
-              Keresés
+              Search
             </button>
           </div>
         </div>
-        <Pagination :useCollectionStore="useCollectionStore" />
+        <Pagination
+          :useCollectionStore="useCollectionStore"
+          firstTitle="First page"
+          lastTitle="Last page"
+        />
       </div>
 
       <div class="team-header-right d-flex align-items-center">
@@ -34,9 +38,7 @@
         <p class="m-0 ms-2 records-pill">{{ getItemsLength }} rekord</p>
 
         <!-- sor/oldal -->
-        <SetSelectedPerPage
-         :useCollectionStore="useCollectionStore" 
-        />
+        <SetSelectedPerPage :useCollectionStore="useCollectionStore" label="Rows per page:" />
       </div>
     </div>
 
@@ -59,7 +61,7 @@
     <div v-else style="width: 100px" class="m-auto">Nincs találat</div>
 
     <!-- Form -->
-    <FormSchoolClass
+    <FormGame
       ref="form"
       :title="title"
       :item="item"
@@ -69,6 +71,10 @@
     <!-- Confirm modal -->
     <ConfirmModal
       :isOpenConfirmModal="isOpenConfirmModal"
+      title="Confirm delete"
+      message="Are you sure you want to delete this game?"
+      cancel="Cancel"
+      confirm="Delete"
       @cancel="cancelHandler"
       @confirm="confirmHandler"
     />
@@ -83,7 +89,7 @@ import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
 import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
-import FormSchoolClass from "@/components/Forms/FormSchoolClass.vue";
+import FormGame from "@/components/Forms/FormGame.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
 import SetSelectedPerPage from "@/components/Pagination/SetSelectedPerPage.vue";
 
@@ -93,7 +99,7 @@ export default {
     GenericTable,
     ConfirmModal,
     ButtonsCrudCreate,
-    FormSchoolClass,
+    FormGame,
     Pagination,
     SetSelectedPerPage,
   },
@@ -168,14 +174,14 @@ export default {
     },
     updateHandler(id) {
       this.state = "u";
-      this.title = "Adatmódosítás";
+      this.title = "Edit Game";
       this.getById(id);
       this.$refs.form.show();
       console.log("update:", id);
     },
     createHandler() {
       this.state = "c";
-      this.title = "Új adatbevitel";
+      this.title = "New Game";
       this.clearItem();
       this.$refs.form.show();
       console.log("Create:");

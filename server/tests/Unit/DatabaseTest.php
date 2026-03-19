@@ -40,7 +40,6 @@ class DatabaseTest extends TestCase
 
         $seat = Seat::create([
             'sector_id' => $sector->id,
-            'seat_number' => 1,
             'row' => 5,
             'col' => 10
         ]);
@@ -52,7 +51,6 @@ class DatabaseTest extends TestCase
         $this->expectException(\Illuminate\Database\QueryException::class);
         Seat::create([
             'sector_id' => $sector->id,
-            'seat_number' => 2, // Másik székszám
             'row' => 5,         // De ugyanaz a sor
             'col' => 10         // És ugyanaz az oszlop -> ütköznie kell
         ]);
@@ -93,7 +91,7 @@ class DatabaseTest extends TestCase
         // Alapadatok létrehozása
         $user = User::factory()->create();
         $sector = Sector::create(['sector_number' => 200, 'sector_price' => 8000]);
-        $seat = Seat::create(['sector_id' => $sector->id, 'seat_number' => 50, 'row' => 1, 'col' => 1]);
+        $seat = Seat::create(['sector_id' => $sector->id, 'row' => 1, 'col' => 1]);
         $home = Team::create(['team_name' => 'Hazai', 'team_city' => 'Város']);
         $away = Team::create(['team_name' => 'Vendég', 'team_city' => 'Város2']);
         $game = Game::create(['team_home_id' => $home->id, 'team_away_id' => $away->id, 'game_date' => now()]);

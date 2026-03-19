@@ -11,7 +11,7 @@
           @click="
             getPaging(1)
           "
-          title="Első oldal"
+          :title="firstTitle"
         >
           &laquo;&laquo;
         </button>
@@ -65,7 +65,7 @@
           class="page-link"
           @click="
             getPaging(pagination.last_page)"
-          title="Utolsó oldal"
+          :title="lastTitle"
         >
           &raquo;&raquo;
         </button>
@@ -80,6 +80,8 @@ export default {
   name: "Paginaiton",
   props: {
     useCollectionStore: { type: Function, required: true },
+    firstTitle: { type: String, default: "Első oldal" },
+    lastTitle: { type: String, default: "Utolsó oldal" },
   },
   data() {
     return {

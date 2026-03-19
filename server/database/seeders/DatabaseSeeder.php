@@ -28,12 +28,11 @@ class DatabaseSeeder extends Seeder
 
         //Ami Seeder osztály itt fel van sorolva, annak lefut a run() metódusa
         $this->call([
-            TeamSeeder::class,
-            SectorSeeder::class,
-            SeatSeeder::class,
-            GameSeeder::class,
-            UserSeeder::class,
-            TicketSeeder::class,
+            UserSeeder::class,    // Felhasználók (szerepkörök miatt)
+            SectorSeeder::class,  // Szektorok (alaprajzhoz)
+            TeamSeeder::class,    // Csapatok (kell a meccshez)
+            GameSeeder::class,    // Meccsek (kell a székekhez/jegyekhez)
+            SeatSeeder::class,    // Székek (amiket most generáltunk az adminnal)
         ]);
     }
 }

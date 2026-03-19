@@ -11,6 +11,9 @@ import "bootstrap"
 //Icons: css
 import "bootstrap-icons/font/bootstrap-icons.min.css"
 
+import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:8000';
+
 const app = createApp(App)
 
 app.use(createPinia())

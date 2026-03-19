@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button type="button" class="btn btn-outline-danger btn-sm"
+    <button type="button" class="btn btn-outline-danger btn-sm crud-action-btn crud-password"
         @click="onClickButton()"
     >
         <i class="bi bi-key"></i>

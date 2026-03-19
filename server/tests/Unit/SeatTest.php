@@ -17,7 +17,6 @@ class SeatTest extends TestCase
         $sector = Sector::create(['sector_number' => 1, 'sector_price' => 5000]);
         $seat = Seat::create([
             'sector_id' => $sector->id,
-            'seat_number' => 10,
             'row' => 1,
             'col' => 1
         ]);
@@ -30,7 +29,7 @@ class SeatTest extends TestCase
         $table = 'seats';
         $this->assertTrue(Schema::hasTable($table), "A '$table' tábla nem létezik.");
 
-        $columns = ['id', 'sector_id', 'seat_number', 'row', 'col'];
+        $columns = ['id', 'sector_id', 'row', 'col'];
         foreach ($columns as $column) {
             $this->assertTrue(Schema::hasColumn($table, $column), "A '$column' oszlop hiányzik a '$table' táblából.");
         }
@@ -41,7 +40,6 @@ class SeatTest extends TestCase
         $expectedSchema = [
             'id'          => 'bigint',
             'sector_id'   => 'bigint',
-            'seat_number' => 'int', // Javítva int-re
             'row'         => 'int', // Javítva int-re
             'col'         => 'int', // Javítva int-re
         ];

@@ -58,8 +58,9 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
         this.loading = true;
         this.error = null;
         const response = await service.login(data);
-        this.item = response.data;
-        localStorage.setItem("user_data", JSON.stringify(response.data));
+        const user = response?.data?.data ?? response?.data ?? null;
+        this.item = user;
+        localStorage.setItem("user_data", JSON.stringify(user));
         // const toastStore = useToastStore();
         // toastStore.messages.push("Sikeres bejelentkezés");
         // toastStore.show("Success");
@@ -99,7 +100,7 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
         this.error = null;
         this.loading = true;
         const response = await service.getMeRefresh();
-        const me = response?.data?.data || {};
+        const me = response?.data?.data ?? response?.data ?? {};
         if (!this.item) {
           this.item = {};
         }
@@ -127,7 +128,7 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
         this.error = null;
         this.loading = true;
         const response = await service.updateMe(data);
-        const updated = response?.data?.data || {};
+        const updated = response?.data?.data ?? response?.data ?? {};
 
         if (this.item) {
           this.item = {

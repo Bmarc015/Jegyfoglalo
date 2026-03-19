@@ -1,12 +1,22 @@
 <template>
   <div v-if="modelValue" class="ticket-modal" @click.self="close">
-    <div class="ticket-modal-panel" role="dialog" aria-modal="true" aria-label="Ticket purchase">
+    <div
+      class="ticket-modal-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Ticket purchase"
+    >
       <header class="ticket-modal-header">
         <div>
           <h2 class="ticket-modal-title">Choose Your Seat</h2>
           <p class="ticket-modal-subtitle">{{ selectedMatchText }}</p>
         </div>
-        <button class="ticket-modal-close" type="button" @click="close" aria-label="Close">
+        <button
+          class="ticket-modal-close"
+          type="button"
+          @click="close"
+          aria-label="Close"
+        >
           <i class="bi bi-x-lg"></i>
         </button>
       </header>
@@ -16,13 +26,23 @@
           <div class="ticket-map-toolbar">
             <span class="ticket-map-label">Sector Map</span>
             <div class="ticket-zoom-controls">
-              <button type="button" class="zoom-btn" @click="zoomOut" :disabled="zoomLevel <= minZoom">
+              <button
+                type="button"
+                class="zoom-btn"
+                @click="zoomOut"
+                :disabled="zoomLevel <= minZoom"
+              >
                 <i class="bi bi-dash-lg"></i>
               </button>
               <button type="button" class="zoom-btn" @click="resetZoom">
                 Reset
               </button>
-              <button type="button" class="zoom-btn" @click="zoomIn" :disabled="zoomLevel >= maxZoom">
+              <button
+                type="button"
+                class="zoom-btn"
+                @click="zoomIn"
+                :disabled="zoomLevel >= maxZoom"
+              >
                 <i class="bi bi-plus-lg"></i>
               </button>
             </div>
@@ -41,9 +61,48 @@
           >
             <div
               class="ticket-map-scale"
-              :style="{ transform: `translate(${panX}px, ${panY}px) scale(${zoomLevel})` }"
+              :style="{
+                transform: `translate(${panX}px, ${panY}px) scale(${zoomLevel})`,
+              }"
             >
-              <div class="ticket-map-svg" v-html="stadiumMapRaw"></div>
+              <div
+                v-if="!isEditMode"
+                class="ticket-map-svg"
+                v-html="stadiumMapRaw"
+                @click="onSvgClick"
+              ></div>
+
+              <div
+                v-else
+                class="admin-grid-container"
+                @mousedown.stop
+                @mousemove.stop
+              >
+                <div class="admin-grid-header">
+                  <h4>Editing Sector: {{ selectedSector }}</h4>
+                  <button class="btn-back" @click="isEditMode = false">
+                    ← Back to Map
+                  </button>
+                </div>
+
+                <div class="seat-grid">
+                  <div
+                    v-for="(seat, index) in seats"
+                    :key="index"
+                    class="seat-dot"
+                    :class="{ 'is-active': seat.active }"
+                    @click="toggleSeat(index)"
+                  >
+                    <span class="tooltip">Seat {{ index + 1 }}</span>
+                  </div>
+                </div>
+
+                <div class="admin-grid-footer">
+                  <button class="btn-save" @click="saveLayout">
+                    Save Sector Layout
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -65,7 +124,9 @@
 
 <script>
 import stadiumMapRaw from "@/assets/stadium-map.svg?raw";
-
+import { mapState } from "pinia";
+import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
+import axios from "axios";
 export default {
   name: "TicketMapModal",
   props: {
@@ -86,6 +147,10 @@ export default {
       panOriginX: 0,
       panOriginY: 0,
       stadiumMapRaw,
+      selectedSector: null,
+      isEditMode: false,
+      seats: [],
+      isMouseDown: false,
     };
   },
   computed: {
@@ -104,6 +169,11 @@ export default {
       const time = this.match.time ? this.match.time : "--:--";
       const venue = this.match.venue ? this.match.venue : "Venue TBD";
       return `${time} · ${venue}`;
+    },
+    ...mapState(useUserLoginLogoutStore, ["item", "isLoggedIn"]),
+    isAdmin() {
+      // Feltételezve, hogy a store-ban a user objektumban benne van a role
+      return this.item && Number(this.item.role) === 1;
     },
   },
   watch: {
@@ -127,11 +197,17 @@ export default {
       this.panY = 0;
     },
     zoomIn() {
-      this.zoomLevel = Math.min(this.maxZoom, +(this.zoomLevel + 0.2).toFixed(2));
+      this.zoomLevel = Math.min(
+        this.maxZoom,
+        +(this.zoomLevel + 0.2).toFixed(2),
+      );
       this.$nextTick(() => this.clampPan());
     },
     zoomOut() {
-      this.zoomLevel = Math.max(this.minZoom, +(this.zoomLevel - 0.2).toFixed(2));
+      this.zoomLevel = Math.max(
+        this.minZoom,
+        +(this.zoomLevel - 0.2).toFixed(2),
+      );
       this.$nextTick(() => this.clampPan());
     },
     resetZoom() {
@@ -172,6 +248,123 @@ export default {
         return { x: event.touches[0].clientX, y: event.touches[0].clientY };
       }
       return { x: event.clientX, y: event.clientY };
+    },
+    onSvgClick(event) {
+      // 1. Megkeressük a legközelebbi olyan <g> vagy <path> elemet, aminek az ID-ja "sector-"-ral kezdődik
+      const target = event.target.closest('[id^="sector-"]');
+
+      if (target) {
+        // 2. Kinyerjük a számot az ID-ból (pl. "sector-121" -> "121")
+        const sectorId = target.id.replace("sector-", "");
+        console.log("Sikeres kattintás! Szektor:", sectorId);
+
+        // 3. Meghívjuk a már megírt handleSectorClick-et
+        this.handleSectorClick(sectorId);
+      } else {
+        console.log("Nem szektorra kattintottál.");
+      }
+    },
+    handleSectorClick(id) {
+      this.selectedSector = id;
+
+      // DEBUG: Nézzük meg, mi van a match-ben
+      console.log("Aktuális match objektum:", this.match);
+
+      if (!this.match) {
+        alert("Hiba: Nincs meccs adat átadva a modálnak!");
+        return;
+      }
+
+      // Ha a Laravel 'game'-ként küldte, próbáljuk meg azt is
+      const game_id = this.match.id || this.match.game_id;
+
+      if (!game_id) {
+        alert("Hiba: A meccs objektumnak nincs ID-ja!");
+        return;
+      }
+
+      const sector_id = id;
+      if (this.isAdmin) {
+        this.isEditMode = true;
+        this.fetchSectorSeats(game_id, sector_id);
+      }
+    },
+    async fetchSectorSeats(game_id, sector_id) {
+      this.loading = true;
+      try {
+        const response = await axios.get("/api/seats-by-sector", {
+          params: { game_id, sector_id },
+        });
+
+        // Itt a trükk: ha a response.data egy objektum, amiben van egy 'data' vagy 'item' kulcs,
+        // akkor azt kell használni. Ha sima tömb, akkor marad az.
+        const dbSeats = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || [];
+
+        this.seats = Array.from({ length: 750 }, (_, i) => {
+          const row = Math.floor(i / 50) + 1;
+          const col = (i % 50) + 1;
+
+          // Most már a dbSeats biztosan tömb, így lefut a .some()
+          const isSaved = dbSeats.some(
+            (s) => Number(s.row) === row && Number(s.col) === col,
+          );
+
+          return {
+            id: i,
+            row: row,
+            col: col,
+            active: isSaved,
+          };
+        });
+      } catch (error) {
+        console.error("Hiba a betöltéskor:", error);
+        this.generateGrid();
+      } finally {
+        this.loading = false;
+      }
+    },
+    generateGrid() {
+      // 15x50-es üres mátrix generálása
+      this.seats = Array.from({ length: 750 }, (_, i) => ({
+        id: i,
+        active: false,
+      }));
+    },
+    toggleSeat(index) {
+      this.seats[index].active = !this.seats[index].active;
+    },
+    async saveLayout() {
+      // 1. ELŐBB definiáljuk a változót (itt gyűjtjük össze a zöld pöttyöket)
+      const selectedSeats = this.seats
+        .filter((s) => s.active)
+        .map((s) => ({
+          row: s.row,
+          col: s.col,
+        }));
+
+      // 2. CSAK UTÁNA használjuk az axios-ban
+      console.log("Küldés folyamatban:", selectedSeats);
+
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/seats-save",
+          {
+            game_id: this.match.id,
+            sector_id: this.selectedSector,
+            seats: selectedSeats, // Itt már létezik a változó!
+          },
+        );
+
+        alert(response.data.message || "Sikeres mentés!");
+        this.isEditMode = false;
+      } catch (error) {
+        console.error("Mentési hiba:", error);
+        // Ha a Laravel küldött hibaüzenetet, azt is írjuk ki:
+        const errorMsg = error.response?.data?.error || "Hiba történt!";
+        alert("Hiba: " + errorMsg);
+      }
     },
   },
 };
@@ -335,7 +528,9 @@ export default {
 
 .ticket-map-svg :deep([id^="sector-"] polygon),
 .ticket-map-svg :deep([id^="sector-"] path) {
-  transition: fill 0.15s ease, stroke 0.15s ease;
+  transition:
+    fill 0.15s ease,
+    stroke 0.15s ease;
 }
 
 .ticket-map-svg :deep([id^="sector-"]:hover polygon),
@@ -377,6 +572,97 @@ export default {
 .ticket-info-hint {
   margin-top: 1rem;
   color: #5a6b82;
+}
+
+/* Admin Rács Stílusok */
+.admin-grid-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 95%;
+}
+
+.admin-grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.seat-grid {
+  display: grid;
+  /* 50 oszlop, 12px-es körök */
+  grid-template-columns: repeat(50, 12px);
+  gap: 5px;
+  justify-content: center;
+  background: #f0f3f7;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #d1d9e6;
+}
+
+.seat-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #cbd5e0;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.seat-dot:hover {
+  background-color: #4a5568;
+  transform: scale(1.3);
+}
+
+.seat-dot.is-active {
+  background-color: #28a745; /* Zöld = kijelölt */
+  box-shadow: 0 0 8px rgba(40, 167, 69, 0.6);
+}
+
+/* Tooltip az ülésszámhoz hover esetén */
+.seat-dot .tooltip {
+  visibility: hidden;
+  position: absolute;
+  bottom: 150%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: black;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.seat-dot:hover .tooltip {
+  visibility: visible;
+}
+
+.btn-back {
+  background: #edf2f7;
+  border: 1px solid #cbd5e0;
+  padding: 5px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-save {
+  margin-top: 1.5rem;
+  width: 100%;
+  background: #1a2d4d;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-save:hover {
+  background: #2a3d5d;
 }
 
 @media (max-width: 992px) {

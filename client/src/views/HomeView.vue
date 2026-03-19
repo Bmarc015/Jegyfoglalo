@@ -99,7 +99,14 @@ export default {
 
 .home-hero {
   position: relative;
-  height: 80vh;
+  height: calc(80vh + var(--app-menu-height, 92px));
+  margin-top: calc(-1 * var(--app-menu-height, 92px));
+}
+
+#homeCarousel,
+.carousel-inner,
+.carousel-item {
+  height: 100%;
 }
 
 .featured-gap {
@@ -136,7 +143,7 @@ export default {
 }
 
 .carousel-img {
-  height: 80vh;
+  height: 100%;
   object-fit: cover;
   filter: brightness(0.5);
 }

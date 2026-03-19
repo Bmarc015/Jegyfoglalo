@@ -89,6 +89,10 @@ Route::patch('seats/{id}', [SeatController::class, 'update'])
 Route::delete('seats/{id}', [SeatController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:admin');
 
+Route::get('/seats-by-sector', [SeatController::class, 'getSeatsBySector']);
+
+Route::post('/seats-save', [SeatController::class, 'saveLayout']);
+
 ////////////////////////////////Sectors/////////////////////////////////////////////// 
 Route::get('sectors', [SectorController::class, 'index']);
 

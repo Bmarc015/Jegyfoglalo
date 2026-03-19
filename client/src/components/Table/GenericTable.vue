@@ -4,7 +4,7 @@
       <table class="table table-hover my-table">
         <thead class="sticky-top my-table-head">
           <tr class="align-middle text-center">
-            <th v-if="toolsColumnVisible">Tools</th>
+            <th v-if="toolsColumnVisible" class="tools-col-head">Tools</th>
             <template v-for="col in columns">
               <th
                 v-if="col.debug >= 1"
@@ -33,18 +33,20 @@
             :class="{ 'table-primary': selectedId === item.id }"
             @click="onClickRow(item.id)"
           >
-            <td v-if="toolsColumnVisible">
-              <ButtonsCrud
-                :id="item.id"
-                :cButtonVisible="cButtonVisible"
-                :uButtonVisible="uButtonVisible"
-                :dButtonVisible="dButtonVisible"
-                :pButtonVisible="pButtonVisible"
-                @delete="$emit('delete', $event)"
-                @update="$emit('update', $event)"
-                @create="$emit('create', $event)"
-                @passwordChange="$emit('passwordChange', $event)"
-              />
+            <td v-if="toolsColumnVisible" class="tools-col-cell">
+              <div class="tools-col-actions">
+                <ButtonsCrud
+                  :id="item.id"
+                  :cButtonVisible="cButtonVisible"
+                  :uButtonVisible="uButtonVisible"
+                  :dButtonVisible="dButtonVisible"
+                  :pButtonVisible="pButtonVisible"
+                  @delete="$emit('delete', $event)"
+                  @update="$emit('update', $event)"
+                  @create="$emit('create', $event)"
+                  @passwordChange="$emit('passwordChange', $event)"
+                />
+              </div>
             </td>
 
             <template v-for="col in columns">
@@ -172,6 +174,63 @@ export default {
 .my-table tbody tr:hover td {
   background-color: #eaf2ff;
   transition: background-color 120ms ease-in-out;
+}
+
+.tools-col-head {
+  width: 150px;
+}
+
+.tools-col-cell {
+  background: #f5f8ff;
+  border-left: 1px solid #e0e7f1;
+}
+
+.tools-col-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.tools-col-actions :deep(.crud-action-btn) {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+.tools-col-actions :deep(.crud-action-btn:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
+}
+
+.tools-col-actions :deep(.crud-create) {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-color: rgba(15, 23, 42, 0.08);
+  color: #ffffff;
+}
+
+.tools-col-actions :deep(.crud-delete) {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-color: rgba(15, 23, 42, 0.08);
+  color: #ffffff;
+}
+
+.tools-col-actions :deep(.crud-update) {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  border-color: rgba(15, 23, 42, 0.08);
+  color: #ffffff;
+}
+
+.tools-col-actions :deep(.crud-password) {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  border-color: rgba(15, 23, 42, 0.08);
+  color: #ffffff;
 }
 
 .my-pointer {

@@ -7,9 +7,11 @@ import service from "@/api/gameService";
 
 //változtatás
 class Item {
-  constructor(id = 0, osztalyNev = "") {
+  constructor(id = 0, team_home_id = "", team_away_id = "", game_date = "") {
     this.id = id;
-    this.osztalyNev = osztalyNev;
+    this.team_home_id = team_home_id;
+    this.team_away_id = team_away_id;
+    this.game_date = game_date;
   }
 }
 
@@ -157,8 +159,8 @@ export const useGamesStore = defineStore("games", {
         await this.getPaging(this.pagination?.current_page || 1);
         return true;
       } catch (err) {
-        this.error = err.response?.data?.errors?.osztalyNev?.[0] || err.message;
-        throw err;
+      this.error = err.response?.data?.errors || err.message;
+      throw err;
       } finally {
         this.loading = false;
       }

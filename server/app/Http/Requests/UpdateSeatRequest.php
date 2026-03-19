@@ -30,16 +30,6 @@ class UpdateSeatRequest extends FormRequest
                 'required',
                 'exists:sectors,id'
             ],
-            'seat_number' => [
-                'required',
-                'integer',
-                'min:1',
-                // Egyediség: Adott szektoron belül ne legyen két azonos seat_number, 
-                // de a jelenlegi székünket (ID alapján) hagyja figyelmen kívül.
-                Rule::unique('seats')->where(function ($query) {
-                    return $query->where('sector_id', $this->sector_id);
-                })->ignore($seatId),
-            ],
             'row' => [
                 'required',
                 'integer',
@@ -63,11 +53,6 @@ class UpdateSeatRequest extends FormRequest
         return [
             'sector_id.required'   => 'The sector selection is required.',
             'sector_id.exists'     => 'The selected sector does not exist.',
-
-            'seat_number.required' => 'The seat number is required.',
-            'seat_number.integer'  => 'The seat number must be an integer.',
-            'seat_number.min'      => 'The seat number must be at least 1.',
-            'seat_number.unique'   => 'This seat number is already assigned to another seat in this sector.',
 
             'row.required'         => 'The row number is required.',
             'row.integer'          => 'The row must be an integer.',

@@ -3,7 +3,11 @@
     <!-- oldal fejléc -->
     <div class="team-header mb-3">
       <div class="team-header-center">
-        <Pagination :useCollectionStore="useCollectionStore" />
+        <Pagination
+          :useCollectionStore="useCollectionStore"
+          firstTitle="First page"
+          lastTitle="Last page"
+        />
       </div>
 
       <div class="team-header-right d-flex align-items-center">
@@ -17,9 +21,7 @@
         <p class="m-0 ms-2 records-pill">{{ getItemsLength }} rekord</p>
 
         <!-- sor/oldal -->
-        <SetSelectedPerPage
-         :useCollectionStore="useCollectionStore" 
-        />
+        <SetSelectedPerPage :useCollectionStore="useCollectionStore" label="Rows per page:" />
       </div>
     </div>
 
@@ -42,7 +44,7 @@
     <div v-else style="width: 100px" class="m-auto">Nincs találat</div>
 
     <!-- Form -->
-    <FormSport
+    <FormTeam
       ref="form"
       :title="title"
       :item="item"
@@ -52,6 +54,10 @@
     <!-- Confirm modal -->
     <ConfirmModal
       :isOpenConfirmModal="isOpenConfirmModal"
+      title="Confirm delete"
+      message="Are you sure you want to delete this team?"
+      cancel="Cancel"
+      confirm="Delete"
       @cancel="cancelHandler"
       @confirm="confirmHandler"
     />
@@ -67,7 +73,7 @@ import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
 import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
-import FormSport from "@/components/Forms/FormSport.vue";
+import FormTeam from "@/components/Forms/FormTeam.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
 import SetSelectedPerPage from "@/components/Pagination/SetSelectedPerPage.vue";
 export default {
@@ -77,7 +83,7 @@ export default {
     GenericTable,
     ConfirmModal,
     ButtonsCrudCreate,
-    FormSport,
+    FormTeam,
     Pagination,
     SetSelectedPerPage,
   },
@@ -94,7 +100,6 @@ export default {
       tableColumns: [
         // { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
         { key: "id", label: "ID", debug: 2 },
-        { key: "team_logo", label: "Logo", debug: 2, type: "image" },
         { key: "team_name", label: "Team_Name", debug: 2 },
         { key: "team_city", label: "Team_City", debug: 2 },
       ],
@@ -150,14 +155,14 @@ export default {
     },
     updateHandler(id) {
       this.state = "u";
-      this.title = "Adatmódosítás";
+      this.title = "Edit Team";
       this.getById(id);
       this.$refs.form.show();
       console.log("update:", id);
     },
     createHandler() {
       this.state = "c";
-      this.title = "Új adatbevitel";
+      this.title = "New Team";
       this.clearItem();
       this.$refs.form.show();
       console.log("Create:");

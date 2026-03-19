@@ -14,9 +14,4 @@ class SeatFactory extends Factory
     {
 
     }
-
-    /**
-     * Generate a unique seat combination (seat_number + row + col)
-     */
-   
 }

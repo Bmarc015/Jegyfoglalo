@@ -84,9 +84,14 @@
                   </div>
                 </div>
                 <div v-if="match.venue" class="match-venue">{{ match.venue }}</div>
-                <button class="btn btn-sm btn-outline-primary mt-3" @click="openMapModal(match)">
+                <button
+                  v-if="isLoggedIn"
+                  class="btn btn-sm btn-outline-primary mt-3"
+                  @click="handleBuyTickets(match)"
+                >
                   Buy Tickets
                 </button>
+                <p v-else class="text-muted small mt-3 mb-0">Please sign in to purchase tickets.</p>
               </div>
             </article>
           </div>
@@ -106,9 +111,11 @@
 </template>
 
 <script>
+import { mapState } from "pinia";
 import gameService from "@/api/gameService";
 import { resolveTeamLogo } from "@/constants/teamLogos";
 import TicketMapModal from "@/components/Modal/TicketMapModal.vue";
+import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 
 export default {
   name: "BuyTicketsView",
@@ -126,6 +133,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(useUserLoginLogoutStore, ["isLoggedIn"]),
     selectedMonthLabel() {
       if (!this.weekDays.length) return "";
       const baseDate = new Date(`${this.weekDays[0].fullDate}T00:00:00`);
@@ -136,13 +144,54 @@ export default {
     },
   },
   async mounted() {
-    const today = new Date();
-    this.selectedWeek = this.getISOWeekValue(today);
-    this.generateWeekDays(this.getISOWeekStartDate(today));
     await this.fetchGames();
+    const nextMatchDate = this.getNextMatchDate();
+    const baseDate = nextMatchDate ?? new Date();
+    this.selectedWeek = this.getISOWeekValue(baseDate);
+    const startOfWeek = this.getISOWeekStartDate(baseDate);
+    this.generateWeekDays(startOfWeek);
+    if (nextMatchDate) {
+      const targetIso = nextMatchDate.toISOString().split("T")[0];
+      const dayIndex = this.weekDays.findIndex((day) => day.fullDate === targetIso);
+      this.selectedDay = dayIndex >= 0 ? dayIndex : 0;
+    } else {
+      const today = new Date();
+      this.selectedDay = (today.getDay() + 6) % 7; // Monday=0 ... Sunday=6
+    }
     this.loadMatches();
+    this.applyRouteMatchFocus();
   },
   methods: {
+    applyRouteMatchFocus() {
+      const matchId = this.$route?.query?.matchId;
+      if (!matchId || !Array.isArray(this.allGames)) return;
+
+      const targetGame = this.allGames.find(
+        (game) => String(game?.id) === String(matchId),
+      );
+      if (!targetGame?.game_date) return;
+
+      const datePart = String(targetGame.game_date).split(" ")[0];
+      const targetDate = new Date(`${datePart}T00:00:00`);
+      if (Number.isNaN(targetDate.getTime())) return;
+
+      const startOfWeek = this.getISOWeekStartDate(targetDate);
+      this.selectedWeek = this.getISOWeekValue(targetDate);
+      this.generateWeekDays(startOfWeek);
+      const dayIndex = this.weekDays.findIndex((day) => day.fullDate === datePart);
+      this.selectedDay = dayIndex >= 0 ? dayIndex : 0;
+      this.loadMatches();
+
+      const mappedMatch = this.matches.find(
+        (match) => String(match?.id) === String(matchId),
+      );
+      if (mappedMatch) {
+        this.openMapModal(mappedMatch);
+      }
+    },
+    handleBuyTickets(match) {
+      this.openMapModal(match);
+    },
     openMapModal(match) {
       this.selectedMatch = match;
       this.showMapModal = true;
@@ -159,7 +208,7 @@ export default {
         this.weekDays.push({
           name: days[date.getDay()],
           date: date.getDate(),
-          fullDate: date.toISOString().split("T")[0],
+          fullDate: this.formatLocalDate(date),
         });
       }
     },
@@ -222,6 +271,25 @@ export default {
         this.loadingMatches = false;
       }
     },
+    getNextMatchDate() {
+      if (!Array.isArray(this.allGames) || this.allGames.length === 0) return null;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let nextDate = null;
+
+      this.allGames.forEach((game) => {
+        if (!game?.game_date) return;
+        const datePart = String(game.game_date).split(" ")[0];
+        const parsed = new Date(`${datePart}T00:00:00`);
+        if (Number.isNaN(parsed.getTime())) return;
+        if (parsed < today) return;
+        if (!nextDate || parsed < nextDate) {
+          nextDate = parsed;
+        }
+      });
+
+      return nextDate;
+    },
     getISOWeekStartDate(date) {
       const d = new Date(date);
       const day = (d.getDay() + 6) % 7;
@@ -280,6 +348,7 @@ export default {
       if (!event?.target) return;
       event.target.onerror = null;
       event.target.style.display = "none";
+      
     },
     formatTime(dateTimeValue) {
       if (!dateTimeValue) return "--:--";
@@ -295,9 +364,20 @@ export default {
         hour12: false,
       });
     },
+    formatLocalDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    },
   },
   beforeUnmount() {
     document.body.style.overflow = "";
+  },
+  watch: {
+    "$route.query.matchId"() {
+      this.applyRouteMatchFocus();
+    },
   },
 };
 </script>

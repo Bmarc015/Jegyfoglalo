@@ -8,27 +8,27 @@ use App\Models\Seat;
 
 class SeatSeeder extends Seeder
 {
-    public function run(): void
+   public function run(): void
 {
     $sectors = \App\Models\Sector::all();
+    $games = \App\Models\Game::take(1)->get(); // Csak az első meccs kap székeket
 
-    foreach ($sectors as $sector) {
-        $seats = [];
-        $seatNumber = 1;
-
-        for ($row = 1; $row <= 10; $row++) { // 10 sor szektoronként
-            for ($col = 1; $col <= 15; $col++) { // 15 oszlop szektoronként
-                $seats[] = [
-                    'sector_id'   => $sector->id,
-                    'row'         => $row,
-                    'col'         => $col,
-                    'seat_number' => $seatNumber++,
-                ];
+    foreach ($games as $game) { // Minden meccshez legeneráljuk a székeket
+        foreach ($sectors as $sector) {
+            $seats = [];
+            for ($row = 1; $row <= 10; $row++) {
+                for ($col = 1; $col <= 15; $col++) {
+                    $seats[] = [
+                        'game_id'   => $game->id,   // <--- EZ KELL BELE!
+                        'sector_id' => $sector->id,
+                        'row'       => $row,
+                        'col'       => $col,
+                        'status'    => 0,
+                    ];
+                }
             }
+            \App\Models\Seat::insert($seats);
         }
-        
-        // Egyszerre szúrjuk be a szektor székeit (gyorsabb)
-        \App\Models\Seat::insert($seats);
     }
 }
 }

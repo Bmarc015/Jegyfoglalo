@@ -54,7 +54,10 @@
               </div>
             </div>
 
-            <RouterLink class="btn btn-primary featured-buy-btn" to="/adatok/buytickets">
+            <RouterLink
+              class="btn btn-primary featured-buy-btn"
+              :to="{ path: '/adatok/buytickets', query: { matchId: match.id } }"
+            >
               Buy Tickets
             </RouterLink>
           </article>

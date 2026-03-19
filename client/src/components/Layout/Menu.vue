@@ -22,14 +22,17 @@
 
         <div id="navbarSupportedContent" class="collapse navbar-collapse">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-2">
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/about">About</RouterLink>
+            </li>
             <li class="nav-item" v-if="hasMenuAccess('/adatok/games')">
               <RouterLink class="nav-link" to="/adatok/games">Games</RouterLink>
             </li>
-            <li class="nav-item" v-if="hasMenuAccess('/adatok/teams')">
+            <li class="nav-item">
               <RouterLink class="nav-link" to="/adatok/teams">Teams</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">About</RouterLink>
+              <RouterLink class="nav-link" to="/adatok/buytickets">Game Calendar</RouterLink>
             </li>
             <li class="nav-item" v-if="hasMenuAccess('/adatok/users')">
               <RouterLink class="nav-link" to="/adatok/users">Users</RouterLink>
@@ -167,6 +170,23 @@ export default {
   color: #0800ff !important;
   font-weight: bold;
   border-bottom: 2px solid rgb(0, 17, 255);
+}
+
+.navbar-nav.me-auto .nav-item + .nav-item {
+  position: relative;
+  padding-left: 0.75rem;
+  margin-left: 0.35rem;
+}
+
+.navbar-nav.me-auto .nav-item + .nav-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1px;
+  height: 22px;
+  background-color: #d0d7e2;
+  transform: translateY(-50%);
 }
 
 .nav-item:has(.dropdown-item.router-link-active) .nav-link.dropdown-toggle {

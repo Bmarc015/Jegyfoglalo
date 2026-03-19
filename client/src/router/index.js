@@ -43,20 +43,18 @@ const router = createRouter({
           path: "teams",
           name: "teams",
           component: () => import("@/views/TeamView.vue"),
-          beforeEnter: [checkIfNotLogged],
           meta: {
             title: (route) => "Teams",
-            roles: [1,2],
+            roles: null,
           },
         },
         {
           path: "buytickets",
           name: "buytickets",
           component: () => import("@/views/BuyTicketsView.vue"),
-          beforeEnter: [checkIfNotLogged],
           meta: {
             title: (route) => "Buy Tickets",
-            roles: [1,2],
+            roles: null,
           },
         },
         {
@@ -120,7 +118,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
  
-  document.title = "Iskola - " + to.meta.title(to);
+  document.title = "TicketMaster - " + to.meta.title(to);
   //mehetsz tovább az oldalra
 
   // Megkeressük az összes meta.roles beállítást az útvonal láncban

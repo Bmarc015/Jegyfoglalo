@@ -15,7 +15,6 @@ class Seat extends Model
 
     protected $fillable = [
         'sector_id',
-        'seat_number',
         'row',
         'col'
     ];
