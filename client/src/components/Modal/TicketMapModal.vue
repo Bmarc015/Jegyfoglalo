@@ -250,18 +250,18 @@ export default {
       return { x: event.clientX, y: event.clientY };
     },
     onSvgClick(event) {
-      // 1. Megkeressük a legközelebbi olyan <g> vagy <path> elemet, aminek az ID-ja "sector-"-ral kezdődik
-      const target = event.target.closest('[id^="sector-"]');
+      const gElement = event.target.closest('g[id^="sector-"]');
 
-      if (target) {
-        // 2. Kinyerjük a számot az ID-ból (pl. "sector-121" -> "121")
-        const sectorId = target.id.replace("sector-", "");
-        console.log("Sikeres kattintás! Szektor:", sectorId);
+      if (gElement) {
+        // 1. "sector-134-3" -> "134-3"
+        let rawId = gElement.id.replace("sector-", "");
 
-        // 3. Meghívjuk a már megírt handleSectorClick-et
-        this.handleSectorClick(sectorId);
-      } else {
-        console.log("Nem szektorra kattintottál.");
+        // 2. "134-3" -> "134"
+        const finalId = rawId.split("-")[0];
+
+        console.log("Tisztított szektor ID:", finalId);
+        this.selectedSector = finalId;
+        this.handleSectorClick(finalId);
       }
     },
     handleSectorClick(id) {
@@ -360,10 +360,10 @@ export default {
         alert(response.data.message || "Sikeres mentés!");
         this.isEditMode = false;
       } catch (error) {
-        console.error("Mentési hiba:", error);
-        // Ha a Laravel küldött hibaüzenetet, azt is írjuk ki:
-        const errorMsg = error.response?.data?.error || "Hiba történt!";
-        alert("Hiba: " + errorMsg);
+        // Ha a Laravel visszaküldte a fenti JSON hibaüzenetet
+        const errorMsg = error.response?.data?.error || error.message;
+        alert("Hoppá! A szerver ezt mondja: " + errorMsg);
+        console.error("Teljes hiba objektum:", error.response);
       }
     },
   },

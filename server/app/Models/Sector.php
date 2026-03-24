@@ -9,11 +9,11 @@ class Sector extends Model
 {
     /** @use HasFactory<\Database\Factories\SectorFactory> */
     use HasFactory;
-        public $timestamps = false;
+    public $timestamps = false;
 
-        protected $fillable = [
-            'sector_number',
-            'sector_price'
-        ];
+    protected $primaryKey = 'id';
+    public $incrementing = false; // Kikapcsoljuk az auto-incrementet
+    protected $keyType = 'string'; // Megadjuk, hogy string az ID
 
+    protected $fillable = ['id', 'name', 'price'];
 }

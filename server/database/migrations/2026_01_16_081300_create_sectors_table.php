@@ -14,8 +14,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sectors', function (Blueprint $table) {
-            $table->id();
-            $table->integer('sector_number');
+            $table->string('id')->primary();
+            $table->string('sector_name')->nullable();
             $table->decimal('sector_price', 10,2)->nullable();
 
             // $table->timestamps();

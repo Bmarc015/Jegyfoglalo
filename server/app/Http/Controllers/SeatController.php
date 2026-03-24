@@ -91,42 +91,54 @@ class SeatController extends Controller
 
         // Csak azokat a székeket kérjük le, amik "aktívak" (vagy az összeset, ha úgy döntöttél)
         $seats = CurrentModel::where('game_id', $request->game_id)
-                     ->where('sector_id', $request->sector_id)
-                     ->get(['id', 'row', 'col', 'status']);
+            ->where('sector_id', $request->sector_id)
+            ->get(['id', 'row', 'col', 'status']);
 
         return response()->json($seats);
     }
     public function saveLayout(Request $request)
     {
-        $gameId = $request->game_id;
-        $sectorId = $request->sector_id;
-        $activeSeats = $request->seats; // Ez a Vue-ból érkező tömb (sor/oszlop adatokkal)
+        try {
+            $gameId = $request->input('game_id');
+            $sectorId = $request->input('sector_id');
+            $seatsData = $request->input('seats');
 
-        // 1. Töröljük a régi leosztást ehhez a meccshez és szektorhoz
-        // Így tiszta lappal indulunk, nem lesz 7,8 millióról 15 millió sorod
-        CurrentModel::where('game_id', $gameId)
-            ->where('sector_id', $sectorId)
-            ->delete();
+            // DEBUG: Ha nincs ID, azonnal szóljon
+            if (!$gameId || !$sectorId) {
+                return response()->json(['error' => "Hianyzo ID-k! Game: $gameId, Sector: $sectorId"], 422);
+            }
 
-        // 2. Az új "aktív" székek beszúrása
-        $dataToInsert = [];
-        foreach ($activeSeats as $seat) {
-            $dataToInsert[] = [
-                'game_id' => $gameId,
-                'sector_id' => $sectorId,
-                'row' => $seat['row'],
-                'col' => $seat['col'],
-                'status' => 0, // Alapból szabad
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+            \Illuminate\Support\Facades\DB::transaction(function () use ($gameId, $sectorId, $seatsData) {
+                // 1. Letakarítjuk a terepet
+                CurrentModel::where('game_id', $gameId)
+                    ->where('sector_id', $sectorId)
+                    ->delete();
+
+                // 2. Csak akkor szúrunk be, ha van mit
+                if (!empty($seatsData)) {
+                    $insertData = [];
+                    foreach ($seatsData as $seat) {
+                        $insertData[] = [
+                            'game_id'   => $gameId,
+                            'sector_id' => $sectorId,
+                            'row'       => $seat['row'],
+                            'col'       => $seat['col'],
+                            'status'    => 0,
+                            // Itt NE legyen timestamp!
+                        ];
+                    }
+
+                    // Chunk-olva biztosabb
+                    foreach (array_chunk($insertData, 200) as $chunk) {
+                        CurrentModel::insert($chunk);
+                    }
+                }
+            });
+
+            return response()->json(['message' => 'Sikeresen mentve!']);
+        } catch (\Exception $e) {
+            // Ez a sor a kulcs: visszaküldi a konkrét SQL hibát!
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        // Chunk-olva szúrjuk be, ha véletlenül túl sok lenne egyszerre
-        foreach (array_chunk($dataToInsert, 100) as $chunk) {
-            CurrentModel::insert($chunk);
-        }
-
-        return response()->json(['message' => 'Sikeres mentés!']);
     }
 }

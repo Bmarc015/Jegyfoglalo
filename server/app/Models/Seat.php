@@ -13,11 +13,7 @@ class Seat extends Model
 
     public $timestamps = false;
 
-    protected $fillable = [
-        'sector_id',
-        'row',
-        'col'
-    ];
+   protected $fillable = ['game_id', 'sector_id', 'row', 'col', 'status'];
     public function sector(): BelongsTo
     {
         return $this->belongsTo(Sector::class);
