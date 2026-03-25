@@ -22,11 +22,9 @@
       :columns="tableColumns"
       :useCollectionStore="useCollectionStore"
       :cButtonVisible="false"
-      :pButtonVisible="true"
       @delete="deleteHandler"
       @update="updateHandler"
       @create="createHandler"
-      @passwordChange="passwordChangeHandler"
       @sort="sortHandler"
       v-if="items.length > 0"
     />
@@ -129,10 +127,6 @@ export default {
       // this.clearItem();
       // this.$refs.form.show();
       // console.log("Create:");
-    },
-    passwordChangeHandler(id){
-      console.log("passwordChangeHandler", id);
-      
     },
     sortHandler(column) {
       console.log(column);

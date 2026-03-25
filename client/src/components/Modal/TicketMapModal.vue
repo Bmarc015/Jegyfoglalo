@@ -1,5 +1,10 @@
 <template>
-  <div v-if="modelValue" class="ticket-modal" @click.self="close">
+  <div
+    v-if="modelValue"
+    class="ticket-modal"
+    ref="modalContent"
+    @click.self="close"
+  >
     <div
       class="ticket-modal-panel"
       role="dialog"
@@ -47,24 +52,40 @@
               </button>
             </div>
           </div>
+          <div class="ticket-map-legend">
+            <span class="legend-title">Legend:</span>
+            <span class="legend-item">
+              <span class="legend-swatch swatch-available"></span>
+              Available
+            </span>
+            <span class="legend-item">
+              <span class="legend-swatch swatch-selected"></span>
+              Selected
+            </span>
+            <span class="legend-item">
+              <span class="legend-swatch swatch-sold"></span>
+              Sold
+            </span>
+          </div>
 
           <div
             ref="mapStage"
             class="ticket-map-stage"
+            :class="{ 'is-editing': isEditMode }"
             @mousedown="startPan"
             @mousemove="onPanMove"
             @mouseup="endPan"
             @mouseleave="endPan"
-            @touchstart.passive="startPan"
-            @touchmove="onPanMove"
-            @touchend="endPan"
           >
             <div
               class="ticket-map-scale"
+              :class="{ 'is-editing': isEditMode }"
               :style="{
-                transform: `translate(${panX}px, ${panY}px) scale(${zoomLevel})`,
+                transform: isEditMode
+                  ? 'translate(0px, 0px) scale(1)'
+                  : `translate(${panX}px, ${panY}px) scale(${zoomLevel})`,
               }"
-            >
+          >
               <div
                 v-if="!isEditMode"
                 class="ticket-map-svg"
@@ -79,25 +100,48 @@
                 @mousemove.stop
               >
                 <div class="admin-grid-header">
-                  <h4>Editing Sector: {{ selectedSector }}</h4>
+                  <h4>
+                    {{ isAdmin ? "Editing Layout:" : "Selected sector:" }}
+                    {{ selectedSector }}
+                  </h4>
                   <button class="btn-back" @click="isEditMode = false">
                     ← Back to Map
                   </button>
                 </div>
 
-                <div class="seat-grid">
+                <div
+                  class="seat-grid"
+                  @mousedown="isMouseDown = true"
+                  @mouseup="isMouseDown = false"
+                  @mouseleave="isMouseDown = false"
+                >
                   <div
                     v-for="(seat, index) in seats"
                     :key="index"
                     class="seat-dot"
-                    :class="{ 'is-active': seat.active }"
-                    @click="toggleSeat(index)"
+                    :style="{
+                      backgroundColor: getSeatColor(seat),
+                      display: !isAdmin && !seat.active ? 'none' : 'block',
+                    }"
+                    :class="{
+                      'is-sold': seat.status === 2,
+                      'is-selected': selectedSeatsForBooking.includes(seat.id),
+                    }"
+                    @mousedown="handleMouseDown(index)"
+                    @mouseenter="handleMouseEnter(index)"
+                    @click="!isAdmin && handleSeatClick(seat)"
                   >
-                    <span class="tooltip">Seat {{ index + 1 }}</span>
+                    <span class="tooltip">
+                      Row {{ seat.row }}, Col {{ seat.col }}
+                      {{ seat.status === 2 ? "(Sold)" : "" }}
+                    </span>
                   </div>
                 </div>
 
-                <div class="admin-grid-footer">
+                <div v-if="isAdmin" class="admin-grid-footer">
+                  <p class="admin-hint">
+                    Tip: Click and drag to mass select/deselect seats.
+                  </p>
                   <button class="btn-save" @click="saveLayout">
                     Save Sector Layout
                   </button>
@@ -112,7 +156,35 @@
             <h3>Match Details</h3>
             <p class="ticket-info-teams">{{ selectedMatchTeams }}</p>
             <p class="ticket-info-meta">{{ selectedMatchMeta }}</p>
-            <p class="ticket-info-hint">
+
+            <div v-if="selectedSector" class="booking-summary">
+              <hr />
+              <p><strong>Sector:</strong> {{ selectedSector }}</p>
+
+              <div v-if="!isAdmin">
+                <div
+                  v-if="selectedSeatsForBooking.length > 0"
+                  class="selection-details"
+                >
+                  <p>
+                    Selected seats:
+                    <strong>{{ selectedSeatsForBooking.length }}</strong>
+                  </p>
+                  <button class="btn-book-action" @click="bookTickets">
+                    Book Tickets Now
+                  </button>
+                </div>
+                <p v-else class="hint-text">
+                  Click on the green dots to select your seats.
+                </p>
+              </div>
+
+              <div v-else class="admin-summary">
+                <p>Status: <strong>Admin Editing Mode</strong></p>
+              </div>
+            </div>
+
+            <p v-if="!selectedSector" class="ticket-info-hint">
               Select a sector on the map to continue. Zoom in for a closer look.
             </p>
           </div>
@@ -127,6 +199,7 @@ import stadiumMapRaw from "@/assets/stadium-map.svg?raw";
 import { mapState } from "pinia";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import axios from "axios";
+
 export default {
   name: "TicketMapModal",
   props: {
@@ -150,42 +223,44 @@ export default {
       selectedSector: null,
       isEditMode: false,
       seats: [],
+      selectedSeatsForBooking: [],
+      loading: false,
       isMouseDown: false,
+      dragAction: true,
     };
   },
   computed: {
+    ...mapState(useUserLoginLogoutStore, ["item", "isLoggedIn"]),
+
+    // Automatikusan eldönti a store-ból, hogy admin-e
+    isAdmin() {
+      return this.item && Number(this.item.role) === 1;
+    },
+
     selectedMatchText() {
       if (!this.match) return "Select your sector to continue.";
-      const teams = `${this.match.homeTeam} vs ${this.match.awayTeam}`;
-      const time = this.match.time ? ` · ${this.match.time}` : "";
-      return `${teams}${time}`;
+      return `${this.match.homeTeam} vs ${this.match.awayTeam} · ${this.match.time || ""}`;
     },
     selectedMatchTeams() {
-      if (!this.match) return "--";
-      return `${this.match.homeTeam} vs ${this.match.awayTeam}`;
+      return this.match
+        ? `${this.match.homeTeam} vs ${this.match.awayTeam}`
+        : "--";
     },
     selectedMatchMeta() {
       if (!this.match) return "--";
-      const time = this.match.time ? this.match.time : "--:--";
-      const venue = this.match.venue ? this.match.venue : "Venue TBD";
-      return `${time} · ${venue}`;
-    },
-    ...mapState(useUserLoginLogoutStore, ["item", "isLoggedIn"]),
-    isAdmin() {
-      // Feltételezve, hogy a store-ban a user objektumban benne van a role
-      return this.item && Number(this.item.role) === 1;
+      return `${this.match.time || "--:--"} · ${this.match.venue || "Venue TBD"}`;
     },
   },
   watch: {
     modelValue(value) {
       if (value) {
-        this.resetView();
+        // Megvárjuk, amíg a Vue kirakja a HTML-t a képernyőre
+        this.$nextTick(() => {
+          this.resetView();
+        });
       }
       document.body.style.overflow = value ? "hidden" : "";
     },
-  },
-  beforeUnmount() {
-    document.body.style.overflow = "";
   },
   methods: {
     close() {
@@ -195,7 +270,12 @@ export default {
       this.zoomLevel = 1;
       this.panX = 0;
       this.panY = 0;
+      this.isEditMode = false;
+      this.selectedSeatsForBooking = [];
+      this.clearSectorHighlight();
     },
+
+    // --- ZOOM & PAN ---
     zoomIn() {
       this.zoomLevel = Math.min(
         this.maxZoom,
@@ -215,128 +295,149 @@ export default {
       this.$nextTick(() => this.clampPan());
     },
     startPan(event) {
-      const point = this.getEventPoint(event);
+      if (this.isEditMode) return;
+      const pt = this.getEventPoint(event);
       this.isPanning = true;
-      this.panStartX = point.x;
-      this.panStartY = point.y;
+      this.panStartX = pt.x;
+      this.panStartY = pt.y;
       this.panOriginX = this.panX;
       this.panOriginY = this.panY;
     },
     onPanMove(event) {
+      if (this.isEditMode) return;
       if (!this.isPanning) return;
-      const point = this.getEventPoint(event);
-      const dx = point.x - this.panStartX;
-      const dy = point.y - this.panStartY;
-      this.panX = this.panOriginX + dx;
-      this.panY = this.panOriginY + dy;
+      const pt = this.getEventPoint(event);
+      this.panX = this.panOriginX + (pt.x - this.panStartX);
+      this.panY = this.panOriginY + (pt.y - this.panStartY);
       this.clampPan();
     },
     endPan() {
+      if (this.isEditMode) return;
       this.isPanning = false;
     },
     clampPan() {
-      const stage = this.$refs.mapStage;
-      if (!stage) return;
-      const rect = stage.getBoundingClientRect();
-      const maxPanX = Math.max(0, (this.zoomLevel - 1) * rect.width * 0.6);
-      const maxPanY = Math.max(0, (this.zoomLevel - 1) * rect.height * 0.6);
-      this.panX = Math.max(-maxPanX, Math.min(maxPanX, this.panX));
-      this.panY = Math.max(-maxPanY, Math.min(maxPanY, this.panY));
+      /* ... a regid ... */
     },
-    getEventPoint(event) {
-      if (event?.touches?.[0]) {
-        return { x: event.touches[0].clientX, y: event.touches[0].clientY };
-      }
-      return { x: event.clientX, y: event.clientY };
+    getEventPoint(e) {
+      if (e?.touches?.[0])
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      return { x: e.clientX, y: e.clientY };
     },
+
+    // --- SVG KATTINTAS ---
     onSvgClick(event) {
       const gElement = event.target.closest('g[id^="sector-"]');
-
       if (gElement) {
-        // 1. "sector-134-3" -> "134-3"
-        let rawId = gElement.id.replace("sector-", "");
-
-        // 2. "134-3" -> "134"
-        const finalId = rawId.split("-")[0];
-
-        console.log("Tisztított szektor ID:", finalId);
-        this.selectedSector = finalId;
+        const finalId = gElement.id.replace("sector-", "").split("-")[0];
         this.handleSectorClick(finalId);
       }
     },
+
     handleSectorClick(id) {
       this.selectedSector = id;
-
-      // DEBUG: Nézzük meg, mi van a match-ben
-      console.log("Aktuális match objektum:", this.match);
-
-      if (!this.match) {
-        alert("Hiba: Nincs meccs adat átadva a modálnak!");
-        return;
-      }
-
-      // Ha a Laravel 'game'-ként küldte, próbáljuk meg azt is
-      const game_id = this.match.id || this.match.game_id;
+      this.highlightSelectedSector(id);
+      this.panX = 0;
+      this.panY = 0;
+      this.zoomLevel = 1;
+      const game_id = this.match?.id || this.match?.game_id;
 
       if (!game_id) {
-        alert("Hiba: A meccs objektumnak nincs ID-ja!");
+        alert("Hiba: Meccs ID nem talalhato!");
         return;
       }
 
-      const sector_id = id;
-      if (this.isAdmin) {
-        this.isEditMode = true;
-        this.fetchSectorSeats(game_id, sector_id);
-      }
+      this.isEditMode = true;
+      this.fetchSectorSeats(game_id, id);
     },
+    highlightSelectedSector(id) {
+      this.$nextTick(() => {
+        const root = this.$el?.querySelector(".ticket-map-svg");
+        if (!root) return;
+        root
+          .querySelectorAll('g[id^="sector-"]')
+          .forEach((node) => node.classList.remove("is-selected"));
+        const selected = root.querySelector(`g[id^="sector-${id}"]`);
+        if (selected) selected.classList.add("is-selected");
+      });
+    },
+    clearSectorHighlight() {
+      const root = this.$el?.querySelector(".ticket-map-svg");
+      if (!root) return;
+      root
+        .querySelectorAll('g[id^="sector-"]')
+        .forEach((node) => node.classList.remove("is-selected"));
+    },
+
     async fetchSectorSeats(game_id, sector_id) {
       this.loading = true;
+      this.seats = [];
       try {
-        const response = await axios.get("/api/seats-by-sector", {
-          params: { game_id, sector_id },
+        const response = await axios.get("/api/get-seats", {
+          params: {
+            game_id: game_id,
+            sector_id: sector_id,
+          },
         });
 
-        // Itt a trükk: ha a response.data egy objektum, amiben van egy 'data' vagy 'item' kulcs,
-        // akkor azt kell használni. Ha sima tömb, akkor marad az.
         const dbSeats = Array.isArray(response.data)
           ? response.data
           : response.data.data || [];
 
-        this.seats = Array.from({ length: 750 }, (_, i) => {
+        this.seats = Array.from({ length: 1000 }, (_, i) => {
           const row = Math.floor(i / 50) + 1;
           const col = (i % 50) + 1;
 
-          // Most már a dbSeats biztosan tömb, így lefut a .some()
-          const isSaved = dbSeats.some(
+          const savedSeat = dbSeats.find(
             (s) => Number(s.row) === row && Number(s.col) === col,
           );
 
           return {
-            id: i,
+            id: savedSeat ? savedSeat.id : i,
             row: row,
             col: col,
-            active: isSaved,
+            active: !!savedSeat,
+            status: savedSeat ? savedSeat.status : 0,
           };
         });
       } catch (error) {
-        console.error("Hiba a betöltéskor:", error);
-        this.generateGrid();
+        console.error("Hiba a betolteskor:", error);
       } finally {
         this.loading = false;
       }
     },
-    generateGrid() {
-      // 15x50-es üres mátrix generálása
-      this.seats = Array.from({ length: 750 }, (_, i) => ({
-        id: i,
-        active: false,
-      }));
+
+    // --- KATTINTAS A POTTYRE (Egyesitett logika) ---
+    handleSeatToggle(index) {
+      const seat = this.seats[index];
+
+      if (this.isAdmin) {
+        seat.active = !seat.active;
+      } else {
+        if (!seat.active || seat.status === 2) return;
+
+        const pos = this.selectedSeatsForBooking.indexOf(seat.id);
+        if (pos > -1) {
+          this.selectedSeatsForBooking.splice(pos, 1);
+        } else {
+          this.selectedSeatsForBooking.push(seat.id);
+        }
+      }
     },
-    toggleSeat(index) {
-      this.seats[index].active = !this.seats[index].active;
+
+    getSeatColor(seat) {
+      if (this.isAdmin) {
+        return seat.active ? "#4CAF50" : "#e0e0e0";
+      } else {
+        if (!seat.active) return "transparent";
+        if (seat.status === 2) return "#F44336";
+
+        return this.selectedSeatsForBooking.includes(seat.id)
+          ? "#2196F3"
+          : "#4CAF50";
+      }
     },
+
     async saveLayout() {
-      // 1. ELŐBB definiáljuk a változót (itt gyűjtjük össze a zöld pöttyöket)
       const selectedSeats = this.seats
         .filter((s) => s.active)
         .map((s) => ({
@@ -344,330 +445,71 @@ export default {
           col: s.col,
         }));
 
-      // 2. CSAK UTÁNA használjuk az axios-ban
-      console.log("Küldés folyamatban:", selectedSeats);
-
       try {
-        const response = await axios.post(
-          "http://localhost:8000/api/seats-save",
-          {
-            game_id: this.match.id,
-            sector_id: this.selectedSector,
-            seats: selectedSeats, // Itt már létezik a változó!
-          },
-        );
+        await axios.post("http://localhost:8000/api/seats-save", {
+          game_id: this.match.id,
+          sector_id: this.selectedSector,
+          seats: selectedSeats,
+        });
 
-        alert(response.data.message || "Sikeres mentés!");
+        alert("Layout elmentve!");
         this.isEditMode = false;
       } catch (error) {
-        // Ha a Laravel visszaküldte a fenti JSON hibaüzenetet
-        const errorMsg = error.response?.data?.error || error.message;
-        alert("Hoppá! A szerver ezt mondja: " + errorMsg);
-        console.error("Teljes hiba objektum:", error.response);
+        console.error("Szerver hiba:", error.response?.data);
+        alert("Hiba tortent a mentes soran! Nezd meg a konzolt.");
+      }
+    },
+
+    async bookTickets() {
+      if (!this.isLoggedIn) {
+        alert("Kerlek, jelentkezz be a vasarlashoz!");
+        return;
+      }
+
+      try {
+        await axios.post("/api/tickets/book", {
+          game_id: this.match.id,
+          seat_ids: this.selectedSeatsForBooking,
+          user_id: this.item.id,
+        });
+
+        alert("Sikeres foglalas!");
+        this.selectedSeatsForBooking = [];
+        this.fetchSectorSeats(this.match.id, this.selectedSector);
+      } catch (error) {
+        alert(
+          "Hiba: " + (error.response?.data?.error || "Sikertelen foglalas"),
+        );
+      }
+    },
+    handleMouseDown(index) {
+      if (!this.isAdmin) return;
+      this.isMouseDown = true;
+      this.dragAction = !this.seats[index].active;
+      this.seats[index].active = this.dragAction;
+    },
+    handleMouseEnter(index) {
+      if (this.isAdmin && this.isMouseDown) {
+        this.seats[index].active = this.dragAction;
+      }
+    },
+    handleSeatClick(seat) {
+      if (this.isAdmin) return;
+      if (!seat.active || seat.status === 2) return;
+
+      const pos = this.selectedSeatsForBooking.indexOf(seat.id);
+      if (pos > -1) {
+        this.selectedSeatsForBooking.splice(pos, 1);
+      } else {
+        this.selectedSeatsForBooking.push(seat.id);
       }
     },
   },
 };
 </script>
 
-<style scoped>
-.ticket-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(6, 16, 31, 0.6);
-  backdrop-filter: blur(6px);
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
+<style scoped src="./TicketMapModal.css"></style>
 
-.ticket-modal-panel {
-  width: 100vw;
-  height: 100vh;
-  background: #ffffff;
-  border-radius: 0;
-  box-shadow: 0 28px 60px rgba(10, 20, 40, 0.25);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
 
-.ticket-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid #e7edf6;
-  background: #f7f9fc;
-}
 
-.ticket-modal-title {
-  margin: 0;
-  font-size: 1.4rem;
-  color: #1a2d4d;
-}
 
-.ticket-modal-subtitle {
-  margin: 0.2rem 0 0;
-  color: #5a6b82;
-  font-weight: 600;
-}
-
-.ticket-modal-close {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  border: none;
-  background: #ffffff;
-  color: #1a2d4d;
-  box-shadow: 0 6px 14px rgba(10, 20, 40, 0.12);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ticket-modal-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
-  gap: 1.5rem;
-  padding: 1.5rem;
-  overflow: hidden;
-}
-
-.ticket-map-col {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  min-height: 0;
-}
-
-.ticket-map-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.ticket-map-label {
-  font-weight: 700;
-  color: #1a2d4d;
-}
-
-.ticket-zoom-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.zoom-btn {
-  border: 1px solid #c9d6ea;
-  background: #ffffff;
-  color: #163a6b;
-  padding: 0.35rem 0.7rem;
-  border-radius: 8px;
-  font-weight: 600;
-  min-width: 48px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  box-shadow: 0 4px 10px rgba(22, 58, 107, 0.08);
-}
-
-.zoom-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.ticket-map-stage {
-  flex: 1;
-  background: #f3f6fb;
-  border-radius: 16px;
-  border: 1px solid #dfe6ef;
-  overflow: auto;
-  position: relative;
-  padding: 1rem;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-}
-
-.ticket-map-stage:active {
-  cursor: grabbing;
-}
-
-.ticket-map-scale {
-  transform-origin: center center;
-  transition: transform 0.15s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100%;
-}
-
-.ticket-map-svg {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-}
-
-.ticket-map-svg :deep(svg) {
-  width: min(900px, 100%);
-  height: auto;
-  display: block;
-  user-select: none;
-}
-
-.ticket-map-svg :deep(text) {
-  user-select: none;
-}
-
-.ticket-map-svg :deep([id^="sector-"] polygon),
-.ticket-map-svg :deep([id^="sector-"] path) {
-  transition:
-    fill 0.15s ease,
-    stroke 0.15s ease;
-}
-
-.ticket-map-svg :deep([id^="sector-"]:hover polygon),
-.ticket-map-svg :deep([id^="sector-"]:hover path) {
-  fill: #2f6fed;
-  stroke: #ffffff;
-}
-
-.ticket-info-col {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.ticket-info-card {
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e1e7f0;
-  padding: 1.2rem;
-  box-shadow: 0 10px 20px rgba(10, 20, 40, 0.08);
-}
-
-.ticket-info-card h3 {
-  margin-top: 0;
-  color: #1a2d4d;
-}
-
-.ticket-info-teams {
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: #163a6b;
-}
-
-.ticket-info-meta {
-  color: #5a6b82;
-  font-weight: 600;
-}
-
-.ticket-info-hint {
-  margin-top: 1rem;
-  color: #5a6b82;
-}
-
-/* Admin Rács Stílusok */
-.admin-grid-container {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  max-width: 95%;
-}
-
-.admin-grid-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.seat-grid {
-  display: grid;
-  /* 50 oszlop, 12px-es körök */
-  grid-template-columns: repeat(50, 12px);
-  gap: 5px;
-  justify-content: center;
-  background: #f0f3f7;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #d1d9e6;
-}
-
-.seat-dot {
-  width: 12px;
-  height: 12px;
-  background-color: #cbd5e0;
-  border-radius: 50%;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s;
-}
-
-.seat-dot:hover {
-  background-color: #4a5568;
-  transform: scale(1.3);
-}
-
-.seat-dot.is-active {
-  background-color: #28a745; /* Zöld = kijelölt */
-  box-shadow: 0 0 8px rgba(40, 167, 69, 0.6);
-}
-
-/* Tooltip az ülésszámhoz hover esetén */
-.seat-dot .tooltip {
-  visibility: hidden;
-  position: absolute;
-  bottom: 150%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: black;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 10px;
-  white-space: nowrap;
-}
-
-.seat-dot:hover .tooltip {
-  visibility: visible;
-}
-
-.btn-back {
-  background: #edf2f7;
-  border: 1px solid #cbd5e0;
-  padding: 5px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.btn-save {
-  margin-top: 1.5rem;
-  width: 100%;
-  background: #1a2d4d;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-save:hover {
-  background: #2a3d5d;
-}
-
-@media (max-width: 992px) {
-  .ticket-modal-body {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

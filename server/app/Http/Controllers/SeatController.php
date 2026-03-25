@@ -83,62 +83,95 @@ class SeatController extends Controller
     }
     public function getSeats(Request $request)
     {
-        // Validáljuk a bejövő adatokat
         $request->validate([
-            'game_id' => 'required|integer',
-            'sector_id' => 'required|integer',
+            'game_id' => 'required',
+            'sector_id' => 'required',
         ]);
 
-        // Csak azokat a székeket kérjük le, amik "aktívak" (vagy az összeset, ha úgy döntöttél)
+        // Lekérjük a székeket, és "hozzácsapjuk" a hozzájuk tartozó jegyet (ha van)
+        // Ehhez feltételezzük, hogy a Seat modellben van: public function ticket() { return $this->hasOne(Ticket::class); }
         $seats = CurrentModel::where('game_id', $request->game_id)
             ->where('sector_id', $request->sector_id)
-            ->get(['id', 'row', 'col', 'status']);
+            ->with(['ticket']) // Betöltjük a kapcsolódó ticketet
+            ->get();
 
-        return response()->json($seats);
+        $formattedSeats = $seats->map(function ($seat) {
+            return [
+                'id'     => $seat->id,
+                'row'    => $seat->row,
+                'col'    => $seat->col,
+                // LOGIKA: 
+                // 1. Ha van hozzá ticket -> 2 (Sold/Piros)
+                // 2. Ha nincs ticket -> 1 (Available/Zöld)
+                'status' => $seat->ticket ? 2 : 1,
+            ];
+        });
+
+        return response()->json($formattedSeats);
     }
-    public function saveLayout(Request $request)
-    {
-        try {
-            $gameId = $request->input('game_id');
-            $sectorId = $request->input('sector_id');
-            $seatsData = $request->input('seats');
-
-            // DEBUG: Ha nincs ID, azonnal szóljon
-            if (!$gameId || !$sectorId) {
-                return response()->json(['error' => "Hianyzo ID-k! Game: $gameId, Sector: $sectorId"], 422);
+  public function saveLayout(Request $request)
+{
+    try {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            foreach ($request->seats as $seatData) {
+                // Az updateOrCreate megnézi, létezik-e már. 
+                // Ha igen, nem csinál semmit, ha nem, létrehozza.
+                CurrentModel::updateOrCreate(
+                    [
+                        'game_id'   => $request->game_id,
+                        'sector_id' => $request->sector_id,
+                        'row'       => $seatData['row'],
+                        'col'       => $seatData['col'],
+                    ],
+                    [
+                        'status'    => 1 // Alapértelmezett státusz
+                    ]
+                );
             }
+            return response()->json(['message' => 'Sikeres mentés!']);
+        });
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+    public function bookTickets(Request $request)
+    {
+        $request->validate([
+            'game_id' => 'required|integer',
+            'seat_ids' => 'required|array',
+            'user_id' => 'required|integer', // Kötelezővé tesszük
+        ]);
 
-            \Illuminate\Support\Facades\DB::transaction(function () use ($gameId, $sectorId, $seatsData) {
-                // 1. Letakarítjuk a terepet
-                CurrentModel::where('game_id', $gameId)
-                    ->where('sector_id', $sectorId)
-                    ->delete();
+        try {
+            return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+                $bookedTickets = [];
 
-                // 2. Csak akkor szúrunk be, ha van mit
-                if (!empty($seatsData)) {
-                    $insertData = [];
-                    foreach ($seatsData as $seat) {
-                        $insertData[] = [
-                            'game_id'   => $gameId,
-                            'sector_id' => $sectorId,
-                            'row'       => $seat['row'],
-                            'col'       => $seat['col'],
-                            'status'    => 0,
-                            // Itt NE legyen timestamp!
-                        ];
+                foreach ($request->seat_ids as $seatId) {
+                    // Ellenőrizzük, hogy ez a szék létezik-e egyáltalán
+                    // és nem foglalták-e le az utolsó pillanatban
+                    $isAlreadyBooked = \App\Models\Ticket::where('game_id', $request->game_id)
+                        ->where('seat_id', $seatId)
+                        ->exists();
+
+                    if ($isAlreadyBooked) {
+                        throw new \Exception("A(z) $seatId azonosítójú szék már elkelt!");
                     }
 
-                    // Chunk-olva biztosabb
-                    foreach (array_chunk($insertData, 200) as $chunk) {
-                        CurrentModel::insert($chunk);
-                    }
+                    $bookedTickets[] = \App\Models\Ticket::create([
+                        'game_id' => $request->game_id,
+                        'seat_id' => $seatId,
+                        'user_id' => $request->user_id, // Itt mentjük el a valódi júzert
+                        'status'  => 'confirmed'
+                    ]);
                 }
-            });
 
-            return response()->json(['message' => 'Sikeresen mentve!']);
+                return response()->json([
+                    'message' => 'Sikeres vásárlás!',
+                    'count' => count($bookedTickets)
+                ]);
+            });
         } catch (\Exception $e) {
-            // Ez a sor a kulcs: visszaküldi a konkrét SQL hibát!
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], 422);
         }
     }
 }

@@ -93,6 +93,8 @@ Route::get('/seats-by-sector', [SeatController::class, 'getSeatsBySector']);
 
 Route::post('/seats-save', [SeatController::class, 'saveLayout']);
 
+Route::get('/get-seats', [SeatController::class, 'getSeats']);
+
 ////////////////////////////////Sectors/////////////////////////////////////////////// 
 Route::get('sectors', [SectorController::class, 'index']);
 
@@ -150,5 +152,6 @@ Route::delete('tickets/{id}', [TicketController::class, 'destroy'])
 Route::delete('tickets/{id}', [TicketController::class, 'destroy'])
     ->middleware('auth:sanctum', 'ability:tickets:delete');
 
+Route::post('tickets/book', [SeatController::class, 'bookTickets']);
 
 //endregion

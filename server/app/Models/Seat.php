@@ -13,9 +13,15 @@ class Seat extends Model
 
     public $timestamps = false;
 
-   protected $fillable = ['game_id', 'sector_id', 'row', 'col', 'status'];
+    // App/Models/Seat.php
+    protected $fillable = ['game_id', 'sector_id', 'row', 'col', 'status'];
     public function sector(): BelongsTo
     {
         return $this->belongsTo(Sector::class);
+    }
+    public function ticket()
+    {
+        // Egy székhez egy adott meccsen egy ticket tartozik
+        return $this->hasOne(\App\Models\Ticket::class, 'seat_id');
     }
 }
