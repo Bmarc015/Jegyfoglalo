@@ -109,31 +109,33 @@ class SeatController extends Controller
 
         return response()->json($formattedSeats);
     }
-  public function saveLayout(Request $request)
-{
-    try {
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
-            foreach ($request->seats as $seatData) {
-                // Az updateOrCreate megnézi, létezik-e már. 
-                // Ha igen, nem csinál semmit, ha nem, létrehozza.
-                CurrentModel::updateOrCreate(
-                    [
+    public function saveLayout(Request $request)
+    {
+        try {
+            return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+
+                // 1. TÖRLÉS: Itt töröljük ki a szektor összes meglévő székét ehhez a meccshez
+                CurrentModel::where('game_id', $request->game_id)
+                    ->where('sector_id', $request->sector_id)
+                    ->delete();
+
+                // 2. MENTÉS: Most már jöhetnek az új székek ütközés nélkül
+                foreach ($request->seats as $seatData) {
+                    CurrentModel::create([
                         'game_id'   => $request->game_id,
                         'sector_id' => $request->sector_id,
                         'row'       => $seatData['row'],
                         'col'       => $seatData['col'],
-                    ],
-                    [
-                        'status'    => 1 // Alapértelmezett státusz
-                    ]
-                );
-            }
-            return response()->json(['message' => 'Sikeres mentés!']);
-        });
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
+                        'status'    => 1
+                    ]);
+                }
+
+                return response()->json(['message' => 'Sikeres mentés!']);
+            });
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
-}
     public function bookTickets(Request $request)
     {
         $request->validate([

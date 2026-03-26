@@ -15,5 +15,5 @@ class Sector extends Model
     public $incrementing = false; // Kikapcsoljuk az auto-incrementet
     protected $keyType = 'string'; // Megadjuk, hogy string az ID
 
-    protected $fillable = ['id', 'name', 'price'];
+    protected $fillable = ['id', 'sector_name', 'sector_price'];
 }

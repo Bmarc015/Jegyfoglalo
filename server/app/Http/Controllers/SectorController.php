@@ -37,7 +37,7 @@ class SectorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(string $id)
     {
         return $this->apiResponse(function () use ($id) {
             return CurrentModel::findOrFail($id);
@@ -48,7 +48,7 @@ class SectorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdtateCurrentModelRequest $request, int $id)
+    public function update(UpdtateCurrentModelRequest $request, string $id)
     {
         return $this->apiResponse(function () use ($request, $id) {
             $row = CurrentModel::findOrFail($id);
@@ -60,7 +60,7 @@ class SectorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-      public function destroy(int $id)
+      public function destroy(string $id)
     {
          return $this->apiResponse(function () use ($id) {
             CurrentModel::findOrFail($id)->delete();

@@ -98,8 +98,7 @@ Route::get('/get-seats', [SeatController::class, 'getSeats']);
 ////////////////////////////////Sectors/////////////////////////////////////////////// 
 Route::get('sectors', [SectorController::class, 'index']);
 
-Route::get('sectors/{id}', [SectorController::class, 'show'])
-    ->middleware('auth:sanctum', 'ability:admin');
+Route::get('sectors/{id}', [SectorController::class, 'show']);
 
 Route::post('sectors', [SectorController::class, 'store'])
     ->middleware('auth:sanctum', 'ability:admin');

@@ -23,15 +23,15 @@ class UpdateSectorRequest extends FormRequest
     public function rules(): array
     {
         // Megszerezzük a szektor ID-ját a route-ból
-        $sectorId = $this->route('sector');
+        $sectorId = $this->route('id');
 
         return [
-            'sector_number' => [
+            'sector_name' => [
                 'required',
                 'string',
                 'max:10',
                 // Ellenőrzi az egyediséget, de figyelmen kívül hagyja a jelenlegi szektort
-                Rule::unique('sectors', 'sector_number')->ignore($sectorId),
+                Rule::unique('sectors', 'sector_name')->ignore($sectorId),
             ],
             'sector_price' => [
                 'required',
@@ -43,10 +43,10 @@ class UpdateSectorRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'sector_number.required' => 'The sector number is required.',
-            'sector_number.string'   => 'The sector number must be a string.',
-            'sector_number.max'      => 'The sector number may not be longer than 10 characters.',
-            'sector_number.unique'   => 'This sector number is already assigned to another sector.',
+            'sector_name.required' => 'The sector name is required.',
+            'sector_name.string'   => 'The sector name must be a string.',
+            'sector_name.max'      => 'The sector name may not be longer than 10 characters.',
+            'sector_name.unique'   => 'This sector name is already assigned to another sector.',
 
             'sector_price.required'  => 'The sector price is required.',
             'sector_price.numeric'   => 'The price must be a numeric value.',
