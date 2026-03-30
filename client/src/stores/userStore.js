@@ -129,7 +129,7 @@ export const useUserStore = defineStore("user", {
       try {
         const newItem = await service.create(data);
         const toast = useToastStore();
-        toast.messages.push("User sikeresen létrehozva!");
+        toast.messages.push("User created successfully!");
         toast.show("Success");
         return true;
       } catch (err) {

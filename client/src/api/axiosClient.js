@@ -73,7 +73,7 @@ apiClient.interceptors.response.use(
       toastStore.show("Error");
     } else {
       // Hálózati hiba (nincs válasz)
-      toastStore.messages.push("A szerver nem elérhető.");
+      toastStore.messages.push("Server is unavailable.");
       toastStore.show("Error");
     }
 

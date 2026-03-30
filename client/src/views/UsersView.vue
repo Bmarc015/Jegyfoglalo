@@ -119,7 +119,7 @@ export default {
       console.log("update:", id);
     },
     createHandler() {
-      useToastStore().messages.push("Innen nem hozható létre user");
+      useToastStore().messages.push("Users cannot be created here.");
       useToastStore().show("Error");
       return;
       // this.state = "c";

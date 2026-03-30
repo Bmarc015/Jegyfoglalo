@@ -53,6 +53,14 @@
                 <i class="bi bi-person-plus"></i> Registration
               </RouterLink>
             </li>
+            <li class="nav-item" v-if="isLoggedIn">
+              <RouterLink class="nav-link cart-link" :to="cartMenuLink">
+                <span class="cart-icon">
+                  <i class="bi bi-cart3"></i>
+                  <span v-if="cartCount > 0" class="cart-badge">{{ cartCount }}</span>
+                </span>
+              </RouterLink>
+            </li>
             <li class="nav-item dropdown" v-if="isLoggedIn">
               <a
                 class="nav-link dropdown-toggle d-flex align-items-center"
@@ -68,14 +76,14 @@
                 <li>
                   <RouterLink class="dropdown-item" to="/profile">
                     <i class="bi bi-person-badge me-2"></i>
-                    Profil
+                    Profile
                   </RouterLink>
                 </li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
                   <button class="dropdown-item text-danger" type="button" @click="onClickLogut()">
                     <i class="bi bi-box-arrow-right me-2"></i>
-                    Kijelentkezes
+                    Sign out
                   </button>
                 </li>
               </ul>
@@ -101,6 +109,7 @@ export default {
     return {
       searchWordInput: "",
       timeout: null,
+      cartCount: 0,
     };
   },
   watch: {
@@ -119,6 +128,10 @@ export default {
     buyTicketsMenuLink() {
       if (this.isLoggedIn) return "/adatok/buytickets";
       return { path: "/login", query: { redirect: "/adatok/buytickets" } };
+    },
+    cartMenuLink() {
+      if (this.isLoggedIn) return "/checkout";
+      return { path: "/login", query: { redirect: "/checkout" } };
     },
   },
   methods: {
@@ -151,15 +164,33 @@ export default {
       const height = Math.ceil(nav.getBoundingClientRect().height);
       document.documentElement.style.setProperty("--app-menu-height", `${height + 8}px`);
     },
+    refreshCartCount() {
+      try {
+        const raw = sessionStorage.getItem("checkoutCart");
+        const parsed = raw ? JSON.parse(raw) : null;
+        const items = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
+        const count = items.reduce((sum, item) => {
+          if (Array.isArray(item?.seatIds)) return sum + item.seatIds.length;
+          if (Array.isArray(item?.seats)) return sum + item.seats.length;
+          return sum;
+        }, 0);
+        this.cartCount = count;
+      } catch (error) {
+        this.cartCount = 0;
+      }
+    },
   },
   mounted() {
     this.$nextTick(() => {
       this.updateMenuHeightVar();
     });
     window.addEventListener("resize", this.updateMenuHeightVar);
+    window.addEventListener("cart-updated", this.refreshCartCount);
+    this.refreshCartCount();
   },
   beforeUnmount() {
     window.removeEventListener("resize", this.updateMenuHeightVar);
+    window.removeEventListener("cart-updated", this.refreshCartCount);
   },
 };
 </script>
@@ -216,5 +247,40 @@ export default {
 
 .home-link {
   color: black !important;
+}
+
+.cart-link {
+  position: relative;
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.cart-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid #d0d7e2;
+  color: #17365f;
+  background: #ffffff;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #dc3545;
+  color: #fff;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  font-weight: 700;
 }
 </style>

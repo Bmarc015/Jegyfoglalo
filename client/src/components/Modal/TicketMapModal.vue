@@ -238,8 +238,8 @@
                       formattedTotalPrice
                     }}</span>
                   </div>
-                  <button class="btn-book-action mt-3" @click="bookTickets">
-                    Complete Purchase
+                  <button class="btn-book-action mt-3" @click="goToCheckout">
+                    Add to cart and checkout
                   </button>
                 </div>
               </div>
@@ -538,9 +538,7 @@ export default {
       try {
         if (!this.isLoggedIn) {
           const toast = useToastStore();
-          toast.messages.push(
-            "Bejelentkezési adat nem található a böngészőben!",
-          );
+          toast.messages.push("No login data found in the browser.");
           toast.show("Error");
           return;
         }
@@ -552,7 +550,7 @@ export default {
 
         {
           const toast = useToastStore();
-          toast.messages.push("Sikeres mentés!");
+          toast.messages.push("Saved successfully!");
           toast.show("Success");
         }
       } catch (error) {
@@ -560,12 +558,12 @@ export default {
         if (error.response?.status === 401) {
           const toast = useToastStore();
           toast.messages.push(
-            "A szerver elutasította a tokent (401 Unauthorized). Próbálj meg újra belépni!",
+            "The server rejected the token (401 Unauthorized). Please sign in again.",
           );
           toast.show("Error");
         } else {
           const toast = useToastStore();
-          toast.messages.push("Hiba történt a mentés során!");
+          toast.messages.push("An error occurred while saving.");
           toast.show("Error");
         }
       }
@@ -649,13 +647,13 @@ export default {
         });
         {
           const toast = useToastStore();
-          toast.messages.push("Layout elmentve!");
+          toast.messages.push("Layout saved!");
           toast.show("Success");
         }
         this.isEditMode = false;
       } catch (error) {
         const toast = useToastStore();
-        toast.messages.push("Szerver hiba mentéskor!");
+        toast.messages.push("Server error while saving.");
         toast.show("Error");
       }
     },
@@ -697,6 +695,77 @@ export default {
       } catch (error) {
         alert("Hiba történt a foglalás során.");
       }
+    },
+    goToCheckout() {
+      if (!this.selectedSeatsForBooking.length) return;
+      const checkoutPayload = {
+        match: {
+          id: this.match?.id ?? null,
+          homeTeam: this.match?.homeTeam ?? "",
+          awayTeam: this.match?.awayTeam ?? "",
+          time: this.match?.time ?? "",
+          date: this.match?.matchDate ?? "",
+          venue: this.match?.venue ?? "",
+        },
+        sectorName: this.sectorName,
+        sectorPrice: parseFloat(this.sectorPrice) || 0,
+        seats: this.selectedSeatDetails.map((seat) => ({
+          id: seat.id,
+          row: seat.row,
+          col: seat.col,
+        })),
+        seatIds: [...this.selectedSeatsForBooking],
+        totalPrice: this.totalPrice,
+        formattedTotalPrice: this.formattedTotalPrice,
+      };
+
+      try {
+        const raw = sessionStorage.getItem("checkoutCart");
+        const existing = raw ? JSON.parse(raw) : [];
+        const cartItems = Array.isArray(existing) ? existing : [existing];
+        const targetId = checkoutPayload.match.id;
+        const matchIndex = cartItems.findIndex(
+          (item) =>
+            String(item?.match?.id) === String(targetId) &&
+            String(item?.sectorName) === String(checkoutPayload.sectorName) &&
+            Number(item?.sectorPrice) === Number(checkoutPayload.sectorPrice),
+        );
+
+        if (matchIndex >= 0) {
+          const current = cartItems[matchIndex];
+          const mergedSeatMap = new Map();
+          [...(current.seats || []), ...checkoutPayload.seats].forEach((seat) => {
+            mergedSeatMap.set(seat.id, seat);
+          });
+          const mergedSeats = Array.from(mergedSeatMap.values());
+          const mergedSeatIds = mergedSeats.map((seat) => seat.id);
+          const totalPrice = mergedSeats.length * (checkoutPayload.sectorPrice || 0);
+          cartItems[matchIndex] = {
+            ...current,
+            seats: mergedSeats,
+            seatIds: mergedSeatIds,
+            totalPrice,
+            formattedTotalPrice: new Intl.NumberFormat("de-DE", {
+              style: "currency",
+              currency: "EUR",
+            }).format(totalPrice),
+          };
+        } else {
+          cartItems.push(checkoutPayload);
+        }
+
+        sessionStorage.setItem("checkoutCart", JSON.stringify(cartItems));
+        window.dispatchEvent(new Event("cart-updated"));
+      } catch (error) {
+        // Non-blocking: still navigate even if storage fails.
+      }
+
+      this.$emit("update:modelValue", false);
+      if (!this.isLoggedIn) {
+        this.$router.push({ path: "/login", query: { redirect: "/checkout" } });
+        return;
+      }
+      this.$router.push("/checkout");
     },
   }, // methods vége
 };

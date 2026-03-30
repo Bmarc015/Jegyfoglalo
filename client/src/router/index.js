@@ -96,6 +96,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/checkout",
+      name: "checkout",
+      component: () => import("@/views/CheckoutView.vue"),
+      beforeEnter: [checkIfNotLogged],
+      meta: {
+        title: (route) => "Checkout",
+        roles: null,
+      },
+    },
+    {
       path: "/profile",
       name: "profile",
       component: () => import("@/views/ProfileView.vue"),
@@ -139,7 +149,7 @@ router.beforeEach((to, from, next) => {
       // Ha be van lépve, de ehhez nincs joga (pl. diák admin oldalra téved)
       // Küldjük a főoldalra vagy egy "Nincs jogosultság" oldalra
       //alert("Nincs jogosultságod az oldal megtekintéséhez!");
-      useToastStore().messages.push("Ehhez az oldalhoz nincs jogod!");
+      useToastStore().messages.push("You don't have permission to view this page.");
       useToastStore().show("Error");
       next("/");
     }

@@ -157,7 +157,8 @@ export default {
       this.openMapModal(match);
     },
     openMapModal(match) {
-      this.selectedMatch = match;
+      const selectedDate = this.weekDays[this.selectedDay]?.fullDate || "";
+      this.selectedMatch = { ...match, matchDate: selectedDate };
       this.showMapModal = true;
     },
     openCalendarPicker() {

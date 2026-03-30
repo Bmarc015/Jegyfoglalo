@@ -82,7 +82,7 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
         // Törlés localStorage-ból
         localStorage.removeItem("user_data");
         const toastStore = useToastStore();
-        toastStore.messages.push("Sikeres kijelenkezés");
+        toastStore.messages.push("Signed out successfully.");
         toastStore.show("Success");
 
         return true;
