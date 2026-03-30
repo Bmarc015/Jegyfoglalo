@@ -57,14 +57,14 @@ export default {
   position: fixed;
   top: calc(var(--app-menu-height, 92px) + 14px);
   right: calc(var(--app-gutter, 18px) + 6px);
-  z-index: 1085;
-  min-width: 320px;
-  max-width: min(92vw, 430px);
+  z-index: 3000;
+  min-width: 380px;
+  max-width: min(94vw, 520px);
   display: grid;
   grid-template-columns: 4px 34px 1fr auto;
   align-items: start;
   gap: 0.65rem;
-  padding: 0.7rem 0.8rem;
+  padding: 0.9rem 1rem;
   border-radius: 12px;
   border: 1px solid #d8e2f0;
   background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
@@ -80,13 +80,13 @@ export default {
 }
 
 .toast-icon {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   background: #e9f1ff;
   color: #0b57d0;
 }
@@ -94,13 +94,14 @@ export default {
 .toast-title {
   font-weight: 700;
   color: #163a6b;
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.15rem;
+  font-size: 1.05rem;
 }
 
 .toast-message {
   color: #2b466b;
-  font-size: 0.93rem;
-  line-height: 1.3;
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
 .toast-close {

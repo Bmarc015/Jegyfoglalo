@@ -213,6 +213,18 @@
                       >{{ selectedSeatsForBooking.length }}x</span
                     >
                   </div>
+                  <div class="cart-seats">
+                    <span class="cart-seats-label">Selected seats:</span>
+                    <div class="cart-seats-list">
+                      <span
+                        v-for="seat in selectedSeatDetails"
+                        :key="seat.id"
+                        class="cart-seat-pill"
+                      >
+                        Row {{ seat.row }}, Col {{ seat.col }}
+                      </span>
+                    </div>
+                  </div>
                   <div class="d-flex justify-content-between mb-2">
                     <span>Price/seat:</span>
                     <span>{{ parseFloat(sectorPrice).toFixed(2) }} €</span>
@@ -226,7 +238,7 @@
                       formattedTotalPrice
                     }}</span>
                   </div>
-                  <button class="btn-checkout mt-3" @click="bookTickets">
+                  <button class="btn-book-action mt-3" @click="bookTickets">
                     Complete Purchase
                   </button>
                 </div>
@@ -254,6 +266,7 @@
 import stadiumMapRaw from "@/assets/stadium-map.svg?raw";
 import { mapState } from "pinia";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
+import { useToastStore } from "@/stores/toastStore";
 import apiClient from "@/api/axiosClient";
 
 export default {
@@ -275,6 +288,15 @@ export default {
       panStartY: 0,
       panOriginX: 0,
       panOriginY: 0,
+      panRafId: null,
+      panQueuedX: 0,
+      panQueuedY: 0,
+      inertiaRafId: null,
+      velocityX: 0,
+      velocityY: 0,
+      lastPanX: 0,
+      lastPanY: 0,
+      lastPanTime: 0,
       stadiumMapRaw,
       selectedSector: null,
       isEditMode: false,
@@ -321,6 +343,11 @@ export default {
         currency: "EUR",
       }).format(this.totalPrice);
     },
+    selectedSeatDetails() {
+      return this.seats
+        .filter((seat) => this.selectedSeatsForBooking.includes(seat.id))
+        .sort((a, b) => (a.row - b.row) || (a.col - b.col));
+    },
   },
   watch: {
     modelValue(value) {
@@ -340,6 +367,12 @@ export default {
       this.zoomLevel = 1;
       this.panX = 0;
       this.panY = 0;
+      this.velocityX = 0;
+      this.velocityY = 0;
+      if (this.inertiaRafId) {
+        cancelAnimationFrame(this.inertiaRafId);
+        this.inertiaRafId = null;
+      }
       this.isEditMode = false;
       this.selectedSeatsForBooking = [];
       this.clearSectorHighlight();
@@ -369,15 +402,66 @@ export default {
       this.panStartY = pt.y;
       this.panOriginX = this.panX;
       this.panOriginY = this.panY;
+      this.lastPanX = this.panX;
+      this.lastPanY = this.panY;
+      this.lastPanTime = performance.now();
+      this.velocityX = 0;
+      this.velocityY = 0;
+      if (this.inertiaRafId) {
+        cancelAnimationFrame(this.inertiaRafId);
+        this.inertiaRafId = null;
+      }
     },
     onPanMove(event) {
       if (this.isEditMode || !this.isPanning) return;
       const pt = this.getEventPoint(event);
-      this.panX = this.panOriginX + (pt.x - this.panStartX);
-      this.panY = this.panOriginY + (pt.y - this.panStartY);
+      this.panQueuedX = this.panOriginX + (pt.x - this.panStartX);
+      this.panQueuedY = this.panOriginY + (pt.y - this.panStartY);
+      if (this.panRafId) return;
+      this.panRafId = requestAnimationFrame(() => {
+        this.panX = this.panQueuedX;
+        this.panY = this.panQueuedY;
+        const now = performance.now();
+        const dt = Math.max(16, now - this.lastPanTime);
+        this.velocityX = (this.panX - this.lastPanX) / dt;
+        this.velocityY = (this.panY - this.lastPanY) / dt;
+        this.lastPanX = this.panX;
+        this.lastPanY = this.panY;
+        this.lastPanTime = now;
+        this.panRafId = null;
+      });
     },
     endPan() {
       this.isPanning = false;
+      if (this.panRafId) {
+        cancelAnimationFrame(this.panRafId);
+        this.panRafId = null;
+      }
+      this.startInertia();
+    },
+    startInertia() {
+      const friction = 0.92;
+      const minVelocity = 0.02;
+      const step = () => {
+        this.velocityX *= friction;
+        this.velocityY *= friction;
+        this.panX += this.velocityX * 16;
+        this.panY += this.velocityY * 16;
+        if (
+          Math.abs(this.velocityX) < minVelocity &&
+          Math.abs(this.velocityY) < minVelocity
+        ) {
+          this.inertiaRafId = null;
+          return;
+        }
+        this.inertiaRafId = requestAnimationFrame(step);
+      };
+      if (
+        Math.abs(this.velocityX) < minVelocity &&
+        Math.abs(this.velocityY) < minVelocity
+      )
+        return;
+      this.inertiaRafId = requestAnimationFrame(step);
     },
     getEventPoint(e) {
       if (e?.touches?.[0])
@@ -391,29 +475,36 @@ export default {
 
       // Fontos: itt definiáljuk a 'target'-et
       const targetElement = event.target.closest("path, polygon, rect, g");
+      const sectorGroup =
+        event.target.closest('g[id^="sector-"]') || targetElement;
 
       if (!targetElement) {
         console.warn("Nem szektorra kattintottál.");
         return;
       }
 
-      // Kinyerjük az ID-t (ha nincs id, megnézzük a data-name-et)
+      // Kinyerjük az ID-t (először data-name, majd a szektor csoport ID-ja)
       let sectorId =
-        targetElement.getAttribute("id") ||
-        targetElement.getAttribute("data-name");
+        targetElement.getAttribute("data-name") ||
+        sectorGroup?.getAttribute?.("id") ||
+        targetElement.getAttribute("id");
 
       if (!sectorId) {
         console.warn("Az elemnek nincs ID-ja.");
         return;
       }
 
-      // Tisztítás: sector-132-2 -> 132-2
-      sectorId = sectorId.replace("sector-", "");
+      // Tisztítás: sector-132-2 -> 132
+      sectorId = sectorId.replace("sector-", "").split("-")[0];
       this.selectedSector = sectorId;
 
       // Vizuális visszajelzés
       this.clearSectorHighlight();
-      targetElement.classList.add("is-selected");
+      if (sectorGroup?.classList) {
+        sectorGroup.classList.add("is-selected");
+      } else {
+        targetElement.classList.add("is-selected");
+      }
 
       // Adatok lekérése a szerverről
       await this.fetchSectorData(sectorId);
@@ -446,7 +537,11 @@ export default {
     async saveSectorPrice() {
       try {
         if (!this.isLoggedIn) {
-          alert("Bejelentkezési adat nem található a böngészőben!");
+          const toast = useToastStore();
+          toast.messages.push(
+            "Bejelentkezési adat nem található a böngészőben!",
+          );
+          toast.show("Error");
           return;
         }
 
@@ -455,15 +550,23 @@ export default {
           sector_price: this.sectorPrice,
         });
 
-        alert("Sikeres mentés!");
+        {
+          const toast = useToastStore();
+          toast.messages.push("Sikeres mentés!");
+          toast.show("Success");
+        }
       } catch (error) {
         console.error("Részletes hiba:", error.response);
         if (error.response?.status === 401) {
-          alert(
+          const toast = useToastStore();
+          toast.messages.push(
             "A szerver elutasította a tokent (401 Unauthorized). Próbálj meg újra belépni!",
           );
+          toast.show("Error");
         } else {
-          alert("Hiba történt a mentés során!");
+          const toast = useToastStore();
+          toast.messages.push("Hiba történt a mentés során!");
+          toast.show("Error");
         }
       }
     },
@@ -544,10 +647,16 @@ export default {
           sector_id: this.selectedSector,
           seats: selectedSeats,
         });
-        alert("Layout elmentve!");
+        {
+          const toast = useToastStore();
+          toast.messages.push("Layout elmentve!");
+          toast.show("Success");
+        }
         this.isEditMode = false;
       } catch (error) {
-        alert("Szerver hiba mentéskor!");
+        const toast = useToastStore();
+        toast.messages.push("Szerver hiba mentéskor!");
+        toast.show("Error");
       }
     },
 
@@ -594,4 +703,6 @@ export default {
 </script>
 
 <style scoped src="../../assets/TicketMapModal.css"></style>
+
+
 

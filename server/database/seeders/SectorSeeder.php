@@ -46,7 +46,7 @@ class SectorSeeder extends Seeder
                 ['id' => $cleandId], // Itt már fixen csak a "134" lesz
                 [
                     'sector_name'  => $cleandId,
-                    'sector_price' => 0
+                    'sector_price' => random_int(110, 1100)
                 ]
             );
             $count++;

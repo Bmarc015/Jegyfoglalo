@@ -30,7 +30,7 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="profile-city">Település</label>
+          <label class="form-label" for="profile-city">City</label>
           <input
             id="profile-city"
             v-model.trim="form.billing_city"
@@ -41,7 +41,7 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="profile-zip">Irányítószám</label>
+          <label class="form-label" for="profile-zip">Zip</label>
           <input
             id="profile-zip"
             v-model.trim="form.billing_zip"
@@ -54,12 +54,12 @@
             @blur="zipTouched = true"
           />
           <div v-if="zipTouched && !isZipValid" class="invalid-feedback d-block">
-            Az irányítószám csak számokat tartalmazhat.
+            Zip code must contain only numbers.
           </div>
         </div>
 
         <div class="mb-3 profile-grid-span-2">
-          <label class="form-label" for="profile-address">Cím</label>
+          <label class="form-label" for="profile-address">Address</label>
           <input
             id="profile-address"
             v-model.trim="form.billing_address"

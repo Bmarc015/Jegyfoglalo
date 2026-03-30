@@ -1,5 +1,6 @@
 <svg id="svg-stadium" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
         viewBox="0 0 800 776">
+        <rect x="0" y="0" width="800" height="776" fill="#0b1220" />
         <defs>
             <style>
                 .cls-1 {
@@ -32,7 +33,12 @@
                 .cls-5,
                 .cls-6 {
                     fill: #1d1d1b;
-                    font-family: ArialNarrow, Arial;
+                    font-family: Arial, sans-serif;
+                    font-weight: 700;
+                    paint-order: stroke fill;
+                    stroke: #ffffff;
+                    stroke-width: 3px;
+                    stroke-linejoin: round;
                 }
 
                 .cls-4 {
@@ -50,7 +56,15 @@
                 .cls-7 {
                     font-size: 20.83px;
                     fill: gray;
-                    font-family: ArialMT, Arial;
+                    font-family: Arial, sans-serif;
+                    font-weight: 700;
+                    paint-order: stroke fill;
+                    stroke: #ffffff;
+                    stroke-width: 3px;
+                    stroke-linejoin: round;
+                }
+                text {
+                    pointer-events: none;
                 }
 
                 .cls-8 {
@@ -92,6 +106,9 @@
                     stroke-width: 2px;
                     fill-rule: evenodd;
                     cursor: default;
+                }
+                #svg-stadium {
+                    background: #0b1220;
                 }
             </style>
             <clipPath id="clip-path">

@@ -263,6 +263,7 @@
   cursor: default;
 }
 
+
 .ticket-map-scale {
   transform-origin: center center;
   transition: transform 0.25s ease;
@@ -310,9 +311,7 @@
 .ticket-map-svg :deep([id^="sector-"]:hover path) {
   fill: #2f6fed;
   stroke: #ffffff;
-  filter: drop-shadow(0 6px 12px rgba(47, 111, 237, 0.35));
 }
-
 .ticket-map-svg :deep([id^="sector-"].is-selected polygon),
 .ticket-map-svg :deep([id^="sector-"].is-selected path) {
   fill: #123d86;
@@ -354,6 +353,39 @@
 .ticket-info-hint {
   margin-top: 1rem;
   color: #5a6b82;
+}
+
+.cart-seats {
+  margin: 0.35rem 0 0.6rem;
+}
+
+.cart-seats-label {
+  display: block;
+  font-weight: 700;
+  color: #1a2d4d;
+  font-size: 0.9rem;
+}
+
+.cart-seats-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  max-height: 120px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.cart-seat-pill {
+  background: #ffffff;
+  border: 1px solid #d7e1f0;
+  color: #17365f;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 6px 14px rgba(22, 58, 107, 0.08);
 }
 
 /* Admin layout */
