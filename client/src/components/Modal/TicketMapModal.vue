@@ -116,12 +116,29 @@
                   @mouseleave="isMouseDown = false"
                 >
                   <div
+                    v-for="col in seatCols"
+                    :key="`col-${col}`"
+                    class="seat-label col-label"
+                    :style="{ gridRow: 1, gridColumn: col + 1 }"
+                  >
+                    {{ col }}
+                  </div>
+                  <div
+                    v-for="row in seatRows"
+                    :key="`row-${row}`"
+                    class="seat-label row-label"
+                    :style="{ gridRow: row + 1, gridColumn: 1 }"
+                  >
+                    {{ row }}
+                  </div>
+                  <div
                     v-for="(seat, index) in seats"
                     :key="index"
                     class="seat-dot"
                     :style="{
                       backgroundColor: getSeatColor(seat),
-                      display: !isAdmin && !seat.active ? 'none' : 'block',
+                      gridRow: seat.row + 1,
+                      gridColumn: seat.col + 1,
                     }"
                     :class="{
                       'is-sold': seat.status === 2,
@@ -132,8 +149,11 @@
                     @click="!isAdmin && handleSeatClick(seat)"
                   >
                     <span class="tooltip">
-                      Row {{ seat.row }}, Col {{ seat.col }}
-                      {{ seat.status === 2 ? "(Sold)" : "" }}
+                      <template v-if="!seat.active">Unavailable</template>
+                      <template v-else>
+                        Row {{ seat.row }}, Col {{ seat.col }}
+                        {{ seat.status === 2 ? "(Sold)" : "" }}
+                      </template>
                     </span>
                   </div>
                 </div>
@@ -142,7 +162,34 @@
                   <p class="admin-hint">
                     Tip: Click and drag to mass select/deselect seats.
                   </p>
-                  <button class="btn-save" @click="saveLayout">
+                  <div class="admin-range-tools">
+                    <div class="admin-range-field">
+                      <label>Row range</label>
+                      <input
+                        v-model="rangeRowInput"
+                        type="text"
+                        placeholder="e.g. 1-10"
+                      />
+                    </div>
+                    <div class="admin-range-field">
+                      <label>Column range</label>
+                      <input
+                        v-model="rangeColInput"
+                        type="text"
+                        placeholder="e.g. 5-20"
+                      />
+                    </div>
+                    <button class="btn-range" @click="applySeatRange">
+                      Fill Range
+                    </button>
+                    <button class="btn-range btn-range-unfill" @click="unfillSeatRange">
+                      Unfill Range
+                    </button>
+                    <button class="btn-range btn-range-reset" @click="resetSeatRange" :disabled="!rangeSnapshot">
+                      Reset Range
+                    </button>
+                  </div>
+                  <button type="button" class="btn-save" @click.prevent="saveLayout">
                     Save Sector Layout
                   </button>
                 </div>
@@ -189,6 +236,7 @@
                       Save
                     </button>
                   </div>
+
                 </div>
                 <p v-if="sectorError" class="admin-error">
                   {{ sectorError }}
@@ -309,6 +357,9 @@ export default {
       dragAction: true,
       sectorPrice: 0,
       sectorName: "",
+      rangeRowInput: "",
+      rangeColInput: "",
+      rangeSnapshot: null,
     };
   },
   computed: {
@@ -347,6 +398,12 @@ export default {
       return this.seats
         .filter((seat) => this.selectedSeatsForBooking.includes(seat.id))
         .sort((a, b) => (a.row - b.row) || (a.col - b.col));
+    },
+    seatCols() {
+      return 50;
+    },
+    seatRows() {
+      return Math.max(0, Math.ceil(this.seats.length / this.seatCols));
     },
   },
   watch: {
@@ -624,7 +681,7 @@ export default {
       if (this.isAdmin) {
         return seat.active ? "#4CAF50" : "#e0e0e0";
       } else {
-        if (!seat.active) return "transparent";
+        if (!seat.active) return "#cbd5e1";
         if (seat.status === 2) return "#F44336"; // Eladott: Piros
         return this.selectedSeatsForBooking.includes(seat.id)
           ? "#2196F3"
@@ -677,6 +734,70 @@ export default {
       } else {
         this.selectedSeatsForBooking.push(seat.id);
       }
+    },
+    parseRangeInput(value) {
+      if (!value) return null;
+      const cleaned = String(value).trim();
+      if (!cleaned) return null;
+      const parts = cleaned.split("-").map((p) => p.trim()).filter(Boolean);
+      const nums = parts.map((p) => Number(p)).filter((n) => !Number.isNaN(n));
+      if (!nums.length) return null;
+      const min = Math.min(...nums);
+      const max = Math.max(...nums);
+      return { min, max };
+    },
+    applySeatRange() {
+      const rowRange = this.parseRangeInput(this.rangeRowInput);
+      const colRange = this.parseRangeInput(this.rangeColInput);
+      if (!rowRange || !colRange) return;
+      this.rangeSnapshot = this.seats.map((seat) => ({
+        row: seat.row,
+        col: seat.col,
+        active: seat.active,
+      }));
+      this.seats.forEach((seat) => {
+        if (
+          seat.row >= rowRange.min &&
+          seat.row <= rowRange.max &&
+          seat.col >= colRange.min &&
+          seat.col <= colRange.max
+        ) {
+          seat.active = true;
+        }
+      });
+    },
+    unfillSeatRange() {
+      const rowRange = this.parseRangeInput(this.rangeRowInput);
+      const colRange = this.parseRangeInput(this.rangeColInput);
+      if (!rowRange || !colRange) return;
+      this.rangeSnapshot = this.seats.map((seat) => ({
+        row: seat.row,
+        col: seat.col,
+        active: seat.active,
+      }));
+      this.seats.forEach((seat) => {
+        if (
+          seat.row >= rowRange.min &&
+          seat.row <= rowRange.max &&
+          seat.col >= colRange.min &&
+          seat.col <= colRange.max
+        ) {
+          seat.active = false;
+        }
+      });
+    },
+    resetSeatRange() {
+      if (!this.rangeSnapshot) return;
+      const snapshotMap = new Map(
+        this.rangeSnapshot.map((seat) => [`${seat.row}-${seat.col}`, seat.active]),
+      );
+      this.seats.forEach((seat) => {
+        const key = `${seat.row}-${seat.col}`;
+        if (snapshotMap.has(key)) {
+          seat.active = snapshotMap.get(key);
+        }
+      });
+      this.rangeSnapshot = null;
     },
     async bookTickets() {
       if (!this.isLoggedIn) {
@@ -772,6 +893,3 @@ export default {
 </script>
 
 <style scoped src="../../assets/TicketMapModal.css"></style>
-
-
-

@@ -415,6 +415,31 @@ export default {
     width: 100%;
     justify-content: center;
   }
+
+  .team-header-right {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .team-search {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .team-header-right {
+    gap: 0.5rem;
+  }
+
+  .team-search :deep(.input-group) {
+    width: 100%;
+  }
+
+  .team-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .team-grid {

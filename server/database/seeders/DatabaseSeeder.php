@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
         DB::statement('DELETE FROM tickets');
         DB::statement('DELETE FROM games');
         DB::statement('DELETE FROM teams');
-        // DB::statement('DELETE FROM seats');
-        // DB::statement('DELETE FROM sectors');
+        DB::statement('DELETE FROM seats');
+        DB::statement('DELETE FROM sectors');
         DB::statement('DELETE FROM users');
 
 
@@ -29,10 +29,10 @@ class DatabaseSeeder extends Seeder
         //Ami Seeder osztály itt fel van sorolva, annak lefut a run() metódusa
         $this->call([
             UserSeeder::class,    // Felhasználók (szerepkörök miatt)
-            // SectorSeeder::class,  // Szektorok (alaprajzhoz)
+            SectorSeeder::class,  // Szektorok (alaprajzhoz)
             TeamSeeder::class,    // Csapatok (kell a meccshez)
             GameSeeder::class,    // Meccsek (kell a székekhez/jegyekhez)
-            // SeatSeeder::class,    // Székek (amiket most generáltunk az adminnal)
+            SeatSeeder::class,    // Székek (amiket most generáltunk az adminnal)
         ]);
     }
 }

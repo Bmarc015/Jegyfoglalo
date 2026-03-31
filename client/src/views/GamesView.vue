@@ -169,6 +169,9 @@ export default {
         this.resetSearchWord();
       }
     },
+    showMapModal(value) {
+      if (!value) this.checkingTicketsId = null;
+    },
   },
   data() {
     return {
@@ -261,6 +264,7 @@ export default {
     },
     onClickSearchButton() {
       this.setSearchWord(this.searchWordInput);
+      this.getPaging(1);
     },
     cancelHandler() {
       console.log("mégsem törlök");
@@ -296,11 +300,6 @@ export default {
   async mounted() {
     this.resetSearchWord();
     await this.getPaging(1);
-  },
-  watch: {
-    showMapModal(value) {
-      if (!value) this.checkingTicketsId = null;
-    },
   },
 };
 </script>
@@ -411,6 +410,37 @@ export default {
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
+  }
+
+  .team-header-right {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .team-search {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .team-header-right {
+    gap: 0.5rem;
+  }
+
+  .team-search :deep(.input-group) {
+    width: 100%;
+  }
+
+  .game-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .game-card-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 

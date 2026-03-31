@@ -2,20 +2,34 @@
 
 /* Seat grid (shared) */
 .seat-grid {
-  --seat-size: clamp(6px, 1.1vw, 12px);
+  --seat-size: clamp(5px, 0.85vw, 10px);
   --seat-gap: clamp(2px, 0.35vw, 5px);
+  --label-size: clamp(8px, 1.2vw, 14px);
   display: grid;
-  grid-template-columns: repeat(50, var(--seat-size));
+  grid-template-columns: var(--label-size) repeat(50, var(--seat-size));
+  grid-template-rows: var(--label-size);
+  grid-auto-rows: var(--seat-size);
   gap: var(--seat-gap);
-  padding: 20px;
+  padding: 14px;
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
   border-radius: 8px;
-  width: 100%;
+  width: max-content;
+  max-width: 100%;
   justify-content: center;
   align-content: center;
   user-select: none;
   overflow: hidden;
+}
+
+.seat-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
 }
 
 .seat-dot {
@@ -84,7 +98,8 @@
   box-shadow: 0 28px 60px rgba(10, 20, 40, 0.25);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .ticket-modal-header {
@@ -126,7 +141,7 @@
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
   gap: 1.5rem;
   padding: 1.5rem;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Map column */
@@ -250,7 +265,7 @@
   touch-action: none;
   user-select: none;
   min-height: clamp(420px, 68vh, 760px);
-  max-height: calc(100vh - 220px);
+  max-height: none;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
@@ -390,14 +405,14 @@
 
 /* Admin layout */
 .admin-grid-container {
-  --seat-size: clamp(6px, 0.95vw, 11px);
-  --seat-gap: clamp(2px, 0.3vw, 4px);
+  --seat-size: clamp(5px, 0.8vw, 10px);
+  --seat-gap: clamp(2px, 0.28vw, 4px);
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  max-width: 980px;
-  width: 100%;
+  max-width: 1200px;
+  width: min(1200px, 100%);
   height: 100%;
   max-height: 100%;
   display: flex;
@@ -432,6 +447,7 @@
   border: 1px solid #d1d9e6;
   width: 100%;
   padding: 16px;
+  overflow: visible;
 }
 
 .admin-grid-footer {
@@ -446,6 +462,74 @@
   margin: 0;
   color: #5a6b82;
   font-weight: 600;
+}
+
+.admin-range-tools {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+  align-items: end;
+}
+
+.admin-range-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-range-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1a2d4d;
+}
+
+.admin-range-field input {
+  border: 1px solid #c9d6ea;
+  border-radius: 10px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.btn-range {
+  border: 1px solid #c9d6ea;
+  background: #ffffff;
+  color: #17365f;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  font-weight: 700;
+  min-width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(22, 58, 107, 0.12);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.btn-range:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(22, 58, 107, 0.16);
+  background: #f3f7ff;
+}
+
+.btn-range-reset {
+  border-color: #f1d0d0;
+  color: #8a1f11;
+  background: #fff5f5;
+}
+
+.btn-range-unfill {
+  border-color: #e7d8f3;
+  color: #4b1a7a;
+  background: #f7f1ff;
+}
+
+.btn-range-reset:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .admin-price-editor {
@@ -549,9 +633,25 @@
   .ticket-modal-body {
     grid-template-columns: 1fr;
   }
+  .ticket-modal-panel {
+    height: 100vh;
+  }
+  .ticket-map-stage {
+    min-height: 50vh;
+  }
+  .ticket-info-col {
+    order: 2;
+  }
+  .ticket-map-col {
+    order: 1;
+  }
 }
 
 @media (max-width: 800px) {
+  .ticket-modal-body {
+    padding: 1rem;
+    gap: 1rem;
+  }
   .ticket-map-toolbar {
     align-items: flex-start;
   }
@@ -566,8 +666,8 @@
   }
 
   .ticket-map-stage {
-    min-height: 55vh;
-    max-height: calc(100vh - 260px);
+    min-height: 48vh;
+    max-height: none;
     padding: 1rem;
   }
 
@@ -578,7 +678,7 @@
 
 @media (max-width: 520px) {
   .ticket-map-stage {
-    min-height: 50vh;
+    min-height: 44vh;
     padding: 0.85rem;
   }
 
@@ -596,5 +696,15 @@
   .btn-book-action {
     min-width: 44px;
     padding: 0.4rem 0.7rem;
+  }
+  .admin-grid-container {
+    padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+  }
+  .seat-grid {
+    --seat-size: clamp(5px, 1.4vw, 9px);
+    --seat-gap: clamp(2px, 0.5vw, 4px);
+    --label-size: clamp(8px, 1.6vw, 12px);
   }
 }

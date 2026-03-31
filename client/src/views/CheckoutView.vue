@@ -199,6 +199,19 @@ export default {
         window.dispatchEvent(new Event("cart-updated"));
         this.$router.push("/adatok/buytickets");
       } catch (error) {
+        const status = error?.response?.status;
+        if (status === 422) {
+          toast.messages.push("Some seats were already sold. Please pick new seats.");
+          toast.show("Error");
+          const firstMatchId = this.cartItems[0]?.match?.id;
+          sessionStorage.removeItem("checkoutCart");
+          window.dispatchEvent(new Event("cart-updated"));
+          this.$router.push({
+            path: "/adatok/buytickets",
+            query: firstMatchId ? { matchId: firstMatchId } : {},
+          });
+          return;
+        }
         toast.messages.push("Booking failed. Please try again.");
         toast.show("Error");
       }
