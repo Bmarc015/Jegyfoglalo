@@ -25,11 +25,11 @@
             <li class="nav-item">
               <RouterLink class="nav-link" to="/about">About</RouterLink>
             </li>
-            <li class="nav-item" v-if="hasMenuAccess('/adatok/games')">
-              <RouterLink class="nav-link" to="/adatok/games">Games</RouterLink>
-            </li>
             <li class="nav-item">
               <RouterLink class="nav-link" to="/adatok/teams">Teams</RouterLink>
+            </li>
+            <li class="nav-item" v-if="hasMenuAccess('/adatok/games')">
+              <RouterLink class="nav-link" to="/adatok/games">Games</RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink class="nav-link" to="/adatok/buytickets">Game Calendar</RouterLink>

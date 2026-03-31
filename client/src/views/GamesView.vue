@@ -3,6 +3,11 @@
     <!-- oldal fejléc -->
     <div class="team-header mb-3">
       <div class="team-header-center">
+        <Pagination
+          :useCollectionStore="useCollectionStore"
+          firstTitle="First page"
+          lastTitle="Last page"
+        />
         <div class="team-search">
           <div class="input-group input-group-sm">
             <span class="input-group-text">
@@ -20,19 +25,9 @@
             </button>
           </div>
         </div>
-        <Pagination
-          :useCollectionStore="useCollectionStore"
-          firstTitle="First page"
-          lastTitle="Last page"
-        />
       </div>
 
       <div class="team-header-right d-flex align-items-center">
-        <!-- homokóra -->
-        <i
-          v-if="loading"
-          class="bi bi-hourglass-split fs-3 col-auto p-0 pe-1"
-        ></i>
         <!-- új rekord ikon -->
         <ButtonsCrudCreate v-if="!loading && crudButtonsVisible" @create="createHandler" />
         <p class="m-0 ms-2 records-pill">{{ getItemsLength }} rekord</p>
@@ -42,21 +37,78 @@
       </div>
     </div>
 
-    <!-- táblázat -->
-    <div class="table-full-bleed" v-if="items.length > 0">
-      <GenericTable
-        :items="items"
-        :columns="visibleTableColumns"
-        :useCollectionStore="useCollectionStore"
-        :cButtonVisible="crudButtonsVisible"
-        :uButtonVisible="crudButtonsVisible"
-        :dButtonVisible="crudButtonsVisible"
-        :toolsColumnVisible="crudButtonsVisible"
-        @delete="deleteHandler"
-        @update="updateHandler"
-        @create="createHandler"
-        @sort="sortHandler"
-      />
+    <div v-if="loading" class="games-loading-screen">
+      <div class="loading-card">
+        <div class="loading-spinner"></div>
+        <p>Loading games...</p>
+      </div>
+    </div>
+
+    <!-- kártyák -->
+    <div class="game-grid" v-else-if="items.length > 0">
+      <article v-for="game in items" :key="game.id" class="game-card">
+        <div class="game-card-tools">
+          <ButtonsCrud
+            v-if="crudButtonsVisible"
+            :id="game.id"
+            :cButtonVisible="false"
+            :uButtonVisible="false"
+            :dButtonVisible="crudButtonsVisible"
+            @delete="deleteHandler"
+            @update="updateHandler"
+          />
+        </div>
+
+        <div class="game-card-teams">
+          <div class="game-team">
+            <div class="game-team-logo" v-if="getGameLogo(game.team_home_name, game.team_home_logo)">
+              <img
+                :src="getGameLogo(game.team_home_name, game.team_home_logo)"
+                :alt="game.team_home_name"
+              />
+            </div>
+            <span class="game-team-name">{{ game.team_home_name }}</span>
+          </div>
+
+          <span class="game-vs">vs</span>
+
+          <div class="game-team">
+            <div class="game-team-logo" v-if="getGameLogo(game.team_away_name, game.team_away_logo)">
+              <img
+                :src="getGameLogo(game.team_away_name, game.team_away_logo)"
+                :alt="game.team_away_name"
+              />
+            </div>
+            <span class="game-team-name">{{ game.team_away_name }}</span>
+          </div>
+        </div>
+
+        <div class="game-card-footer">
+          <span class="game-date">
+            <i class="bi bi-calendar3"></i>
+            {{ game.game_date || "Date TBD" }}
+          </span>
+          <div class="game-card-actions">
+            <button
+              type="button"
+              class="game-card-action secondary"
+              @click="openMapModal(game)"
+              :disabled="checkingTicketsId === game.id"
+            >
+              <span v-if="checkingTicketsId === game.id" class="btn-spinner"></span>
+              {{ checkingTicketsId === game.id ? "Loading..." : "Check tickets" }}
+            </button>
+            <button
+              type="button"
+              class="game-card-action"
+              @click="updateHandler(game.id)"
+              v-if="crudButtonsVisible"
+            >
+              Edit game
+            </button>
+          </div>
+        </div>
+      </article>
     </div>
     <div v-else style="width: 100px" class="m-auto">Nincs találat</div>
 
@@ -78,6 +130,7 @@
       @cancel="cancelHandler"
       @confirm="confirmHandler"
     />
+    <TicketMapModal v-model="showMapModal" :match="selectedMatch" />
   </div>
 </template>
 
@@ -86,22 +139,25 @@ import { mapActions, mapState } from "pinia";
 import { useGamesStore } from "@/stores/gamesStore";
 import { useSearchStore } from "@/stores/searchStore";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
-import GenericTable from "@/components/Table/GenericTable.vue";
+import ButtonsCrud from "@/components/Table/ButtonsCrud.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
 import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
 import FormGame from "@/components/Forms/FormGame.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
 import SetSelectedPerPage from "@/components/Pagination/SetSelectedPerPage.vue";
+import { resolveTeamLogo } from "@/constants/teamLogos";
+import TicketMapModal from "@/components/Modal/TicketMapModal.vue";
 
 export default {
   name: "GamesView",
   components: {
-    GenericTable,
+    ButtonsCrud,
     ConfirmModal,
     ButtonsCrudCreate,
     FormGame,
     Pagination,
     SetSelectedPerPage,
+    TicketMapModal,
   },
   watch: {
     searchWord() {
@@ -118,17 +174,14 @@ export default {
     return {
       pageTitle: "Games",
       searchWordInput: "",
-      tableColumns: [
-        { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
-        { key: "team_home_name", label: "Home Team", debug: 2 },
-        { key: "team_away_name", label: "Away Team", debug: 2 },
-        { key: "game_date", label: "Game_Date", debug: 2 },
-      ],
       useCollectionStore: useGamesStore,
       isOpenConfirmModal: false,
       toDeleteId: null,
       state: "r",
       title: "",
+      showMapModal: false,
+      selectedMatch: null,
+      checkingTicketsId: null,
     };
   },
   computed: {
@@ -143,10 +196,6 @@ export default {
     ]),
     ...mapState(useSearchStore, ["searchWord"]),
     ...mapState(useUserLoginLogoutStore, ["role"]),
-    visibleTableColumns() {
-      if (this.role === 1) return this.tableColumns;
-      return this.tableColumns.filter((column) => column.key !== "id");
-    },
     isAdmin() {
       return this.role === 1;
     },
@@ -155,6 +204,26 @@ export default {
     },
   },
   methods: {
+    getGameLogo(teamName, logoValue) {
+      if (logoValue) {
+        const raw = String(logoValue);
+        if (raw.startsWith("http")) return raw;
+        return `/csapat%20kepek/${encodeURIComponent(raw)}`;
+      }
+      return resolveTeamLogo(teamName);
+    },
+    openMapModal(game) {
+      this.checkingTicketsId = game?.id ?? null;
+      this.selectedMatch = {
+        id: game?.id ?? game?.game_id ?? null,
+        homeTeam: game?.team_home_name ?? "",
+        awayTeam: game?.team_away_name ?? "",
+        time: game?.game_time ?? game?.time ?? "",
+        matchDate: game?.game_date ?? game?.match_date ?? "",
+        venue: game?.venue ?? "",
+      };
+      this.showMapModal = true;
+    },
     ...mapActions(useGamesStore, [
       "getAll",
       "getAllSortSearch",
@@ -228,6 +297,11 @@ export default {
     this.resetSearchWord();
     await this.getPaging(1);
   },
+  watch: {
+    showMapModal(value) {
+      if (!value) this.checkingTicketsId = null;
+    },
+  },
 };
 </script>
 
@@ -265,6 +339,7 @@ export default {
 
 .team-search {
   min-width: 260px;
+  margin-left: auto;
 }
 
 .team-search :deep(.input-group) {
@@ -339,13 +414,209 @@ export default {
   }
 }
 
-.table-full-bleed {
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 320px));
+  gap: 1.2rem;
+  justify-content: center;
+}
+
+.games-loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  margin-bottom: 1rem;
+}
+
+.loading-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #d8e2f0;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.loading-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #c7d7f5;
+  border-top-color: #0b57d0;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.game-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f6f8fb 100%);
+  border: 1px solid #e3e9f1;
+  border-radius: 18px;
+  padding: 1rem 1.1rem 0.9rem;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.game-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 55%);
+  pointer-events: none;
+}
+
+.game-card-tools {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.6rem;
+  z-index: 2;
+}
+
+.game-card-tools :deep(.crud-action-btn) {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+.game-card-tools :deep(.crud-action-btn:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
+}
+
+.game-card-tools :deep(.crud-delete) {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+}
+
+.game-card-tools :deep(.crud-update) {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #ffffff;
+}
+
+.game-card-teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.game-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  text-align: center;
+}
+
+.game-team-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+}
+
+.game-team-logo img {
   width: 100%;
-  max-width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  padding-left: 0;
-  padding-right: 0;
-  overflow-x: auto;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.game-team-name {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.98rem;
+}
+
+.game-vs {
+  font-weight: 700;
+  color: #0b57d0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.game-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  position: relative;
+  z-index: 1;
+}
+
+.game-card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.game-date {
+  color: #475569;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.game-card-action {
+  border: 0;
+  background: linear-gradient(135deg, #0d6efd 0%, #0b57d0 100%);
+  color: #fff;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(13, 110, 253, 0.25);
+}
+
+.game-card-action.secondary {
+  background: #ffffff;
+  color: #0b57d0;
+  border: 1px solid #c7d7f5;
+  box-shadow: none;
+}
+
+.game-card-action:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #c7d7f5;
+  border-top-color: #0b57d0;
+  display: inline-block;
+  margin-right: 0.45rem;
+  animation: spin 0.8s linear infinite;
 }
 </style>

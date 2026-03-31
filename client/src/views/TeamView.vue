@@ -11,35 +11,77 @@
       </div>
 
       <div class="team-header-right d-flex align-items-center">
-        <!-- homokóra -->
-        <i
-          v-if="loading"
-          class="bi bi-hourglass-split fs-3 col-auto p-0 pe-1"
-        ></i>
+        <div class="team-search">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              v-model="searchWordInput"
+              type="text"
+              class="form-control"
+              placeholder="Search teams..."
+              @keyup.enter="onClickSearchButton"
+            />
+            <button class="btn btn-primary" type="button" @click="onClickSearchButton">
+              Search
+            </button>
+          </div>
+        </div>
         <!-- új rekord ikon -->
         <ButtonsCrudCreate v-if="!loading && crudButtonsVisible" @create="createHandler" />
-        <p class="m-0 ms-2 records-pill">{{ getItemsLength }} rekord</p>
+        <p class="m-0 ms-2 records-pill">{{ getItemsLength }} Record</p>
 
         <!-- sor/oldal -->
         <SetSelectedPerPage :useCollectionStore="useCollectionStore" label="Rows per page:" />
       </div>
     </div>
 
-    <!-- táblázat -->
-    <div class="table-full-bleed" v-if="items.length > 0">
-      <GenericTable
-        :items="items"
-        :columns="visibleTableColumns"
-        :useCollectionStore="useCollectionStore"
-        :cButtonVisible="crudButtonsVisible"
-        :uButtonVisible="crudButtonsVisible"
-        :dButtonVisible="crudButtonsVisible"
-        :toolsColumnVisible="crudButtonsVisible"
-        @delete="deleteHandler"
-        @update="updateHandler"
-        @create="createHandler"
-        @sort="sortHandler"
-      />
+    <div v-if="loading" class="teams-loading-screen">
+      <div class="loading-card">
+        <div class="loading-spinner"></div>
+        <p>Loading teams...</p>
+      </div>
+    </div>
+
+    <!-- kártyák -->
+    <div class="team-grid" v-else-if="items.length > 0">
+      <article v-for="team in items" :key="team.id" class="team-card">
+        <div class="team-card-top">
+          <ButtonsCrud
+            v-if="crudButtonsVisible"
+            class="team-card-tools"
+            :id="team.id"
+            :cButtonVisible="false"
+            :uButtonVisible="false"
+            :dButtonVisible="crudButtonsVisible"
+            @delete="deleteHandler"
+            @update="updateHandler"
+          />
+        </div>
+        <div class="team-card-logo" v-if="getTeamLogo(team)">
+          <img
+            :src="getTeamLogo(team)"
+            :alt="team.team_name"
+          />
+        </div>
+        <h3 class="team-card-title">{{ team.team_name }}</h3>
+        <p class="team-card-meta">
+          <i class="bi bi-geo-alt"></i>
+          <span>{{ team.team_city }}</span>
+        </p>
+        <div class="team-card-footer">
+          <span class="team-card-id" v-if="isAdmin">#{{ team.id }}</span>
+          <button
+            type="button"
+            class="team-card-action"
+            @click="updateHandler(team.id)"
+            v-if="crudButtonsVisible"
+          >
+            Edit team
+          </button>
+        </div>
+      </article>
     </div>
     <div v-else style="width: 100px" class="m-auto">Nincs találat</div>
 
@@ -70,17 +112,18 @@ import { mapActions, mapState } from "pinia";
 import { useTeamStore } from "@/stores/teamStore";
 import { useSearchStore } from "@/stores/searchStore";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
-import GenericTable from "@/components/Table/GenericTable.vue";
+import ButtonsCrud from "@/components/Table/ButtonsCrud.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
 import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
 import FormTeam from "@/components/Forms/FormTeam.vue";
 import Pagination from "@/components/Pagination/Pagination.vue";
 import SetSelectedPerPage from "@/components/Pagination/SetSelectedPerPage.vue";
+import { resolveTeamLogo } from "@/constants/teamLogos";
 export default {
   //módosít
   name: "SportView",
   components: {
-    GenericTable,
+    ButtonsCrud,
     ConfirmModal,
     ButtonsCrudCreate,
     FormTeam,
@@ -89,13 +132,20 @@ export default {
   },
   watch: {
     searchWord() {
+      this.searchWordInput = this.searchWord;
       this.getPaging();
+    },
+    searchWordInput(value) {
+      if (!value) {
+        this.resetSearchWord();
+      }
     },
   },
   data() {
     return {
       //módosít
       pageTitle: "Teams",
+      searchWordInput: "",
       //módosít
       tableColumns: [
         // { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
@@ -135,6 +185,9 @@ export default {
     },
   },
   methods: {
+    getTeamLogo(team) {
+      return team?.team_logo || resolveTeamLogo(team?.team_name);
+    },
     //módosít
     ...mapActions(useTeamStore, [
       "getAll",
@@ -147,7 +200,7 @@ export default {
       "delete",
       "clearItem"
     ]),
-    ...mapActions(useSearchStore, ["resetSearchWord"]),
+    ...mapActions(useSearchStore, ["resetSearchWord", "setSearchWord"]),
     deleteHandler(id) {
       this.state = "d";
       this.isOpenConfirmModal = true;
@@ -170,6 +223,9 @@ export default {
     sortHandler(column) {
       console.log(column);
       this.setColumn(column);
+    },
+    onClickSearchButton() {
+      this.setSearchWord(this.searchWordInput);
     },
     cancelHandler() {
       console.log("mégsem törlök");
@@ -250,6 +306,31 @@ export default {
   padding: 0.2rem;
 }
 
+.team-search {
+  min-width: 260px;
+}
+
+.team-search :deep(.input-group) {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.team-search :deep(.input-group-text) {
+  background: #ffffff;
+  border: 1px solid #d8e2f0;
+  border-right: 0;
+  color: #0b57d0;
+}
+
+.team-search :deep(.form-control) {
+  border-color: #d8e2f0;
+}
+
+.team-search :deep(.btn) {
+  border-radius: 0;
+}
+
 .team-header-center :deep(.page-link) {
   border: 0;
   margin: 0 1px;
@@ -278,6 +359,42 @@ export default {
   margin-left: auto;
 }
 
+.teams-loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  margin-bottom: 1rem;
+}
+
+.loading-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #d8e2f0;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.loading-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #c7d7f5;
+  border-top-color: #0b57d0;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .records-pill {
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
@@ -300,13 +417,143 @@ export default {
   }
 }
 
-.table-full-bleed {
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+  gap: 1.2rem;
+  justify-content: center;
+}
+
+.team-card {
   width: 100%;
-  max-width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  padding-left: 0;
-  padding-right: 0;
-  overflow-x: auto;
+  max-width: 320px;
+  background: linear-gradient(135deg, #ffffff 0%, #f6f8fb 100%);
+  border: 1px solid #e3e9f1;
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.team-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 55%);
+  pointer-events: none;
+}
+
+.team-card-top {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 2;
+}
+
+.team-card-logo {
+  width: 68px;
+  height: 68px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.team-card-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.team-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.team-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #475569;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.team-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.team-card-id {
+  font-weight: 600;
+  color: #64748b;
+}
+
+.team-card-action {
+  border: 0;
+  background: linear-gradient(135deg, #0d6efd 0%, #0b57d0 100%);
+  color: #fff;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(13, 110, 253, 0.25);
+}
+
+.team-card-tools :deep(.crud-action-btn) {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+.team-card-tools :deep(.crud-action-btn:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
+}
+
+.team-card-tools :deep(.crud-delete) {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+}
+
+.team-card-tools :deep(.crud-update) {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #ffffff;
 }
 </style>
+
+
+
+
+
+
+
+
+
+
