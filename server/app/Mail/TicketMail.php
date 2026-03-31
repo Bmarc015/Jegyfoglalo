@@ -13,19 +13,23 @@ class TicketMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $ticket;
-    protected $pdfContent;
+    public $tickets;
+    public $orderRef;
+    public $orderTotal;
+    protected $pdfAttachments;
 
-    public function __construct($ticket, $pdfContent)
+    public function __construct($tickets, $pdfAttachments, $orderRef, $orderTotal)
     {
-        $this->ticket = $ticket;
-        $this->pdfContent = $pdfContent;
+        $this->tickets = $tickets;
+        $this->pdfAttachments = $pdfAttachments;
+        $this->orderRef = $orderRef;
+        $this->orderTotal = $orderTotal;
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Ticket purchase confirmation',
+            subject: 'Your tickets are ready',
         );
     }
 
@@ -38,9 +42,9 @@ class TicketMail extends Mailable
 
     public function attachments(): array
     {
-        return [
-            Attachment::fromData(fn () => $this->pdfContent, 'ticket.pdf')
-                ->withMime('application/pdf'),
-        ];
+        return array_map(function ($item) {
+            return Attachment::fromData(fn () => $item['content'], $item['filename'])
+                ->withMime('application/pdf');
+        }, $this->pdfAttachments);
     }
 }

@@ -166,6 +166,11 @@ class SeatController extends Controller
             });
 
             $mailErrors = [];
+            $ticketsPayload = [];
+            $pdfAttachments = [];
+            $orderRef = 'ORD-' . date('YmdHis') . '-' . $bookedTickets[0]->user_id;
+            $orderTotal = 0;
+
             foreach ($bookedTickets as $ticket) {
                 $ticket->load([
                     'game.homeTeam',
@@ -174,18 +179,63 @@ class SeatController extends Controller
                     'user'
                 ]);
 
+                $ticketsPayload[] = $ticket;
+                $orderTotal += (float) ($ticket->seat->sector->sector_price ?? 0);
+
                 try {
-                    $pdf = Pdf::loadView('ticket', compact('ticket'));
-                    Mail::to($ticket->user->email)->send(new TicketMail($ticket, $pdf->output()));
-                } catch (\Exception $mailError) {
-                    $mailErrors[] = $mailError->getMessage();
-                    Log::error('Ticket email failed', ['error' => $mailError->getMessage()]);
+                    $qrBase = implode('|', [
+                        'TICKET:' . $ticket->id,
+                        'GAME:' . $ticket->game_id,
+                        'SEAT:' . $ticket->seat_id,
+                        'USER:' . $ticket->user_id,
+                        'ORDER:' . $orderRef,
+                    ]);
+                    $qrSig = hash_hmac('sha256', $qrBase, config('app.key'));
+                    $qrPayload = $qrBase . '|SIG:' . $qrSig;
+
+                    $pdf = Pdf::loadView('ticket', [
+                        'ticket' => $ticket,
+                        'orderRef' => $orderRef,
+                        'orderTotal' => $orderTotal,
+                        'qrPayload' => $qrPayload,
+                    ]);
+                    $pdfAttachments[] = [
+                        'filename' => 'ticket-' . $ticket->id . '.pdf',
+                        'content' => $pdf->output(),
+                    ];
+                } catch (\Exception $pdfError) {
+                    $mailErrors[] = $pdfError->getMessage();
+                    Log::error('Ticket PDF failed', ['error' => $pdfError->getMessage()]);
+                }
+            }
+
+            if (count($pdfAttachments) > 0) {
+                $recipient = $bookedTickets[0]->user->email;
+                $maxAttempts = 3;
+                $sent = false;
+
+                for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+                    try {
+                        Mail::to($recipient)->send(new TicketMail($ticketsPayload, $pdfAttachments, $orderRef, $orderTotal));
+                        $sent = true;
+                        break;
+                    } catch (\Exception $mailError) {
+                        $mailErrors[] = $mailError->getMessage();
+                        Log::error('Ticket email failed', ['error' => $mailError->getMessage(), 'attempt' => $attempt]);
+                        usleep(200000);
+                    }
+                }
+
+                if (!$sent) {
+                    Log::error('Ticket email failed after retries');
                 }
             }
 
             return response()->json([
                 'message' => 'Purchase successful!',
                 'count' => count($bookedTickets),
+                'order_ref' => $orderRef,
+                'order_total' => $orderTotal,
                 'mail_errors' => $mailErrors,
             ]);
         } catch (\Exception $e) {
