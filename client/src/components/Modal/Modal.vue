@@ -66,9 +66,9 @@ import { Modal } from "bootstrap";
 export default {
   emits: ["yesEvent"],
   props: {
-    title: { type: String, default: "Modális ablak" },
-    yes: { type: String, default: "Mentés" },
-    no: { type: String, default: "Mégsem" },
+    title: { type: String, default: "Modal Window" },
+    yes: { type: String, default: "Save" },
+    no: { type: String, default: "Cancel" },
     modalSize: { type: String, default: "" },
   },
   data() {

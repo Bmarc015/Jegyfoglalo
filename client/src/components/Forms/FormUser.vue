@@ -1,12 +1,10 @@
-<template>
+﻿<template>
   <div>
     <Modal ref="modal" :title="title" @yesEvent="yesEventHandler">
-      <!-- vezérlőelemek -->
-      <!-- user név -->
+      <!-- controls -->
+      <!-- user name -->
       <div class="mb-4 row pt-2">
-        <label for="name" class="col-form-label col-auto pt-1 pe-0"
-          >User név:</label
-        >
+        <label for="name" class="col-form-label col-auto pt-1 pe-0">User name:</label>
         <div class="col">
           <input
             type="text"
@@ -20,7 +18,7 @@
             v-if="!serverErrors.name"
             class="invalid-feedback position-absolute"
           >
-            A user név kötelező
+            User name is required
           </div>
           <div
             v-if="serverErrors.name"
@@ -33,9 +31,7 @@
 
       <!-- email -->
       <div class="mb-4 row pt-2">
-        <label for="email" class="col-form-label col-auto pt-1 pe-0"
-          >Email:</label
-        >
+        <label for="email" class="col-form-label col-auto pt-1 pe-0">Email:</label>
         <div class="col">
           <input
             type="email"
@@ -49,7 +45,7 @@
             v-if="!serverErrors.email"
             class="invalid-feedback position-absolute"
           >
-            Az email kötelező
+            Email is required
           </div>
           <div
             v-if="serverErrors.email"
@@ -62,19 +58,8 @@
 
       <!-- role -->
       <div class="mb-4 row pt-2">
-        <label for="role" class="col-form-label col-auto pt-1 pe-0"
-          >Hatáskör:</label
-        >
+        <label for="role" class="col-form-label col-auto pt-1 pe-0">Role:</label>
         <div class="col">
-          <!-- <input
-            type="number"
-            class="form-control"
-            id="role"
-            v-model="formItem.role"
-            @input="clearError('role')"
-            required
-          /> -->
-
           <select
             class="form-select"
             style="width: 100px"
@@ -89,7 +74,7 @@
             v-if="!serverErrors.role"
             class="invalid-feedback position-absolute"
           >
-            A role kötelező
+            Role is required
           </div>
           <div
             v-if="serverErrors.role"
@@ -105,7 +90,6 @@
 
 <script>
 import Modal from "@/components/Modal/Modal.vue";
-// import Modal from "../Modal/Modal.vue";
 export default {
   emits: ["yesEventForm"],
   name: "FormSport",
@@ -113,7 +97,7 @@ export default {
     Modal,
   },
   props: {
-    title: { type: String, default: "Új rekord felvitele" },
+    title: { type: String, default: "Create User" },
     item: { type: Object },
   },
   data() {
@@ -123,13 +107,11 @@ export default {
     };
   },
   watch: {
-    //Fontos!!! frissülhessen a szülő által küldött item
     item(value) {
       this.formItem = { ...value };
     },
   },
   methods: {
-    //metódus továbbítás
     show() {
       this.serverErrors = {};
       this.$refs.modal.show();
