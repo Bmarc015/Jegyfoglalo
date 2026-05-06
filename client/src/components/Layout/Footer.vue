@@ -6,21 +6,11 @@
         <div class="col-md-4 mb-3 mb-md-0">
           <h5>TicketMaster</h5>
           <p class="small text-light mb-0">
-            Your one-stop destination for football tickets. 
-            Experience the thrill of live matches in Estadio Santiago Bernabéu!
+            Your one-stop destination for football tickets. Experience the
+            thrill of live matches in Estadio Santiago Bernabéu!
           </p>
         </div>
-        
-        <!-- Quick Links -->
-        <div class="col-md-4 mb-3 mb-md-0">
-          <h5>Quick Links</h5>
-          <ul class="list-unstyled mb-0">
-            <li><RouterLink to="/about" class="text-light text-decoration-none small">About Us</RouterLink></li>
-            <li><RouterLink to="/matches" class="text-light text-decoration-none small">Matches</RouterLink></li>
-            <li><RouterLink to="/login" class="text-light text-decoration-none small">Login</RouterLink></li>
-          </ul>
-        </div>
-        
+
         <!-- Contact Section -->
         <div class="col-md-4">
           <h5>Contact</h5>
@@ -32,9 +22,9 @@
           </p>
         </div>
       </div>
-      
-      <hr class="my-3">
-      
+
+      <hr class="my-3" />
+
       <!-- Copyright -->
       <div class="row">
         <div class="col-12 text-center">
@@ -52,8 +42,8 @@ export default {
   computed: {
     currentYear() {
       return new Date().getFullYear();
-    }
-  }
+    },
+  },
 };
 </script>
 

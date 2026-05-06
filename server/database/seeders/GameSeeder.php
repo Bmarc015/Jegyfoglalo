@@ -17,7 +17,7 @@ class GameSeeder extends Seeder
         }
 
         $weeksToGenerate = 10;
-        $matchesPerDay = 3;
+        $matchesPerDay = 7;
         $kickoffTimes = ['14:00:00', '16:30:00', '19:00:00', '21:00:00'];
 
         $startOfSchedule = now()->startOfWeek()->addWeek();
@@ -28,6 +28,13 @@ class GameSeeder extends Seeder
             for ($day = 0; $day < 7; $day++) {
                 $baseDate = $startOfSchedule->copy()->addWeeks($week)->addDays($day);
                 $dailyTimes = $kickoffTimes;
+                // Ha több meccs kell, generáljunk extra időpontokat
+                while (count($dailyTimes) < $matchesPerDay) {
+                    // 2 óránként új időpontot adunk hozzá
+                    $last = end($dailyTimes);
+                    $next = date('H:i:s', strtotime($last) + 7200);
+                    $dailyTimes[] = $next;
+                }
                 shuffle($dailyTimes);
 
                 for ($i = 0; $i < $matchesPerDay; $i++) {
