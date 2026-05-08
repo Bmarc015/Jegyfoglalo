@@ -4,12 +4,12 @@ Ez a dokumentum a Jegyfoglaló alkalmazáshoz tartozó kézi és automatizált t
 
 ## Tesztkörnyezet
 
-| Terület | Technológia | Helye |
-|---|---|---|
-| Backend | Laravel, PHPUnit | `server/tests` |
-| Backend kézi API teszt | REST Client / request.rest | `server/request.rest` |
-| Frontend unit teszt | Vitest, Vue Test Utils | `client/src/__tests__` |
-| Frontend E2E teszt | Cypress | `client/cypress/e2e` |
+| Terület                | Technológia                | Helye                  |
+| ---------------------- | -------------------------- | ---------------------- |
+| Backend                | Laravel, PHPUnit           | `server/tests`         |
+| Backend kézi API teszt | REST Client / request.rest | `server/request.rest`  |
+| Frontend unit teszt    | Vitest, Vue Test Utils     | `client/src/__tests__` |
+| Frontend E2E teszt     | Cypress                    | `client/cypress/e2e`   |
 
 ## Kézi teszt: pingelés REST kéréssel
 
@@ -165,15 +165,15 @@ A unit tesztek főleg az adatbázistáblák meglétét, az oszlopokat, az oszlop
 
 Fontosabb tesztfájlok:
 
-| Fájl | Mit ellenőriz? |
-|---|---|
+| Fájl               | Mit ellenőriz?                                                     |
+| ------------------ | ------------------------------------------------------------------ |
 | `DatabaseTest.php` | táblák, idegen kulcsok, kapcsolatok, dupla foglalás elleni védelem |
-| `UserTest.php` | user mezők, jelszó hash, admin szerepkör, email egyediség |
-| `TeamTest.php` | csapat létrehozása és tábla szerkezete |
-| `GameTest.php` | hazai és vendég csapat kapcsolata |
-| `SectorTest.php` | szektor létrehozása és mezők |
-| `SeatTest.php` | szék és szektor kapcsolata |
-| `TicketTest.php` | jegy létrehozása, státusz, kapcsolatok |
+| `UserTest.php`     | user mezők, jelszó hash, admin szerepkör, email egyediség          |
+| `TeamTest.php`     | csapat létrehozása és tábla szerkezete                             |
+| `GameTest.php`     | hazai és vendég csapat kapcsolata                                  |
+| `SectorTest.php`   | szektor létrehozása és mezők                                       |
+| `SeatTest.php`     | szék és szektor kapcsolata                                         |
+| `TicketTest.php`   | jegy létrehozása, státusz, kapcsolatok                             |
 
 Tipikus unit teszt mintakód:
 
@@ -220,15 +220,15 @@ Magyarázat: a teszt belépteti a felhasználót, lekéri a tokent, meghív egy 
 
 A `PingTest.php` több végpontot is ellenőriz:
 
-| Végpont | Tesztelt működés |
-|---|---|
-| `GET /api/teams` | csapatok lekérése |
-| `GET /api/sectors` | szektorok lekérése |
-| `GET /api/games` | mérkőzések lekérése |
-| `GET /api/tickets` | jegyek lekérése tokennel |
-| `GET /api/users` | admin jogosultság ellenőrzése |
-| `POST /api/teams` | admin létrehozási jogosultság |
-| `POST /api/games` | admin létrehozási jogosultság |
+| Végpont            | Tesztelt működés              |
+| ------------------ | ----------------------------- |
+| `GET /api/teams`   | csapatok lekérése             |
+| `GET /api/sectors` | szektorok lekérése            |
+| `GET /api/games`   | mérkőzések lekérése           |
+| `GET /api/tickets` | jegyek lekérése tokennel      |
+| `GET /api/users`   | admin jogosultság ellenőrzése |
+| `POST /api/teams`  | admin létrehozási jogosultság |
+| `POST /api/games`  | admin létrehozási jogosultság |
 
 ## Backend teszteredmény
 
@@ -265,13 +265,13 @@ PASS Tests\Feature\PingTest
 
 A javított backend tesztek az aktuális migrációkhoz igazodnak:
 
-| Terület | Ellenőrzött működés |
-|---|---|
-| Szektorok | `id`, `sector_name`, `sector_price` mezők, string alapú szektorazonosító |
-| Székek | `game_id`, `sector_id`, sor, oszlop, státusz, valamint a szektor kapcsolat |
-| Jegyek | user, meccs és szék kapcsolat, dupla foglalás elleni egyedi kulcs |
-| API jogosultság | admin írhat/törölhet, sima felhasználó nem fér hozzá admin műveletekhez |
-| Ping végpont | `GET /api/x` elérhetőségi teszt |
+| Terület         | Ellenőrzött működés                                                        |
+| --------------- | -------------------------------------------------------------------------- |
+| Szektorok       | `id`, `sector_name`, `sector_price` mezők, string alapú szektorazonosító   |
+| Székek          | `game_id`, `sector_id`, sor, oszlop, státusz, valamint a szektor kapcsolat |
+| Jegyek          | user, meccs és szék kapcsolat, dupla foglalás elleni egyedi kulcs          |
+| API jogosultság | admin írhat/törölhet, sima felhasználó nem fér hozzá admin műveletekhez    |
+| Ping végpont    | `GET /api/x` elérhetőségi teszt                                            |
 
 Következtetés: a backend automatizált tesztcsomag sikeresen lefutott, a unit, funkcionális és end-point tesztek zöldek.
 
@@ -279,10 +279,10 @@ Következtetés: a backend automatizált tesztcsomag sikeresen lefutott, a unit,
 
 A frontend két teszttípust tartalmaz:
 
-| Teszt fajta | Eszköz | Helye |
-|---|---|---|
-| Unit teszt | Vitest + Vue Test Utils | `client/src/__tests__/App.spec.js` |
-| E2E teszt | Cypress | `client/cypress/e2e/example.cy.js` |
+| Teszt fajta | Eszköz                  | Helye                              |
+| ----------- | ----------------------- | ---------------------------------- |
+| Unit teszt  | Vitest + Vue Test Utils | `client/src/__tests__/App.spec.js` |
+| E2E teszt   | Cypress                 | `client/cypress/e2e/example.cy.js` |
 
 ### Vitest unit teszt
 
@@ -302,7 +302,7 @@ npm.cmd run test:unit -- --run > ../teszt-eredmeny-frontend-vitest.txt
 Mintakód:
 
 ```js
-it('megjeleníti az alkalmazás fő szerkezeti elemeit', () => {
+it("megjeleníti az alkalmazás fő szerkezeti elemeit", () => {
   const wrapper = shallowMount(App, {
     global: {
       stubs: {
@@ -314,12 +314,12 @@ it('megjeleníti az alkalmazás fő szerkezeti elemeit', () => {
         },
       },
     },
-  })
+  });
 
-  expect(wrapper.findComponent({ name: 'Menu' }).exists()).toBe(true)
-  expect(wrapper.find('[data-test="router-view"]').exists()).toBe(true)
-  expect(wrapper.findComponent({ name: 'Footer' }).exists()).toBe(true)
-})
+  expect(wrapper.findComponent({ name: "Menu" }).exists()).toBe(true);
+  expect(wrapper.find('[data-test="router-view"]').exists()).toBe(true);
+  expect(wrapper.findComponent({ name: "Footer" }).exists()).toBe(true);
+});
 ```
 
 Magyarázat: a teszt nem a teljes alkalmazást rendereli, hanem az `App.vue` fő szerkezetét vizsgálja. Ellenőrzi, hogy a menü, a router nézet és a lábléc megjelenik-e.
@@ -358,13 +358,13 @@ npm.cmd run test:e2e:dev
 Mintakód:
 
 ```js
-describe('Jegyfoglaló felület', () => {
-  it('betölti a főoldalt', () => {
-    cy.visit('/')
-    cy.contains('h1', 'Welcome to TicketMaster!')
-    cy.contains('a', 'Buy Tickets').should('be.visible')
-  })
-})
+describe("Jegyfoglaló felület", () => {
+  it("betölti a főoldalt", () => {
+    cy.visit("/");
+    cy.contains("h1", "Welcome to TicketMaster!");
+    cy.contains("a", "Buy Tickets").should("be.visible");
+  });
+});
 ```
 
 Magyarázat: az E2E teszt böngészőben nyitja meg az alkalmazást, majd ellenőrzi, hogy a főoldali cím és a jegyvásárlás link látható-e.
@@ -399,16 +399,19 @@ Javasolt fájlnevek:
 ```text
 screenshots/backend-phpunit-result.png
 screenshots/frontend-vitest-result.png
-screenshots/frontend-cypress-result.png
+screenshots/rest-ping-result.png
+screenshots/rest-login-result.png
 ```
 
 A dokumentációban ezek így hivatkozhatók:
 
-```md
 ![Backend PHPUnit eredmény](screenshots/backend-phpunit-result.png)
+
 ![Frontend Vitest eredmény](screenshots/frontend-vitest-result.png)
-![Frontend Cypress eredmény](screenshots/frontend-cypress-result.png)
-```
+
+![REST ping eredmény](screenshots/rest-ping-result.png)
+
+![REST bejelentkezés eredmény](screenshots/rest-login-result.png)
 
 ## Összegzés
 
