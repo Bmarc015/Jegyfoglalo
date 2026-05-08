@@ -1,163 +1,111 @@
-### változók
-@protocol = http://
+### Változók
+@protocol = http
 @hostname = localhost
 @port = 8000
-@host = {{protocol}}{{hostname}}:{{port}}
-### @token = 12|ibiwTdr77o8ppToh1tBxIkckBNb8ECjIjLgaweTaa757cdef
+@host = {{protocol}}://{{hostname}}:{{port}}
 
+### Pingelés - az API elérhetőségének ellenőrzése
+GET {{host}}/api/x
+Accept: application/json
 
-### login
+### Bejelentkezés
 # @name login
 POST {{host}}/api/users/login
 Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "lakatosronaldo@example.com",
-    "password": "1234"
+  "email": "admin@example.com",
+  "password": "123"
 }
 
-###
+### Token kinyerése a bejelentkezés válaszából
 @token = {{login.response.body.data.token}}
 
-### logout user
-POST  {{host}}/api/users/logout
+### Kijelentkezés
+POST {{host}}/api/users/logout
 Accept: application/json
 Authorization: Bearer {{token}}
 
-
-### get users
-GET  {{host}}/api/users
+### Csapatok listázása
+GET {{host}}/api/teams
 Accept: application/json
-Authorization: Bearer {{token}}
 
-### get user by id
-GET  {{host}}/api/users/1
+### Csapat létrehozása - admin token szükséges
+POST {{host}}/api/teams
 Accept: application/json
-Authorization: Bearer {{token}}
-
-### post user
-POST {{host}}/api/users 
 Content-Type: application/json
-Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name":  "Lakatos Ronaldo",
-    "email": "lakatosronaldo@example.com",
-    "password": "1234",
-    "role": "1"
+  "team_name": "Új Csapat",
+  "team_city": "Budapest"
 }
 
-### patch user
-PATCH {{host}}/api/users/2
-Content-Type: application/json
+### Csapat módosítása - admin token szükséges
+PATCH {{host}}/api/teams/1
 Accept: application/json
+Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "No Boss"
+  "team_name": "Módosított Csapat",
+  "team_city": "Győr"
 }
 
-### delete user
-DELETE {{host}}/api/users/2
-Content-Type: application/json
+### Csapat törlése - admin token szükséges
+DELETE {{host}}/api/teams/1
 Accept: application/json
 Authorization: Bearer {{token}}
 
-
-### User csak önmagát törölheti
-DELETE {{host}}/api/usersme
-Content-Type: application/json
+### Mérkőzések listázása
+GET {{host}}/api/games
 Accept: application/json
-Authorization: Bearer {{token}}
 
-### A bejelentkezett user a jelszavát módosítja
-PATCH {{host}}/api/usersme
-Content-Type: application/json
+### Mérkőzés létrehozása - admin token szükséges
+POST {{host}}/api/games
 Accept: application/json
+Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "vasarlo2",
-    "email": "vasarlo2@example.com"
+  "team_home_id": 1,
+  "team_away_id": 2,
+  "game_date": "2026-09-21 19:00:00"
 }
 
-### A bejelentkezett user egy adatát módosítja. A role tiltott
-PATCH {{host}}/api/usersme
-Content-Type: application/json
+### Szektorok listázása
+GET {{host}}/api/sectors
 Accept: application/json
+
+### Szektor létrehozása - admin token szükséges
+POST {{host}}/api/sectors
+Accept: application/json
+Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-     "name": "admin1"
+  "id": "T901",
+  "sector_name": "T901",
+  "sector_price": 12000
 }
 
-### A bejelnkezett felhasználó jelszó cseréje
-PATCH {{host}}/api/usersmeupdatepassword
-Content-Type: application/json
+### Székek listázása
+GET {{host}}/api/seats
+Accept: application/json
+
+### Jegyek listázása - bejelentkezés szükséges
+GET {{host}}/api/tickets
 Accept: application/json
 Authorization: Bearer {{token}}
+
+### Jegyfoglalás
+POST {{host}}/api/tickets/book
+Accept: application/json
+Content-Type: application/json
 
 {
-    "oldpassword": "ronaldo",
-    "newpassword": "123",
-    "newpassword_confirmation": "123"
-}
-
-### A bejelentkezett user önmagát lekérheti
-GET  {{host}}/api/usersme
-Accept: application/json
-Authorization: Bearer {{token}}
-
-
-
-### teszt
-get {{host}}/api/x
-
-### get products
-get {{host}}/api/products
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-
-### get product by id
-get {{host}}/api/products/1
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-### post products
-POST  {{host}}/api/products
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "category": "Bogyós",
-    "name": "f3333xx",
-    "description": "Kézzel termelt egészség",
-    "picture": "https:\/\/hur.webmania.cc\/img\/malna.jpg",
-    "price": 8000,
-    "stock": 22
-}
-
-### delete product by id
-delete {{host}}/api/products/104
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-
-### post products
-PATCH {{host}}/api/products/1
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-
-{
-    "price": 1002,
-    "stock": "eee"
+  "game_id": 1,
+  "user_id": 1,
+  "seat_ids": [1, 2]
 }
